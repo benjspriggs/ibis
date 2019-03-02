@@ -1,0 +1,7 @@
+{
+    "extends": "tslint:recommended",
+    "$schema": "https://raw.githubusercontent.com/SchemaStore/schemastore/master/src/schemas/json/tslint.json",
+    "linterOptions": {
+        "exclude": ["dist/*", "node_modules/*"]
+    }
+}

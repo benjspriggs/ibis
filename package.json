@@ -3,19 +3,19 @@
   "version": "1.0.0",
   "description": "Web version of IBIS (MedicineWorks)",
   "scripts": {
-    "start": "concurrently --kill-others \"npm:serve:api\" \"npm:serve:app\"",
-    "serve:api": "node dist/api/index.js",
-    "serve:app": "node dist/index.js",
+    "start": "concurrently --kill-others \"npm:start:api\" \"npm:start:app\"",
+    "start:api": "node dist/api/index.js",
+    "start:app": "node dist/index.js",
     "watch:app": "nodemon dist/index.js",
     "watch:api": "nodemon dist/api/index.js",
-    "build": "tsc",
+    "build": "npm run build:ts && npm run build:copy",
+    "build:ts": "tsc",
+    "build:copy": "gulp copy",
     "test": "npm run build && ava",
+    "watch": "npm run build:copy && concurrently --kill-others \"npm:watch:ts\" \"npm:watch:api\" \"npm:watch:app\" \"npm:watch:copy\"",
     "watch:ts": "tsc -w",
     "watch:copy": "gulp watch",
-    "tslint": "tslint -c tslint.json -p tsconfig.json",
-    "watch": "npm run build:copy && concurrently --kill-others \"npm:watch:ts\" \"npm:watch:api\" \"npm:watch:app\" \"npm:watch:copy\"",
-    "build:copy": "gulp copy",
-    "build:bundle": "browserify dist/public/scripts/app.js > dist/public/scripts/main.js"
+    "tslint": "tslint src/**/*.ts -t verbose"
   },
   "repository": {
     "type": "git",

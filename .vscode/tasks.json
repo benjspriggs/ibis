@@ -12,7 +12,7 @@
         },
         {
             "type": "npm",
-            "script": "tslint",
+            "script": "lint",
             "problemMatcher": {
                 "owner": "javascript",
                 "fileLocation": ["relative", "${workspaceFolder}"],

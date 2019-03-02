@@ -15,7 +15,9 @@
     "watch": "npm run build:copy && concurrently --kill-others \"npm:watch:ts\" \"npm:watch:api\" \"npm:watch:app\" \"npm:watch:copy\"",
     "watch:ts": "tsc -w",
     "watch:copy": "gulp watch",
-    "tslint": "tslint src/**/*.ts -t verbose"
+    "lint": "npm run lint:ts",
+    "lint:ts": "tslint src/**/*.ts -t verbose",
+    "lint:ts:fix": "tslint src/**/*.ts -t verbose --fix"
   },
   "repository": {
     "type": "git",
@@ -64,6 +66,7 @@
     "gulp-newer": "^1.4.0",
     "supertest": "^3.4.2",
     "tslint": "^5.13.0",
+    "tslint-eslint-rules": "^5.4.0",
     "typescript": "^3.3.3333"
   },
   "nodemonConfig": {

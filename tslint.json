@@ -1,7 +1,21 @@
 {
-    "extends": "tslint:recommended",
     "$schema": "https://raw.githubusercontent.com/SchemaStore/schemastore/master/src/schemas/json/tslint.json",
+    "extends": [
+        "tslint-eslint-rules"
+    ],
     "linterOptions": {
-        "exclude": ["dist/*", "node_modules/*"]
+        "exclude": [
+            "dist/*",
+            "node_modules/*"
+        ]
+    },
+    "rules": {
+        "semi": false,
+        "no-constant-condition": true,
+        "sort-imports": true,
+        "quotemark": [
+            true,
+            "avoid-escape"
+        ]
     }
 }

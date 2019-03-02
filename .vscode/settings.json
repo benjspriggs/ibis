@@ -1,0 +1,4 @@
+{
+    "sort-imports.on-save": false,
+    "sort-imports.default-sort-style": "eslint"
+}

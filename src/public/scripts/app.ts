@@ -1,4 +1,3 @@
-import './reload'
 import './semantic.api'
 import { CategorizedSearchResult, SearchResult } from '../../api/db'
 import { Searchable } from 'fomantic-ui'

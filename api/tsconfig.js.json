@@ -2,7 +2,9 @@
     "extends": "../tsconfig.json",
     "compilerOptions": {
         "outDir": "dist",
+        "declaration": false,
+        "declarationMap": false,
         "allowJs": true
     },
-    "exclude": ["**/*.ts"]
+    "include": ["src/**/*.js", "src/**/*.d.ts"]
 }

@@ -5,9 +5,9 @@
   "main": "dist/index.js",
   "scripts": {
     "start": "npm run build && npm run serve",
-    "serve": "cd dist && node index.js",
+    "serve": "cd dist && node start.js",
     "test": "ava",
-    "build": "tsc && tsc --project tsconfig.js.json"
+    "build": "tsc --project tsconfig.json && tsc --project tsconfig.js.json"
   },
   "author": "Ben Spriggs",
   "license": "ISC",

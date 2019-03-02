@@ -14,14 +14,18 @@ app.use(cors())
 
 app.use(requestLogger)
 
-app.engine(".hbs", exhbs.express4({
+const hbsConfig = {
     "defaultLayout": path.join(__dirname, "views", "layouts", "default"),
     "extname": ".hbs",
-    "layoutsDir": "dist/views/layouts",
-    "partialsDir": "dist/views/partials"
-}))
+    "layoutsDir": "views/layouts",
+    "partialsDir": "views/partials"
+}
 
-app.set("views", "dist/views")
+console.log('using', hbsConfig);
+
+app.engine(".hbs", exhbs.express4(hbsConfig))
+
+app.set("views", "views")
 
 app.set("view engine", ".hbs")
 

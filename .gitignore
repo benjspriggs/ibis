@@ -1,6 +1,6 @@
 IBIS-Mac*
-node_modules
-dist
-semantic/*
-data/*
+node_modules/
+dist/
+semantic/
+data/
 db.json

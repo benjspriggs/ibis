@@ -1,13 +1,14 @@
-import express from 'express'
-import fs from 'fs'
-import path from 'path'
-import { isEmpty } from 'lodash'
-import { Header, getModality, parseHeaderFromFile } from '../common'
-import { parse, HTMLElement, Node, TextNode } from 'node-html-parser'
+import { HTMLElement, Node, TextNode, parse } from "node-html-parser"
+import { Header, getModality, parseHeaderFromFile } from "../common"
+
+import express from "express"
+import fs from "fs"
+import { isEmpty } from "lodash"
+import path from "path"
 
 const nodeMatches = (condition: RegExp) => (node: Node) => condition.test(node.rawText)
 const childrenContainsDefinitionText = (condition: RegExp) => (node: Node): boolean => node.childNodes.some(nodeMatches(condition))
-const emptyNode = (node: Node) => node.rawText.trim() === ''
+const emptyNode = (node: Node) => node.rawText.trim() === ""
 
 export function getFileInfo(absoluteFilePath: string, modality: string, listing: string[]): Promise<{ filename: string, header: Header }[]> {
     const promises = listing.map(async (filename: string) => ({
@@ -55,7 +56,7 @@ const trimEmptyNodes = (root: Node): Node | undefined => {
         root.childNodes = []
     } else {
         const trimmedNodes = root.childNodes.map(trimEmptyNodes)
-        root.childNodes = trimmedNodes.filter(n => typeof n !== 'undefined')
+        root.childNodes = trimmedNodes.filter(n => typeof n !== "undefined")
     }
 
     return root
@@ -102,7 +103,7 @@ const trimLeft = (condition: RegExp) => {
             const body = root as HTMLElement;
 
             if (body.childNodes.length === 0 && contains(body)) {
-                console.log('found text: ', body.text)
+                console.log("found text: ", body.text)
                 return body;
             }
 
@@ -130,7 +131,7 @@ export default (options: { endpoint: string, absoluteFilePath: string, trimLeftP
 
     const afterDefinition = options.trimLeftPattern ? trimLeft(options.trimLeftPattern) : (root: Node) => root
 
-    router.get('/:modality/:file', (req, res) => {
+    router.get("/:modality/:file", (req, res) => {
         const {
             modality,
             file
@@ -175,7 +176,7 @@ export default (options: { endpoint: string, absoluteFilePath: string, trimLeftP
 
     const filepath = (req: express.Request, modality: string, filename: string) => resolved(req, `${options.endpoint}/${modality}/${filename}`)
 
-    router.get('/:modality', addModalityListingToLocals(options.absoluteFilePath), async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    router.get("/:modality", addModalityListingToLocals(options.absoluteFilePath), async (req: express.Request, res: express.Response, next: express.NextFunction) => {
         const {
             modality
         } = req.params
@@ -184,7 +185,7 @@ export default (options: { endpoint: string, absoluteFilePath: string, trimLeftP
             const meta = (await getFileInfo(options.absoluteFilePath, modality, res.locals.listing))
                 .map(x => ({ filepath: filepath(req, modality, x.filename), ...x}))
 
-            const empty = meta.filter((infoObject) => isEmpty(infoObject.header) || Object.values(infoObject.header).some(val => typeof val === 'undefined'))
+            const empty = meta.filter((infoObject) => isEmpty(infoObject.header) || Object.values(infoObject.header).some(val => typeof val === "undefined"))
 
             res.send({
                 modality: {

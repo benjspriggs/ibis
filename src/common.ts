@@ -1,8 +1,8 @@
-import './promises'
-import { flatten } from 'lodash'
-import { readFileSync } from 'fs'
-import { parse, HTMLElement, TextNode, Node } from 'node-html-parser'
-import { RequestHandler, Request, NextFunction } from 'express'
+import { HTMLElement, Node, TextNode, parse } from "node-html-parser"
+import { NextFunction, Request, RequestHandler } from "express"
+
+import { flatten } from "lodash"
+import { readFileSync } from "fs"
 
 export interface Modality {
     code: string,
@@ -14,34 +14,34 @@ export interface ModalityData {
 }
 
 export const modalities: { [code: string]: ModalityData } = {
-    'acup': {
+    "acup": {
         displayName: "Acupuncture"
     },
-    'bota': {
+    "bota": {
         displayName: "Botanical Medicine"
     },
-    'chin': {
+    "chin": {
         displayName: "Chinese Medicine"
     },
-    'diag': {
+    "diag": {
         displayName: "Diagnostic"
     },
-    'home': {
+    "home": {
         displayName: "Homeopathy"
     },
-    'inte': {
+    "inte": {
         displayName: "WHO TF KNOWS"
     },
-    'nutr': {
+    "nutr": {
         displayName: "Nutrition"
     },
-    'phys': {
+    "phys": {
         displayName: "Physical Medicine"
     },
-    'psyc': {
+    "psyc": {
         displayName: "Psychology (?)"
     },
-    'vibr': {
+    "vibr": {
         displayName: "Vibrators? Who tf knows"
     },
 }
@@ -75,7 +75,7 @@ const possibleNodes = (node: Node) => {
 
     return flatten(node.childNodes
         .map(flattenNode)
-        .filter(nodeText => nodeText.every(text => text !== '')))
+        .filter(nodeText => nodeText.every(text => text !== "")))
 }
 
 export interface Header {
@@ -86,8 +86,8 @@ export interface Header {
 }
 
 export function parseHeaderFromFile(filepath: string): Header {
-    if (typeof filepath === 'undefined') {
-        throw new Error('undefined filepath')
+    if (typeof filepath === "undefined") {
+        throw new Error("undefined filepath")
     }
 
     const buffer = readFileSync(filepath)
@@ -148,7 +148,7 @@ export const requestLogger: RequestHandler = (req: Request, _, next: NextFunctio
             date: new Date(),
             path: req.path,
             query: req.query,
-            'user-agent': req.headers['user-agent'],
+            "user-agent": req.headers["user-agent"],
         }))
     next()
 }

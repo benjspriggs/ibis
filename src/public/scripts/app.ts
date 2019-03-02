@@ -1,6 +1,6 @@
-import './semantic.api'
-import { CategorizedSearchResult, SearchResult } from '../../api/db'
-import { Searchable } from 'fomantic-ui'
+import "./semantic.api"
+import { CategorizedSearchResult, SearchResult } from "../../api/db"
+import { Searchable } from "fomantic-ui"
 
 declare var $: JQueryStatic
 
@@ -11,33 +11,33 @@ function formatBackendResource(url: string) {
         _,
         first,
         ...rest
-     ] = u.pathname.split('/')
+     ] = u.pathname.split("/")
 
-     if (first === 'rx') {
-         return `/materia-medica/${rest.join('/')}`
-     } else if (first == 'tx') {
-         return `/therapeutics/${rest.join('/')}`
+     if (first === "rx") {
+         return `/materia-medica/${rest.join("/")}`
+     } else if (first == "tx") {
+         return `/therapeutics/${rest.join("/")}`
      } else {
-         throw new Error('unknown: ' + first)
+         throw new Error("unknown: " + first)
      }
 }
 
 $(document).ready(() => {
-    $('#modality-menu-toggle').click(() => {
-        let menu: any = $('#modality-menu') as any;
+    $("#modality-menu-toggle").click(() => {
+        let menu: any = $("#modality-menu") as any;
         if (menu) {
-            menu.sidebar('toggle')
+            menu.sidebar("toggle")
         }
     });
 
-    ($('.ui.button.htm-link') as any).api({
+    ($(".ui.button.htm-link") as any).api({
         encodeParameters: false,
         onSuccess: (data: any) => {
             console.dir(data)
         }
     });
 
-    ($('.ui.search') as Searchable).search({
+    ($(".ui.search") as Searchable).search({
         apiSettings: {
             onResponse: (data: SearchResult) => {
                 return ({
@@ -53,8 +53,8 @@ $(document).ready(() => {
         }
     });
 
-    ($('.ui.search.categorize') as Searchable).search({
-        type: 'category',
+    ($(".ui.search.categorize") as Searchable).search({
+        type: "category",
         apiSettings: {
             onResponse: (data: CategorizedSearchResult) => {
                 return ({

@@ -1,3 +1,4 @@
-import { AdapterAsync } from 'lowdb'
+import { AdapterAsync } from "lowdb"
+
 declare const BetterFileAsync: AdapterAsync
 export = BetterFileAsync

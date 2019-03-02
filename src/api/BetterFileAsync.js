@@ -1,6 +1,5 @@
 'use strict';
 
-import '../promises'
 import FileAsync from 'lowdb/adapters/FileAsync'
 import pify from 'pify'
 import write from 'write-file-atomic'
@@ -10,6 +9,10 @@ const readFile = pify(fs.readFile);
 const writeFile = pify(write);
 
 const whitespace = /^\s*$/.compile()
+
+function empty() {
+
+}
 
 class BetterFileAsync extends FileAsync {
     async read() {

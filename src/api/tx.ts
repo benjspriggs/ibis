@@ -1,10 +1,10 @@
-import '../promises'
-import express from 'express'
-import config from './config'
-import file from './file'
-import fs from 'fs'
-import path from 'path'
-import { parseHeaderFromFile, Header } from '../common';
+import { Header, parseHeaderFromFile } from "../common";
+
+import config from "./config"
+import express from "express"
+import file from "./file"
+import fs from "fs"
+import path from "path"
 
 const router = express.Router()
 
@@ -37,15 +37,15 @@ const allInfo: () => Promise<TreatmentListing[]> = async () => {
     return listing
 }
 
-router.get('/treatments', (_, res: express.Response) => {
+router.get("/treatments", (_, res: express.Response) => {
     allInfo().then((treatmentListing) => {
         res.send([].concat(...treatmentListing.map(t => t.treatments)))
     })
 })
 
-router.use('/', file({
-    endpoint: 'tx',
-    absoluteFilePath: config.relative.ibisRoot('system', 'tx')
+router.use("/", file({
+    endpoint: "tx",
+    absoluteFilePath: config.relative.ibisRoot("system", "tx")
 }))
 
 export default router

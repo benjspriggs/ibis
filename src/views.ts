@@ -1,7 +1,7 @@
-import express from 'express'
-import path from 'path'
-import { fetchFromAPI } from './helpers'
-import { modalities } from './common'
+import express from "express"
+import { fetchFromAPI } from "./helpers"
+import { modalities } from "./common"
+import path from "path"
 
 export const menuItems: {
     destination: string,
@@ -12,28 +12,28 @@ export const menuItems: {
     route?: string
 }[] = [
         {
-            destination: '',
-            title: 'Home'
+            destination: "",
+            title: "Home"
         },
         {
-            destination: 'therapeutics',
-            title: 'Therapeutics',
+            destination: "therapeutics",
+            title: "Therapeutics",
             needs_modalities: true,
-            route: 'tx'
+            route: "tx"
         },
         {
-            destination: 'materia-medica',
-            title: 'Materia Medica',
+            destination: "materia-medica",
+            title: "Materia Medica",
             needs_modalities: true,
-            route: 'rx'
+            route: "rx"
         },
         {
-            destination: 'contact',
-            title: 'Contact'
+            destination: "contact",
+            title: "Contact"
         },
         {
-            destination: 'https://github.com/benjspriggs/ibis',
-            title: 'Source',
+            destination: "https://github.com/benjspriggs/ibis",
+            title: "Source",
             external: true
         },
     ]
@@ -46,10 +46,10 @@ export const getMenuItemBy = {
 var router: express.Router = express.Router()
 
 router.get("/", (_, res: express.Response) => {
-    res.render('home', getMenuItemBy.destination(''))
+    res.render("home", getMenuItemBy.destination(""))
 })
 
-router.use('/:asset', express.static(path.join(__dirname, 'public')))
+router.use("/:asset", express.static(path.join(__dirname, "public")))
 
 router.get("/:route", (req: express.Request, res: express.Response, next: express.NextFunction) => {
     const {
@@ -58,7 +58,7 @@ router.get("/:route", (req: express.Request, res: express.Response, next: expres
 
     const item = getMenuItemBy.destination(route)
 
-    if (typeof item === 'undefined') {
+    if (typeof item === "undefined") {
         next(new Error(`no such route found: ${route}`))
         return
     }
@@ -72,7 +72,7 @@ router.get("/:route", (req: express.Request, res: express.Response, next: expres
     }
 })
 
-router.get('/:route/:modality_code', (req, res, next) => {
+router.get("/:route/:modality_code", (req, res, next) => {
     const {
         route,
         modality_code
@@ -81,11 +81,11 @@ router.get('/:route/:modality_code', (req, res, next) => {
     const item = getMenuItemBy.destination(route)
 
     if (!item) {
-        return next(new Error('no such route' + route))
+        return next(new Error("no such route" + route))
     }
 
     fetchFromAPI(`${item.route}/${modality_code}`, (data) => {
-        res.render('listing', {
+        res.render("listing", {
             title: modalities[modality_code].displayName,
             needs_modalities: true,
             route: route,
@@ -94,7 +94,7 @@ router.get('/:route/:modality_code', (req, res, next) => {
     })
 })
 
-router.get('/:route/:modality_code/:resource', (req, res, next) => {
+router.get("/:route/:modality_code/:resource", (req, res, next) => {
     const {
         route,
         modality_code,
@@ -108,11 +108,11 @@ router.get('/:route/:modality_code/:resource', (req, res, next) => {
     const item = getMenuItemBy.destination(route)
 
     if (!item) {
-        return next(new Error('no such route' + route))
+        return next(new Error("no such route" + route))
     }
 
     fetchFromAPI(`${item.route}/${modality_code}/${resource}`, (data) => {
-        res.render('single', {
+        res.render("single", {
             title: `${modalities[modality_code].displayName} - ${data.name}`,
             needs_modalities: true,
             route: route,

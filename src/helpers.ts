@@ -1,13 +1,13 @@
-import exhbs from 'express-hbs'
-import axios from 'axios'
-import fs from 'fs'
-import path from 'path'
-import { menuItems } from './views'
-import { apiHostname } from './api/config'
-import { modalities } from './common'
+import { apiHostname } from "./api/config"
+import axios from "axios"
+import exhbs from "express-hbs"
+import fs from "fs"
+import { menuItems } from "./views"
+import { modalities } from "./common"
+import path from "path"
 
 const readFile = (root: string) => (filename: string, cb: Function) => {
-    fs.readFile(path.join(root, filename), 'utf8', function (err, content) {
+    fs.readFile(path.join(root, filename), "utf8", function (err, content) {
         if (err) {
             console.error(err)
             cb()
@@ -29,11 +29,11 @@ export const fetchFromAPI = (endpoint: string, cb: (data?: any)=>any) => {
         })
 };
 
-exhbs.registerHelper('modalities', (options: any) => {
+exhbs.registerHelper("modalities", (options: any) => {
     return Object.keys(modalities).reduce((l, key) => l.concat({ code: key, ...modalities[key]}), [])
 })
 
-exhbs.registerAsyncHelper('menu', (context: any, cb: Function) => {
+exhbs.registerAsyncHelper("menu", (context: any, cb: Function) => {
     const {
         data: {
             root: {
@@ -42,7 +42,7 @@ exhbs.registerAsyncHelper('menu', (context: any, cb: Function) => {
         }
     } = context
 
-    exhbs.cacheLayout('dist/views/partials/menu', true, (err: any, layouts: any[]) => {
+    exhbs.cacheLayout("dist/views/partials/menu", true, (err: any, layouts: any[]) => {
         const [
             menuLayout
         ] = layouts;
@@ -50,7 +50,7 @@ exhbs.registerAsyncHelper('menu', (context: any, cb: Function) => {
         const s = menuLayout({
             items: menuItems.map(item => ({
                 ...item,
-                style: item.destination === destination ? 'active': '',
+                style: item.destination === destination ? "active": "",
                 destination: item.external ? item.destination : `/${item.destination}`
             }))
         })
@@ -59,41 +59,41 @@ exhbs.registerAsyncHelper('menu', (context: any, cb: Function) => {
     });
 })
 
-exhbs.registerAsyncHelper('ibis_file', (info: any, cb: Function) => {
+exhbs.registerAsyncHelper("ibis_file", (info: any, cb: Function) => {
     fetchFromAPI(info.filepath.relative, (data) => {
         cb(data)
     })
 })
 
-exhbs.registerAsyncHelper('api', (context: any, cb: Function) => {
+exhbs.registerAsyncHelper("api", (context: any, cb: Function) => {
     fetchFromAPI(context.hash.endpoint, (data) => cb(new exhbs.SafeString(data)))
 })
 
-exhbs.registerHelper('hostname', (route: any) => {
-    if (route === 'api') {
+exhbs.registerHelper("hostname", (route: any) => {
+    if (route === "api") {
         return apiHostname;
     }
 })
 
-exhbs.registerHelper('json', (data: any) => {
+exhbs.registerHelper("json", (data: any) => {
     return JSON.stringify(data)
 })
 
-exhbs.registerHelper('if_present', (value: any, defaultValue: any) => {
+exhbs.registerHelper("if_present", (value: any, defaultValue: any) => {
     return new exhbs.SafeString(value || defaultValue)
 })
 
 const whitespace = /\s+/
 
-exhbs.registerHelper('title_case', (s: string) => {
-    if (typeof s !== 'string') return s;
+exhbs.registerHelper("title_case", (s: string) => {
+    if (typeof s !== "string") return s;
 
     return s
         .split(whitespace)
         .map(segment => segment.charAt(0).toLocaleUpperCase() + segment.slice(1))
-        .join(' ')
+        .join(" ")
 })
 
-exhbs.registerHelper('with', (context: any, options: any) => {
+exhbs.registerHelper("with", (context: any, options: any) => {
     return options.fn(context)
 })

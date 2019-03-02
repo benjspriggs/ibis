@@ -1,5 +1,6 @@
-import app from './app'
-import { port, hostname, appHostname } from './config'
+import { appHostname, hostname, port } from "./config"
+
+import app from "./app"
 
 app.listen(port, hostname, () => {
     console.log(`Listening on ${appHostname}`)

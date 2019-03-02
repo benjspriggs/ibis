@@ -1,6 +1,6 @@
-declare module 'express-hbs' {
-    import handlebars from 'handlebars'
-    import jsb from 'js-beautify'
+declare module "express-hbs" {
+    import handlebars from "handlebars"
+    import jsb from "js-beautify"
 
     interface Options {
         handlebars?: typeof handlebars;

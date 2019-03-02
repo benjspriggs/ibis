@@ -1,17 +1,17 @@
-import '../promises'
-import express from 'express'
-import { Header, modalities, getModality, Modality } from '../common'
-import config, { apiHostname } from './config'
-import fuse from 'fuse.js'
-import { getFileInfo, getListing } from './file';
-import BetterFileAsync from './BetterFileAsync'
-import lowdb from 'lowdb'
+import { Header, Modality, getModality, modalities } from "../common"
+import config, { apiHostname } from "./config"
+import { getFileInfo, getListing } from "./file";
 
-const adapter = new BetterFileAsync<Database>('db.json', {
+import BetterFileAsync from "./BetterFileAsync"
+import express from "express"
+import fuse from "fuse.js"
+import lowdb from "lowdb"
+
+const adapter = new BetterFileAsync<Database>("db.json", {
     defaultValue: {
         diseases: [],
         treatments: [],
-    }
+    },
 })
 
 function database(): Promise<lowdb.LowdbAsync<Database>> {
@@ -34,7 +34,7 @@ export interface Query {
     modality?: string
 }
 
-const modalityPattern = /m(?:odality)?:(\w+|'.*?'|".*?")/g
+const modalityPattern = /m(?:odality)?:(\w+|".*?"|".*?")/g
 
 export function query(text: string): Query {
     const result: Query = {
@@ -50,7 +50,7 @@ export function query(text: string): Query {
 
         const matchedModality = modalityPattern.exec(text)[1]
 
-        result.modality = matchedModality.replace(/['"]/g, '')
+        result.modality = matchedModality.replace(/[""]/g, "")
     }
 
     return result
@@ -72,7 +72,7 @@ function searchOptions<DataType>(options?: fuse.FuseOptions<DataType>): (query: 
 
         const results = search.search(query)
 
-        if ('matches' in (results as any)) {
+        if ("matches" in (results as any)) {
             return results as any
         } else {
             return results
@@ -98,7 +98,7 @@ async function getAllListings(resourcePrefix: string, abs: string): Promise<Dire
 
 const router = express.Router()
 
-router.get('/', async (req, res) => {
+router.get("/", async (req, res) => {
     const db = await database();
 
     if (!req.query.q) {
@@ -106,8 +106,8 @@ router.get('/', async (req, res) => {
         return
     }
 
-    const t = db.get('treatments')
-    const d = db.get('diseases')
+    const t = db.get("treatments")
+    const d = db.get("diseases")
 
     res.send(searchDirectory(req.query.q, ([] as Directory[]).concat(...t.value(), ...d.value())))
 })
@@ -160,7 +160,7 @@ function formatSearchResponse(query: string, directory: string, results: Directo
     }
 }
 
-router.get('/:sub', async (req, res) => {
+router.get("/:sub", async (req, res) => {
     const {
         sub
     } = req.params
@@ -177,7 +177,7 @@ router.get('/:sub', async (req, res) => {
         categorize
     } = req.query
 
-    const _categorize = typeof categorize === 'undefined' ? false : categorize === 'true';
+    const _categorize = typeof categorize === "undefined" ? false : categorize === "true";
 
     if (!q) {
         res.send(formatSearchResponse(q, sub, db.get(sub).value(), _categorize));
@@ -191,20 +191,20 @@ router.get('/:sub', async (req, res) => {
 export async function initialize() {
     const db = await database()
 
-    console.debug('initializing')
+    console.debug("initializing")
 
-    if (db.get('treatments').value().length !== 0) {
-        console.debug('we done')
+    if (db.get("treatments").value().length !== 0) {
+        console.debug("we done")
         return
     }
 
-    const txs = await getAllListings(`${apiHostname}/tx`, config.relative.ibisRoot('system', 'tx'))
-    const rxs = await getAllListings(`${apiHostname}/rx`, config.relative.ibisRoot('system', 'rx'))
-    console.debug('got all the magic')
+    const txs = await getAllListings(`${apiHostname}/tx`, config.relative.ibisRoot("system", "tx"))
+    const rxs = await getAllListings(`${apiHostname}/rx`, config.relative.ibisRoot("system", "rx"))
+    console.debug("got all the magic")
 
-    db.get('diseases').splice(0, 0, ...txs).write()
-    db.get('treatments').splice(0, 0, ...rxs).write()
-    console.debug('finished mapping listings')
+    db.get("diseases").splice(0, 0, ...txs).write()
+    db.get("treatments").splice(0, 0, ...rxs).write()
+    console.debug("finished mapping listings")
     // get ALL the files everywhere
     // put them in the diseases/ tx/ rx
 }

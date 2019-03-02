@@ -1,5 +1,5 @@
-import app, { initialize } from './app'
-import { port, hostname, apiHostname } from './config'
+import { apiHostname, hostname, port } from "./config"
+import app, { initialize } from "./app"
 
 app.listen(port, hostname, async () => {
     await initialize()

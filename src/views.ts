@@ -81,13 +81,39 @@ router.get('/:route/:modality_code', (req, res, next) => {
     const item = getMenuItemBy.destination(route)
 
     if (!item) {
-        next(new Error('no such route' + route))
-        return
+        return next(new Error('no such route' + route))
     }
 
     fetchFromAPI(`${item.route}/${modality_code}`, (data) => {
         res.render('listing', {
             title: modalities[modality_code].displayName,
+            needs_modalities: true,
+            route: route,
+            data: data
+        })
+    })
+})
+
+router.get('/:route/:modality_code/:resource', (req, res, next) => {
+    const {
+        route,
+        modality_code,
+        resource
+    } = req.params;
+
+    if (!route || !modality_code || !resource) {
+        return next()
+    }
+
+    const item = getMenuItemBy.destination(route)
+
+    if (!item) {
+        return next(new Error('no such route' + route))
+    }
+
+    fetchFromAPI(`${item.route}/${modality_code}/${resource}`, (data) => {
+        res.render('single', {
+            title: `${modalities[modality_code].displayName} - ${data.name}`,
             needs_modalities: true,
             route: route,
             data: data

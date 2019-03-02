@@ -8,15 +8,15 @@ router.get('/favicon.ico', (_, res) => {
     res.sendFile(config.relative.ibisRoot('system', 'rsrcs', '32IBIS3.ico'))
 })
 
-router.use('/', express.static(path.join(config.paths.applicationRoot, 'dist', 'public'), {
+// if this 404s, make sure to build fomantic-ui
+router.use('/semantic', express.static(path.join(config.paths.applicationRoot, 'semantic', 'dist'), {
     index: false,
     immutable: true,
     maxAge: 10000,
     lastModified: true
 }))
 
-// if this 404s, make sure to build fomantic-ui
-router.use('/semantic', express.static(path.join(config.paths.applicationRoot, 'semantic', 'dist'), {
+router.use('/', express.static(path.join(config.paths.applicationRoot, 'dist', 'public'), {
     index: false,
     immutable: true,
     maxAge: 10000,

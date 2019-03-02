@@ -130,26 +130,39 @@ export default (options: { endpoint: string, absoluteFilePath: string, trimLeftP
 
     const afterDefinition = options.trimLeftPattern ? trimLeft(options.trimLeftPattern) : (root: Node) => root
 
-    router.get('/:modality/:file', (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    router.get('/:modality/:file', (req, res) => {
         const {
             modality,
             file
         } = req.params;
 
-        fs.readFile(path.join(options.absoluteFilePath, modality, file), (err, data) => {
-            if (err) {
-                next(err)
-                return
-            }
+        const filePath = path.join(options.absoluteFilePath, modality, file)
 
-            const root = parse(data.toString(), { noFix: false })
+        const data = fs.readFileSync(filePath);
 
-            const body = root.childNodes.find(node => node instanceof HTMLElement)
+        const root = parse(data.toString(), { noFix: false })
 
-            res.type('html')
-            const formattedBoy = afterDefinition(body)
-            formattedBoy.childNodes = trimConsecutive(formattedBoy.childNodes)
-            res.send(formattedBoy.toString())
+        const body = root.childNodes.find(node => node instanceof HTMLElement)
+
+        const formattedBoy = afterDefinition(body)
+        formattedBoy.childNodes = trimConsecutive(formattedBoy.childNodes)
+
+        const {
+            version,
+            tag,
+            name,
+            category
+        } = parseHeaderFromFile(filePath)
+
+        res.send({
+            modality: modality,
+            filename: file,
+            filepath: filepath(req, modality, file),
+            version: version,
+            tag: tag,
+            name: name,
+            category: category,
+            content: formattedBoy.toString()
         })
     });
 
@@ -161,36 +174,6 @@ export default (options: { endpoint: string, absoluteFilePath: string, trimLeftP
     }
 
     const filepath = (req: express.Request, modality: string, filename: string) => resolved(req, `${options.endpoint}/${modality}/${filename}`)
-
-    router.get('/:modality/:file/info', async (req: express.Request, res: express.Response, next: express.NextFunction) => {
-        const {
-            modality,
-            file
-        } = req.params;
-
-        const filePath = path.join(options.absoluteFilePath, modality, file)
-
-        try {
-            const {
-                version,
-                tag,
-                name,
-                category
-            } = parseHeaderFromFile(filePath)
-
-            res.send({
-                modality: modality,
-                filename: file,
-                filepath: filepath(req, modality, file),
-                version: version,
-                tag: tag,
-                name: name,
-                category: category
-            })
-        } catch (e) {
-            next(e)
-        }
-    });
 
     router.get('/:modality', addModalityListingToLocals(options.absoluteFilePath), async (req: express.Request, res: express.Response, next: express.NextFunction) => {
         const {

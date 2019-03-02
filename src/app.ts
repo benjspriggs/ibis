@@ -25,7 +25,7 @@ app.set('views', 'dist/views')
 
 app.set('view engine', '.hbs')
 
-app.use('/assets', assets)
+app.use('/assets/', assets)
 
 app.use('/', views)
 

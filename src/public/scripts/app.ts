@@ -4,6 +4,24 @@ import { Searchable } from 'fomantic-ui'
 
 declare var $: JQueryStatic
 
+function formatBackendResource(url: string) {
+    const u = new URL(url)
+
+    const [
+        _,
+        first,
+        ...rest
+     ] = u.pathname.split('/')
+
+     if (first === 'rx') {
+         return `/materia-medica/${rest.join('/')}`
+     } else if (first == 'tx') {
+         return `/therapeutics/${rest.join('/')}`
+     } else {
+         throw new Error('unknown: ' + first)
+     }
+}
+
 $(document).ready(() => {
     $('#modality-menu-toggle').click(() => {
         let menu: any = $('#modality-menu') as any;
@@ -28,7 +46,7 @@ $(document).ready(() => {
                         ...result,
                         category: result.modality.data.displayName,
                         title: result.header.name,
-                        url: result.url
+                        url: formatBackendResource(result.url)
                     }))
                 })
             }
@@ -48,7 +66,7 @@ $(document).ready(() => {
                             results: d.results.map(result => ({
                                 category: result.modality.data.displayName,
                                 title: result.header.name,
-                                url: result.url
+                                url: formatBackendResource(result.url)
                             }))
                         })
                         return acc

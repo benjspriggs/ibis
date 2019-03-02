@@ -1,5 +1,5 @@
 import db, { initialize as dbInitialize } from "./db"
-import { modalities, requestLogger } from "../common"
+import { modalities, requestLogger } from "ibis-lib"
 
 import cors from "cors"
 import express from "express"

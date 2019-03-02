@@ -1,5 +1,5 @@
 import { HTMLElement, Node, TextNode, parse } from "node-html-parser"
-import { Header, getModality, parseHeaderFromFile } from "../common"
+import { Header, getModality, parseHeaderFromFile } from "ibis-lib"
 
 import express from "express"
 import fs from "fs"

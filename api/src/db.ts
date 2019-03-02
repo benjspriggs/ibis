@@ -1,4 +1,4 @@
-import { Header, Modality, getModality, modalities } from "../common"
+import { Header, Modality, getModality, modalities } from "ibis-lib"
 import config, { apiHostname } from "./config"
 import { getFileInfo, getListing } from "./file";
 

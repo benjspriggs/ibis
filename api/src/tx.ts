@@ -1,4 +1,4 @@
-import { Header, parseHeaderFromFile } from "../common";
+import { Header, parseHeaderFromFile } from "ibis-lib"
 
 import config from "./config"
 import express from "express"

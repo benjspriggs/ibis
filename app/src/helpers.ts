@@ -1,4 +1,4 @@
-import { apiHostname } from "./api/config"
+import { apiHostname } from "ibis-api"
 import axios from "axios"
 import exhbs from "express-hbs"
 import fs from "fs"

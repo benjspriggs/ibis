@@ -10,10 +10,6 @@ const writeFile = pify(write);
 
 const whitespace = /^\s*$/.compile()
 
-function empty() {
-
-}
-
 class BetterFileAsync extends FileAsync {
     async read() {
         if (!fs.existsSync(this.source)) {

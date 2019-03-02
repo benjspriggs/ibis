@@ -1,10 +1,9 @@
-//@ts-check
-const fs = require('fs')
-const { src, dest, watch, series } = require('gulp')
-const clean = require('gulp-clean')
-const newer = require('gulp-newer')
-const glob = require('glob')
-const browserify = require('browserify')
+const fs = require("fs")
+const { src, dest, watch, series } = require("gulp")
+const clean = require("gulp-clean")
+const newer = require("gulp-newer")
+const glob = require("glob")
+const browserify = require("browserify")
 
 const distributable = "dist"
 const source = "src"
@@ -16,9 +15,13 @@ function staticAssets(prefix) {
     return ["**/*.hbs", "**/*.css"].map(pattern => `${prefix}/${pattern}`)
 }
 
+/**
+ * 
+ * @param {any} _cb 
+ */
 function watchStaticAssets(_cb) {
     watch(staticAssets(source), series(cleanStaticAssets, copyStaticAssets))
-    watch(['dist/public/scripts/*.js', '!dist/public/scripts/main.js'], createClientBundle)
+    watch(["dist/public/scripts/*.js", "!dist/public/scripts/main.js"], createClientBundle)
     _cb()
 }
 
@@ -35,13 +38,16 @@ function copyStaticAssets() {
 
 function createClientBundle() {
     return browserify({
-        entries: 'dist/public/scripts/app.js',
+        entries: "dist/public/scripts/app.js",
         debug: true
     })
     .bundle()
-    .pipe(fs.createWriteStream('dist/public/scripts/main.js'))
+    .pipe(fs.createWriteStream("dist/public/scripts/main.js"))
 }
 
+/**
+ * @param {any} cb
+ */
 exports.ls = function (cb) {
     staticAssets(source).forEach(pattern => {
         glob(pattern, function (err, files) {

@@ -1,4 +1,4 @@
-import config from "./api/config"
+import { config } from "ibis-api"
 import express from "express"
 import path from "path"
 

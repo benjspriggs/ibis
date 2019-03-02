@@ -1,4 +1,10 @@
+declare interface JQueryStatic {
+    // TODO: add api types from fomantic-ui
+    api: any
+}
+
 declare module "fomantic-ui" {
+
     export interface Searchable extends JQuery<HTMLElement> {
         search: (options?: SemanticSearchOptions) => void;
     }

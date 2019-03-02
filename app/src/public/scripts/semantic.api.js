@@ -1,4 +1,5 @@
-import { apiHostname } from '../../api/config'
+//@ts-check
+import { apiHostname } from "ibis-api/dist/config"
 
 $.api.settings.verbose = true
 

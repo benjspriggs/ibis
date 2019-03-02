@@ -1,3 +1,4 @@
+//@ts-check
 const fs = require("fs")
 const { src, dest, watch, series } = require("gulp")
 const clean = require("gulp-clean")
@@ -63,4 +64,4 @@ exports.ls = function (cb) {
 exports.copy = copyStaticAssets
 exports.clean = cleanStaticAssets
 exports.watch = watchStaticAssets
-exports.default = watchStaticAssets
+exports.default = series(cleanStaticAssets, copyStaticAssets, createClientBundle)

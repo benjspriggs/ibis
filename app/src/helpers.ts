@@ -6,6 +6,8 @@ import { menuItems } from "./views"
 import { modalities } from "./common"
 import path from "path"
 
+const menuLayoutPath = "views/partials/menu"
+
 const readFile = (root: string) => (filename: string, cb: Function) => {
     fs.readFile(path.join(root, filename), "utf8", function (err, content) {
         if (err) {
@@ -17,15 +19,11 @@ const readFile = (root: string) => (filename: string, cb: Function) => {
     });
 }
 
-export const fetchFromAPI = (endpoint: string, cb: (data?: any)=>any) => {
+export const fetchFromAPI = (endpoint: string) => {
     const absolutePath = `${apiHostname}/${endpoint}`
-    axios.get(absolutePath)
-        .then((response) => {
-            cb(response.data)
-        })
+    return axios.get<string>(absolutePath)
         .catch((err) => {
-            console.log(`api err on endpoint '${err.request.path}': ${err.response}`)
-            cb()
+            console.error(`api err on endpoint ${endpoint}/'${err.request.path}': ${err.response}`)
         })
 };
 
@@ -42,7 +40,7 @@ exhbs.registerAsyncHelper("menu", (context: any, cb: Function) => {
         }
     } = context
 
-    exhbs.cacheLayout("dist/views/partials/menu", true, (err: any, layouts: any[]) => {
+    exhbs.cacheLayout(menuLayoutPath, true, (err: any, layouts: any[]) => {
         const [
             menuLayout
         ] = layouts;
@@ -60,13 +58,17 @@ exhbs.registerAsyncHelper("menu", (context: any, cb: Function) => {
 })
 
 exhbs.registerAsyncHelper("ibis_file", (info: any, cb: Function) => {
-    fetchFromAPI(info.filepath.relative, (data) => {
+    fetchFromAPI(info.filepath.relative).then((data) => {
         cb(data)
     })
 })
 
 exhbs.registerAsyncHelper("api", (context: any, cb: Function) => {
-    fetchFromAPI(context.hash.endpoint, (data) => cb(new exhbs.SafeString(data)))
+    fetchFromAPI(context.hash.endpoint).then((response) =>  {
+        if (response) {
+            cb(new exhbs.SafeString(response.data))
+        }
+    })
 })
 
 exhbs.registerHelper("hostname", (route: any) => {

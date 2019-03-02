@@ -7,7 +7,7 @@
     "start": "npm run build && npm run serve",
     "serve": "cd dist && node index.js",
     "test": "ava",
-    "build": "gulp copy && tsc"
+    "build": "tsc && gulp"
   },
   "author": "Ben Spriggs",
   "license": "ISC",

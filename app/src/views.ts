@@ -64,8 +64,12 @@ router.get("/:route", (req: express.Request, res: express.Response, next: expres
     }
 
     if (item.endpoint) {
-        fetchFromAPI(item.endpoint, (data) => {
-            res.render(route, ({ ...item, data: data }))
+        fetchFromAPI(item.endpoint).then((response) => {
+            if (response) {
+                res.render(route, ({ ...item, data: JSON.parse(response.data) }))
+            } else {
+                res.render('error')
+            }
         })
     } else {
         res.render(route, item)
@@ -84,13 +88,17 @@ router.get("/:route/:modality_code", (req, res, next) => {
         return next(new Error("no such route" + route))
     }
 
-    fetchFromAPI(`${item.route}/${modality_code}`, (data) => {
-        res.render("listing", {
-            title: modalities[modality_code].displayName,
-            needs_modalities: true,
-            route: route,
-            data: data
-        })
+    fetchFromAPI(`${item.route}/${modality_code}`).then((response) => {
+        if (response) {
+            res.render("listing", {
+                title: modalities[modality_code].displayName,
+                needs_modalities: true,
+                route: route,
+                data: JSON.parse(response.data)
+            })
+        } else {
+            res.render('error')
+        }
     })
 })
 
@@ -111,7 +119,14 @@ router.get("/:route/:modality_code/:resource", (req, res, next) => {
         return next(new Error("no such route" + route))
     }
 
-    fetchFromAPI(`${item.route}/${modality_code}/${resource}`, (data) => {
+    fetchFromAPI(`${item.route}/${modality_code}/${resource}`).then((response) => {
+        if (!response) {
+            res.render('error')
+            return
+        }
+
+        // TODO: add type safety to API routes
+        const data = JSON.parse(response.data)
         res.render("single", {
             title: `${modalities[modality_code].displayName} - ${data.name}`,
             needs_modalities: true,

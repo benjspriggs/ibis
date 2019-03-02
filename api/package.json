@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "dist/index.js",
+  "bin": "dist/start.js",
   "scripts": {
     "start": "npm run build && npm run serve",
     "serve": "cd dist && node start.js",

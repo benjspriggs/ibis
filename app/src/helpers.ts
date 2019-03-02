@@ -21,7 +21,7 @@ const readFile = (root: string) => (filename: string, cb: Function) => {
 
 export const fetchFromAPI = (endpoint: string) => {
     const absolutePath = `${apiHostname}/${endpoint}`
-    return axios.get<string>(absolutePath)
+    return axios.get(absolutePath)
         .catch((err) => {
             console.error(`api err on endpoint ${endpoint}/'${err.request.path}': ${err.response}`)
         })

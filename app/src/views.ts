@@ -66,7 +66,7 @@ router.get("/:route", (req: express.Request, res: express.Response, next: expres
     if (item.endpoint) {
         fetchFromAPI(item.endpoint).then((response) => {
             if (response) {
-                res.render(route, ({ ...item, data: JSON.parse(response.data) }))
+                res.render(route, ({ ...item, data: response }))
             } else {
                 res.render('error')
             }
@@ -94,7 +94,7 @@ router.get("/:route/:modality_code", (req, res, next) => {
                 title: modalities[modality_code].displayName,
                 needs_modalities: true,
                 route: route,
-                data: JSON.parse(response.data)
+                data: response.data
             })
         } else {
             res.render('error')
@@ -126,7 +126,7 @@ router.get("/:route/:modality_code/:resource", (req, res, next) => {
         }
 
         // TODO: add type safety to API routes
-        const data = JSON.parse(response.data)
+        const data = response.data
         res.render("single", {
             title: `${modalities[modality_code].displayName} - ${data.name}`,
             needs_modalities: true,

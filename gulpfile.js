@@ -13,7 +13,7 @@ const source = "src"
  * @param {string} prefix
  */
 function staticAssets(prefix) {
-    return ["**/*.hbs"].map(pattern => `${prefix}/${pattern}`)
+    return ["**/*.hbs", "**/*.css"].map(pattern => `${prefix}/${pattern}`)
 }
 
 function watchStaticAssets(_cb) {

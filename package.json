@@ -16,6 +16,7 @@
     "test": "npm run build && ava",
     "watch": "npm run build:copy && concurrently --kill-others \"npm:watch:ts\" \"npm:watch:api\" \"npm:watch:app\"",
     "watch:ts": "tsc -w",
+    "pkg": "concurrently --kill-others \"pkg api --debug\" \"pkg app --debug\"",
     "lint": "npm run lint:lib && npm run lint:api && npm run lint:app",
     "lint:lib": "tslint --project lib -t verbose",
     "lint:api": "tslint --project api -t verbose",

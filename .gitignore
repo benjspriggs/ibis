@@ -4,3 +4,4 @@ dist/
 semantic/
 data/
 db.json
+ibis-*

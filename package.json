@@ -9,16 +9,17 @@
     "start:app": "cd app && npm run start",
     "watch:app": "cd app && npm run serve",
     "watch:api": "cd api && npm run serve",
-    "build": "npm run build:ts && npm run build:copy",
-    "build:ts": "tsc",
-    "build:copy": "gulp copy",
+    "build": "npm run build:lib && npm run build:api && npm run build:app",
+    "build:api": "cd api && npm run build",
+    "build:app": "cd app && npm run build",
+    "build:lib": "cd lib && npm run build",
     "test": "npm run build && ava",
-    "watch": "npm run build:copy && concurrently --kill-others \"npm:watch:ts\" \"npm:watch:api\" \"npm:watch:app\" \"npm:watch:copy\"",
+    "watch": "npm run build:copy && concurrently --kill-others \"npm:watch:ts\" \"npm:watch:api\" \"npm:watch:app\"",
     "watch:ts": "tsc -w",
-    "watch:copy": "gulp watch",
-    "lint": "npm run lint:ts",
-    "lint:ts": "tslint src/**/*.ts -t verbose",
-    "lint:ts:fix": "tslint src/**/*.ts -t verbose --fix"
+    "lint": "npm run lint:lib && npm run lint:api && npm run lint:app",
+    "lint:lib": "tslint --project lib -t verbose",
+    "lint:api": "tslint --project api -t verbose",
+    "lint:app": "tslint --project app -t verbose"
   },
   "repository": {
     "type": "git",
@@ -31,7 +32,10 @@
   },
   "homepage": "https://github.com/benjspriggs/ibis#readme",
   "devDependencies": {
-    "concurrently": "^4.1.0"
+    "concurrently": "^4.1.0",
+    "tslint": "^5.13.1",
+    "tslint-eslint-rules": "^5.4.0",
+    "typescript": "^3.3.3333"
   },
   "nodemonConfig": {
     "delay": 1000,

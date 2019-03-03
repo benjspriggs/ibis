@@ -1,3 +1,4 @@
+import { applicationRoot } from "ibis-lib"
 import { config } from "ibis-api"
 import express from "express"
 import path from "path"
@@ -8,7 +9,7 @@ router.get("/favicon.ico", (_, res) => {
     res.sendFile(config.relative.ibisRoot("system", "rsrcs", "32IBIS3.ico"))
 })
 
-const semanticPath = path.join(config.paths.applicationRoot, "app", "semantic", "dist")
+const semanticPath = path.join(applicationRoot, "app", "semantic", "dist")
 console.log('serving semantic from ', semanticPath)
 // if this 404s, make sure to build fomantic-ui
 router.use("/semantic", express.static(semanticPath, {
@@ -19,7 +20,7 @@ router.use("/semantic", express.static(semanticPath, {
     fallthrough: false
 }))
 
-const publicPath = path.join(config.paths.applicationRoot, "app", "dist", "public")
+const publicPath = path.join(applicationRoot, "app", "dist", "public")
 console.log('serving public from: ', publicPath)
 router.use("/", express.static(publicPath, {
     index: false,

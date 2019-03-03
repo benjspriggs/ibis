@@ -17,6 +17,7 @@
   "devDependencies": {
     "@types/express": "^4.16.1",
     "@types/lodash": "^4.14.121",
-    "ava": "^1.2.1"
+    "ava": "^1.2.1",
+    "typescript": "^3.3.3333"
   }
 }

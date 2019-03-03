@@ -2,6 +2,7 @@ import { HTMLElement, Node, TextNode, parse } from "node-html-parser"
 import { NextFunction, Request, RequestHandler } from "express"
 
 import { flatten } from "lodash"
+import { join } from "path"
 import { readFileSync } from "fs"
 
 export interface Modality {
@@ -152,3 +153,13 @@ export const requestLogger: RequestHandler = (req: Request, _, next: NextFunctio
         }))
     next()
 }
+
+function detectApplicationRoot() {
+    if ((process as any).pkg) {
+        return __dirname;
+    } else {
+        return join(__dirname, '../..')
+    }
+}
+
+export const applicationRoot: string = detectApplicationRoot()

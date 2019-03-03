@@ -20,6 +20,7 @@
     "fomantic-ui": "^2.7.2",
     "handlebars": "^4.1.0",
     "ibis-api": "file:../api",
+    "ibis-lib": "file:../lib",
     "node-html-parser": "^1.1.12"
   },
   "devDependencies": {

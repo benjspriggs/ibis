@@ -15,10 +15,9 @@
             "script": "lint",
             "problemMatcher": {
                 "owner": "javascript",
-                "fileLocation": ["relative", "${workspaceFolder}"],
                 "pattern": [
                     {
-                        "regexp": "^([A-Z]+):\\s+\\(([\\w-]+)\\)\\s+([\\w/.]+)\\[(\\d+),\\s+(\\d+)\\]:\\s+(.*)$",
+                        "regexp": "^([A-Z]+):\\s+\\(([\\w-]+)\\)\\s+([\\w/.:]+)\\[(\\d+),\\s+(\\d+)\\]:\\s+(.*)$",
                         "severity": 1,
                         "code": 2,
                         "file": 3,

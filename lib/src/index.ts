@@ -115,7 +115,7 @@ export function parseHeaderFromFile(filepath: string): Header {
 
 const versionPattern = /^-IBIS-(\d+)\.(\d+)\.(\d+)-$/
 
-// TODO: this doesn't reliably parse the headers for most files
+// TODO: this doesn"t reliably parse the headers for most files
 // @bspriggs investigate
 export function parseHeader(source: string): string[] {
     const root = parse(source, { noFix: false, lowerCaseTagName: false })
@@ -158,7 +158,7 @@ function detectApplicationRoot() {
     if ((process as any).pkg) {
         return __dirname;
     } else {
-        return join(__dirname, '../..')
+        return join(__dirname, "../..")
     }
 }
 

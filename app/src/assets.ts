@@ -10,7 +10,9 @@ router.get("/favicon.ico", (_, res) => {
 })
 
 const semanticPath = path.join(applicationRoot, "app", "semantic", "dist")
-console.log('serving semantic from ', semanticPath)
+
+console.log("serving semantic from ", semanticPath)
+
 // if this 404s, make sure to build fomantic-ui
 router.use("/semantic", express.static(semanticPath, {
     index: false,
@@ -21,7 +23,7 @@ router.use("/semantic", express.static(semanticPath, {
 }))
 
 const publicPath = path.join(applicationRoot, "app", "dist", "public")
-console.log('serving public from: ', publicPath)
+console.log("serving public from: ", publicPath)
 router.use("/", express.static(publicPath, {
     index: false,
     immutable: true,

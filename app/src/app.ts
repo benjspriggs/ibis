@@ -21,7 +21,7 @@ const hbsConfig = {
     "partialsDir": "views/partials"
 }
 
-console.log('using', hbsConfig);
+console.log("using", hbsConfig);
 
 app.engine(".hbs", exhbs.express4(hbsConfig))
 

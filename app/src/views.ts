@@ -68,7 +68,7 @@ router.get("/:route", (req: express.Request, res: express.Response, next: expres
             if (response) {
                 res.render(route, ({ ...item, data: response }))
             } else {
-                res.render('error')
+                res.render("error")
             }
         })
     } else {
@@ -97,7 +97,7 @@ router.get("/:route/:modality_code", (req, res, next) => {
                 data: response.data
             })
         } else {
-            res.render('error')
+            res.render("error")
         }
     })
 })
@@ -121,7 +121,7 @@ router.get("/:route/:modality_code/:resource", (req, res, next) => {
 
     fetchFromAPI(`${item.route}/${modality_code}/${resource}`).then((response) => {
         if (!response) {
-            res.render('error')
+            res.render("error")
             return
         }
 

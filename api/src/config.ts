@@ -1,5 +1,5 @@
-import path from "path"
 import { applicationRoot } from "ibis-lib"
+import path from "path"
 
 export const port: number = parseInt(process.env.API_PORT, 10) || 3000
 export const hostname: string = process.env.API_HOSTNAME || "localhost"

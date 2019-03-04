@@ -1,10 +1,11 @@
 //@ts-check
 const fs = require("fs")
-const { src, dest, watch, series } = require("gulp")
-const clean = require("gulp-clean")
+const { src, dest, watch, series, parallel, task } = require("gulp")
+const { default: del } = require("del")
 const newer = require("gulp-newer")
 const glob = require("glob")
 const browserify = require("browserify")
+const shakeify = require("common-shakeify")
 
 const distributable = "dist"
 const source = "src"
@@ -13,22 +14,33 @@ const source = "src"
  * @param {string} prefix
  */
 function staticAssets(prefix) {
-    return ["**/*.hbs", "**/*.css"].map(pattern => `${prefix}/${pattern}`)
+    return ["semantic/**/*", "**/*.hbs", "**/*.css"].map(pattern => `${prefix}/${pattern}`)
 }
+
+const staticSources = ["semantic/**/*"]
 
 /**
  * 
- * @param {any} _cb 
+ * @param {any} done 
  */
-function watchStaticAssets(_cb) {
+function watchStaticAssets(done) {
     watch(staticAssets(source), series(cleanStaticAssets, copyStaticAssets))
     watch(["dist/public/scripts/*.js", "!dist/public/scripts/main.js"], createClientBundle)
-    _cb()
+    return done()
+}
+
+function cleanStaticSources() {
+    return del(staticSources.map(source => `dist/${source}/**/*`))
 }
 
 function cleanStaticAssets() {
-    return src(staticAssets(distributable), { read: false })
-        .pipe(clean())
+    return del(staticAssets(distributable))
+}
+
+function copyStaticSources() {
+    return src(staticSources, { "base": "." })
+        .pipe(newer(distributable))
+        .pipe(dest(distributable))
 }
 
 function copyStaticAssets() {
@@ -37,13 +49,15 @@ function copyStaticAssets() {
         .pipe(dest(distributable))
 }
 
-function createClientBundle() {
-    return browserify({
+function createClientBundle(done) {
+    browserify({
         entries: "dist/public/scripts/app.js",
         debug: true
     })
+    .plugin(shakeify, { verbose: true })
     .bundle()
     .pipe(fs.createWriteStream("dist/public/scripts/main.js"))
+    done()
 }
 
 /**
@@ -61,7 +75,11 @@ exports.ls = function (cb) {
     cb()
 }
 
-exports.copy = copyStaticAssets
-exports.clean = cleanStaticAssets
-exports.watch = watchStaticAssets
-exports.default = series(cleanStaticAssets, copyStaticAssets, createClientBundle)
+task('copy', parallel(copyStaticAssets, copyStaticSources))
+
+task('clean', parallel(cleanStaticAssets, cleanStaticSources))
+
+task('watch', watchStaticAssets)
+task('bundle', createClientBundle)
+//@ts-ignore
+task('default', series('clean', parallel('copy', 'bundle')))

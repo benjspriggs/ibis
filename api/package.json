@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "bin": "dist/start.js",
   "scripts": {
-    "start": "npm run build && npm run serve",
+    "start": "npm run serve",
     "serve": "cd dist && node start.js",
     "test": "ava",
     "build": "tsc --project tsconfig.json && tsc --project tsconfig.js.json"
@@ -49,5 +49,11 @@
     "tslint": "^5.13.0",
     "tslint-eslint-rules": "^5.4.0",
     "typescript": "^3.3.3333"
+  },
+  "pkg": {
+    "scripts": ["dist/*.js", "!dist/*.test.js"],
+    "assets": [
+      "dist/IBIS-Mac OS X/**/*"
+    ]
   }
 }

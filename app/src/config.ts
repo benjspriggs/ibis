@@ -10,7 +10,7 @@ function t(pre: string, path: string) {
     })
 }
 
-const root = isPackaged() ? join(applicationRoot, "dist/") : join(applicationRoot, "app/dist/")
+const root = isPackaged() ? applicationRoot : join(applicationRoot, "app/dist/")
 const views = join(root, "views")
 const semantic = join(root, "semantic/dist")
 const _public = join(root, "public")

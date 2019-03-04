@@ -2,7 +2,7 @@ declare module "express-hbs" {
     import handlebars from "handlebars"
     import jsb from "js-beautify"
 
-    interface Options {
+    export interface Options {
         handlebars?: typeof handlebars;
         defaultLayout?: string,
         partialsDir?: string,
@@ -14,13 +14,13 @@ declare module "express-hbs" {
         onCompile?: (self: any, source: any, filename: any) => typeof handlebars.compile;
     }
 
-    class ExpressHbs {
+    export class ExpressHbs {
         handlebars: typeof Handlebars;
         SafeString: typeof Handlebars.SafeString;
         utils: typeof Handlebars.Utils;
         beautify: typeof jsb.html;
         beautifyrc: any;
-        cwd: typeof process.cwd;
+        cwd: string;
         content: (name: any, options: any, context: any) => any;
         layoutPath: (filename: string, layout: string) => string;
         declaredLayoutFile: (str: string, filename: string) => string | undefined;
@@ -41,5 +41,5 @@ declare module "express-hbs" {
 
     var exhbs: ExpressHbs;
 
-    export = exhbs
+    export default exhbs
 }

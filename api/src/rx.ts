@@ -7,7 +7,7 @@ const router = express.Router()
 router.use("/", file({
     endpoint: "rx",
     absoluteFilePath: config.relative.ibisRoot("system", "rx"),
-    trimLeftPattern: /definition/
+    // trimLeftPattern: /[Dd]efinition/
 }))
 
 export default router

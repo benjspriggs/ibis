@@ -1,13 +1,13 @@
 import { applicationRoot } from "ibis-lib"
-import path from "path"
+import { join } from "path"
 
 export const port: number = parseInt(process.env.API_PORT, 10) || 3000
 export const hostname: string = process.env.API_HOSTNAME || "localhost"
 export const apiHostname: string = `http://${hostname}:${port}`
 
-const ibisRoot: string = path.join(applicationRoot, "IBIS-Mac OS X")
-const system: string = path.join(ibisRoot, "system")
-const user: string = path.join(ibisRoot, "system")
+const ibisRoot: string = join(applicationRoot, "IBIS-Mac OS X")
+const system: string = join(ibisRoot, "system")
+const user: string = join(ibisRoot, "system")
 
 interface IConfig {
     paths: {
@@ -26,14 +26,14 @@ interface IConfig {
 const config: IConfig = {
     paths: {
         ibisRoot,
-        rx: path.join(system, "rx"),
+        rx: join(system, "rx"),
         system,
-        tx: path.join(system, "tx"),
+        tx: join(system, "tx"),
         user,
     },
     relative: {
-        applicationRoot: (...folders: string[]) => path.join(applicationRoot, ...folders),
-        ibisRoot: (...folders: string[]) => path.join(ibisRoot, ...folders),
+        applicationRoot: (...folders: string[]) => join(applicationRoot, ...folders),
+        ibisRoot: (...folders: string[]) => join(ibisRoot, ...folders),
     },
 }
 

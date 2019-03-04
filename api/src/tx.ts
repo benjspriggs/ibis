@@ -4,7 +4,7 @@ import config from "./config"
 import express from "express"
 import file from "./file"
 import fs from "fs"
-import path from "path"
+import { join } from "path"
 
 const router = express.Router()
 
@@ -16,17 +16,17 @@ interface TreatmentListing {
 const allInfo: () => Promise<TreatmentListing[]> = async () => {
     const items: string[] = fs.readdirSync(config.paths.tx)
 
-    const dirs = items.filter(item => fs.statSync(path.join(config.paths.tx, item)).isDirectory())
+    const dirs = items.filter(item => fs.statSync(join(config.paths.tx, item)).isDirectory())
 
     const listing = await Promise.all(dirs.map(async dir => {
         const items = await new Promise<string[]>(async (resolve, reject) => {
-            fs.readdir(path.join(config.paths.tx, dir), async (err: any, items: string[]) => {
+            fs.readdir(join(config.paths.tx, dir), async (err: any, items: string[]) => {
                 if (err)
                     return reject(err);
                 resolve(items);
             });
         });
-        const infos = items.map((item: string) => parseHeaderFromFile(path.join(config.paths.tx, dir, item)));
+        const infos = items.map((item: string) => parseHeaderFromFile(join(config.paths.tx, dir, item)));
 
         return ({
             modality: dir,

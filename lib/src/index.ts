@@ -2,7 +2,7 @@ import { HTMLElement, Node, TextNode, parse } from "node-html-parser"
 import { NextFunction, Request, RequestHandler } from "express"
 
 import { flatten } from "lodash"
-import { join } from "path"
+import { join, dirname } from "path"
 import { readFileSync } from "fs"
 
 export interface Modality {
@@ -154,12 +154,28 @@ export const requestLogger: RequestHandler = (req: Request, _, next: NextFunctio
     next()
 }
 
+interface pkgOptions {
+    entrypoint?: string;
+    defaultEntrypoint?: string;
+}
+
 function detectApplicationRoot() {
-    if ((process as any).pkg) {
-        return __dirname;
+    if (isPackaged()) {
+        // https://www.npmjs.com/package/pkg#snapshot-filesystem
+        const pkg: pkgOptions = (process as any).pkg
+        return dirname(pkg.entrypoint);
     } else {
         return join(__dirname, "../..")
     }
+}
+
+/**
+ * See https://www.npmjs.com/package/pkg#snapshot-filesystem
+ */
+export function isPackaged(): boolean {
+    const pkg: pkgOptions = (process as any).pkg
+
+    return !!pkg
 }
 
 export const applicationRoot: string = detectApplicationRoot()

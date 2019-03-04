@@ -1,7 +1,36 @@
+import { exhbs } from "./helpers"
 import express from "express"
+import { Options } from "express-hbs"
 import { fetchFromAPI } from "./helpers"
 import { modalities } from "./common"
-import path from "path"
+import cors from "cors"
+import assets from "./assets"
+import { requestLogger } from "./common"
+import { join } from "path"
+import { paths } from "./config"
+
+const app = express()
+
+app.use(cors())
+
+app.use(requestLogger)
+
+app.use("/assets/", assets)
+
+const hbsConfig: Options = {
+    "defaultLayout": join(paths.root, "views/layouts/default"),
+    "extname": ".hbs",
+    "layoutsDir": join(paths.root, "views/layouts"),
+    "partialsDir": join(paths.root, "views/partials")
+}
+
+console.log("using", hbsConfig);
+
+app.engine(".hbs", exhbs.express4(hbsConfig))
+
+app.set("views", paths.views)
+
+app.set("view engine", ".hbs")
 
 export const menuItems: {
     destination: string,
@@ -43,15 +72,13 @@ export const getMenuItemBy = {
     title: (title: string) => menuItems.find(item => item.title === title)
 }
 
-var router: express.Router = express.Router()
-
-router.get("/", (_, res: express.Response) => {
+app.get("/", (_, res: express.Response) => {
     res.render("home", getMenuItemBy.destination(""))
 })
 
-router.use("/:asset", express.static(path.join(__dirname, "public")))
+app.use("/:asset", express.static(join(__dirname, "public")))
 
-router.get("/:route", (req: express.Request, res: express.Response, next: express.NextFunction) => {
+app.get("/:route", (req: express.Request, res: express.Response, next: express.NextFunction) => {
     const {
         route
     } = req.params
@@ -59,7 +86,7 @@ router.get("/:route", (req: express.Request, res: express.Response, next: expres
     const item = getMenuItemBy.destination(route)
 
     if (typeof item === "undefined") {
-        next(new Error(`no such route found: ${route}`))
+        next()
         return
     }
 
@@ -76,7 +103,7 @@ router.get("/:route", (req: express.Request, res: express.Response, next: expres
     }
 })
 
-router.get("/:route/:modality_code", (req, res, next) => {
+app.get("/:route/:modality_code", (req, res, next) => {
     const {
         route,
         modality_code
@@ -102,7 +129,7 @@ router.get("/:route/:modality_code", (req, res, next) => {
     })
 })
 
-router.get("/:route/:modality_code/:resource", (req, res, next) => {
+app.get("/:route/:modality_code/:resource", (req, res, next) => {
     const {
         route,
         modality_code,
@@ -136,4 +163,4 @@ router.get("/:route/:modality_code/:resource", (req, res, next) => {
     })
 })
 
-export default router
+export default app

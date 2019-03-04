@@ -81,5 +81,4 @@ task('clean', parallel(cleanStaticAssets, cleanStaticSources))
 
 task('watch', watchStaticAssets)
 task('bundle', createClientBundle)
-//@ts-ignore
-task('default', series('clean', parallel('copy', 'bundle')))
+task('default', parallel('copy', 'bundle'))

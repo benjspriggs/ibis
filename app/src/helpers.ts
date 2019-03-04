@@ -1,23 +1,16 @@
 import { apiHostname } from "ibis-api"
 import axios from "axios"
 import exhbs from "express-hbs"
-import fs from "fs"
 import { menuItems } from "./views"
 import { modalities } from "./common"
-import path from "path"
+import { paths } from "./config"
+import { join } from "path"
 
-const menuLayoutPath = "views/partials/menu"
+exhbs.cwd = paths.root
 
-const readFile = (root: string) => (filename: string, cb: Function) => {
-    fs.readFile(path.join(root, filename), "utf8", function (err, content) {
-        if (err) {
-            console.error(err)
-            cb()
-        } else {
-            cb(new exhbs.SafeString(content))
-        }
-    });
-}
+export { exhbs }
+
+const menuLayoutPath = join(paths.views, "partials/menu")
 
 export const fetchFromAPI = (endpoint: string) => {
     const absolutePath = `${apiHostname}/${endpoint}`
@@ -27,7 +20,7 @@ export const fetchFromAPI = (endpoint: string) => {
         })
 };
 
-exhbs.registerHelper("modalities", (options: any) => {
+exhbs.registerHelper("modalities", () => {
     return Object.keys(modalities).reduce((l, key) => l.concat({ code: key, ...modalities[key]}), [])
 })
 

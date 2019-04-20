@@ -1,4 +1,5 @@
 import { Header, Modality, getModality, modalities } from "ibis-lib"
+import { join } from "path"
 import config, { apiHostname } from "./config"
 import { getFileInfo, getListing } from "./file";
 
@@ -7,7 +8,7 @@ import express from "express"
 import fuse from "fuse.js"
 import lowdb from "lowdb"
 
-const adapter = new BetterFileAsync<Database>("db.json", {
+const adapter = new BetterFileAsync<Database>(join(process.cwd(), "db.json"), {
     defaultValue: {
         diseases: [],
         treatments: [],
@@ -58,6 +59,10 @@ export function query(text: string): Query {
 
 function searchOptions<DataType>(options?: fuse.FuseOptions<DataType>): (query: string, data: DataType[]) => DataType[] {
     return (query, data) => {
+        if (!data) {
+            return []
+        }
+
         const values = Array.from(data.values())
 
         const search = new fuse(values, {
@@ -191,10 +196,10 @@ router.get("/:sub", async (req, res) => {
 export async function initialize() {
     const db = await database()
 
-    console.debug("initializing")
+    console.debug("initializing...")
 
     if (db.get("treatments").value().length !== 0) {
-        console.debug("we done")
+        console.debug("initialized (cached)")
         return
     }
 
@@ -204,7 +209,7 @@ export async function initialize() {
 
     db.get("diseases").splice(0, 0, ...txs).write()
     db.get("treatments").splice(0, 0, ...rxs).write()
-    console.debug("finished mapping listings")
+    console.debug("initialized")
     // get ALL the files everywhere
     // put them in the diseases/ tx/ rx
 }

@@ -51,9 +51,6 @@
     "typescript": "^3.3.3333"
   },
   "pkg": {
-    "scripts": ["dist/*.js", "!dist/*.test.js"],
-    "assets": [
-      "dist/IBIS-Mac OS X/**/*"
-    ]
+    "scripts": ["dist/*.js", "!dist/*.test.js"]
   }
 }

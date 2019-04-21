@@ -63,7 +63,7 @@ function searchOptions<DataType>(options?: fuse.FuseOptions<DataType>): (query: 
             return []
         }
 
-        const values = Array.from(data.values())
+        const values = Array.from(data)
 
         const search = new fuse(values, {
             shouldSort: true,

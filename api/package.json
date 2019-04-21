@@ -51,6 +51,9 @@
     "typescript": "^3.3.3333"
   },
   "pkg": {
-    "scripts": ["dist/*.js", "!dist/*.test.js"]
+    "scripts": [
+      "dist/*.js",
+      "!dist/*.test.js"
+    ]
   }
 }

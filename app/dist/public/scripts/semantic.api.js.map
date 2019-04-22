@@ -1,0 +1,1 @@
+{"version":3,"file":"semantic.api.js","sourceRoot":"","sources":["../../../src/public/scripts/semantic.api.js"],"names":[],"mappings":";;AAAA,WAAW;AACX,+CAAkD;AAElD,CAAC,CAAC,GAAG,CAAC,QAAQ,CAAC,OAAO,GAAG,IAAI,CAAA;AAE7B,CAAC,CAAC,GAAG,CAAC,QAAQ,CAAC,GAAG,GAAG;IACjB,mBAAmB,EAAK,oBAAW,+BAA4B;IAC/D,iBAAiB,EAAK,oBAAW,6CAA0C;IAC3E,QAAQ,EAAK,oBAAW,oBAAiB;CAC5C,CAAA"}

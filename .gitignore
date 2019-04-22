@@ -4,4 +4,3 @@ app/semantic/dist/*
 data/
 db.json
 ibis-*
-*.map

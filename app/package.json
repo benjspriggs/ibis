@@ -7,7 +7,7 @@
   "scripts": {
     "start": "npm run serve",
     "serve": "node dist/index.js",
-    "test": "ava",
+    "test": "ava --tap",
     "build": "tsc && gulp"
   },
   "author": "Ben Spriggs",

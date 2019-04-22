@@ -7,7 +7,7 @@
   "scripts": {
     "start": "npm run serve",
     "serve": "cd dist && node start.js",
-    "test": "ava",
+    "test": "ava --tap",
     "build": "tsc --project tsconfig.json && tsc --project tsconfig.js.json"
   },
   "author": "Ben Spriggs",

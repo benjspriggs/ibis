@@ -1,4 +1,9 @@
 {
     "sort-imports.on-save": false,
-    "sort-imports.default-sort-style": "eslint"
+    "sort-imports.default-sort-style": "eslint",
+    "files.watcherExclude": {
+        "**/.git/objects/**": true,
+        "**/.git/subtree-cache/**": true,
+        "**/node_modules/*/**": true
+    }
 }

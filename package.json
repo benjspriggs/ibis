@@ -5,6 +5,10 @@
   "bin": "dist/index.js",
   "scripts": {
     "start": "concurrently --kill-others \"npm:start:api\" \"npm:start:app\"",
+    "install": "npm run install:lib && npm run install:api && npm run install:app",
+    "install:lib": "cd lib && npm install",
+    "install:api": "cd api && npm install",
+    "install:app": "cd app && npm install",
     "start:api": "cd api && npm run start",
     "start:app": "cd app && npm run start",
     "watch:app": "cd app && npm run serve",

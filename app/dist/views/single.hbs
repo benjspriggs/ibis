@@ -1,0 +1,14 @@
+<div class="ui container">
+    {{#with data}}
+    <div class="header">
+        <div class="ui breadcrumb">
+            <div class="section">{{category}}</div>
+            <div class="divider">-</div>
+            <div class="section">{{tag}}</div>
+            <div class="divider">-</div>
+            <div class="active section">{{name}}</div>
+        </div>
+    </div>
+    {{/with}}
+    {{{data.content}}}
+</div>

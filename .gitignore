@@ -1,7 +1,7 @@
 IBIS-Mac*
 node_modules/
-dist/
 semantic/
 data/
 db.json
 ibis-*
+*.map

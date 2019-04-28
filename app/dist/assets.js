@@ -10,7 +10,7 @@ var router = express_1.default.Router();
 router.use("/semantic", express_1.default.static(config_1.paths.semantic, {
     index: false,
     immutable: true,
-    maxAge: 10000,
+    maxAge: 1000000,
     lastModified: true,
     fallthrough: false
 }));

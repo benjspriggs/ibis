@@ -11,6 +11,8 @@ import { paths } from "./config"
 
 const app = express()
 
+const noSuchRoute = (params: any) => new Error(`no such route for: '${JSON.stringify(params)}'`)
+
 app.use(cors())
 
 app.use(requestLogger)
@@ -112,7 +114,7 @@ app.get("/:route/:modality_code", (req, res, next) => {
     const item = getMenuItemBy.destination(route)
 
     if (!item) {
-        return next(new Error("no such route" + route))
+        return next(noSuchRoute(req.params))
     }
 
     fetchFromAPI(`${item.route}/${modality_code}`).then((response) => {
@@ -143,7 +145,7 @@ app.get("/:route/:modality_code/:resource", (req, res, next) => {
     const item = getMenuItemBy.destination(route)
 
     if (!item) {
-        return next(new Error("no such route" + route))
+        return next(noSuchRoute(req.params))
     }
 
     fetchFromAPI(`${item.route}/${modality_code}/${resource}`).then((response) => {

@@ -24,6 +24,7 @@ var common_2 = require("./common");
 var path_1 = require("path");
 var config_1 = require("./config");
 var app = express_1.default();
+var noSuchRoute = function (params) { return new Error("no such route for: '" + JSON.stringify(params) + "'"); };
 app.use(cors_1.default());
 app.use(common_2.requestLogger);
 app.use("/assets/", assets_1.default);
@@ -97,7 +98,7 @@ app.get("/:route/:modality_code", function (req, res, next) {
     var _a = req.params, route = _a.route, modality_code = _a.modality_code;
     var item = exports.getMenuItemBy.destination(route);
     if (!item) {
-        return next(new Error("no such route" + route));
+        return next(noSuchRoute(req.params));
     }
     helpers_2.fetchFromAPI(item.route + "/" + modality_code).then(function (response) {
         if (response) {
@@ -120,7 +121,7 @@ app.get("/:route/:modality_code/:resource", function (req, res, next) {
     }
     var item = exports.getMenuItemBy.destination(route);
     if (!item) {
-        return next(new Error("no such route" + route));
+        return next(noSuchRoute(req.params));
     }
     helpers_2.fetchFromAPI(item.route + "/" + modality_code + "/" + resource).then(function (response) {
         if (!response) {

@@ -7,7 +7,7 @@ let router: express.Router = express.Router()
 router.use("/semantic", express.static(paths.semantic, {
     index: false,
     immutable: true,
-    maxAge: 10000,
+    maxAge: 1000000,
     lastModified: true,
     fallthrough: false
 }))

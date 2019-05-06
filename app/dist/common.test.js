@@ -10,4 +10,5 @@ ava_1.default("common:getModality", function (t) {
     t.not(common_1.getModality(acup), undefined);
     t.is(common_1.getModality(acup).data.displayName, common_1.modalities[acup].displayName);
 });
+
 //# sourceMappingURL=common.test.js.map

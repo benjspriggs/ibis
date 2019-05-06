@@ -79,4 +79,5 @@ express_hbs_1.default.registerHelper("title_case", function (s) {
 express_hbs_1.default.registerHelper("with", function (context, options) {
     return options.fn(context);
 });
+
 //# sourceMappingURL=helpers.js.map

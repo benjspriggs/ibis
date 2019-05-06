@@ -17,7 +17,7 @@ app.use(cors())
 
 app.use(requestLogger)
 
-app.use("/assets/", assets)
+app.use("/assets", assets)
 
 const hbsConfig: Options = {
     "defaultLayout": join(paths.root, "views/layouts/default"),

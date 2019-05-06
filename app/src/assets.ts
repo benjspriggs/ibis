@@ -17,7 +17,7 @@ router.use("/", express.static(paths.public, {
         immutable: true,
         maxAge: 10000,
         lastModified: true,
-        fallthrough: true
+        fallthrough: false
     }))
 
 export default router

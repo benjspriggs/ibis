@@ -19,7 +19,8 @@ router.use("/", express_1.default.static(config_1.paths.public, {
     immutable: true,
     maxAge: 10000,
     lastModified: true,
-    fallthrough: true
+    fallthrough: false
 }));
 exports.default = router;
+
 //# sourceMappingURL=assets.js.map

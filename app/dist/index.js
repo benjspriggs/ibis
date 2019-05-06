@@ -8,4 +8,5 @@ var app_1 = __importDefault(require("./app"));
 app_1.default.listen(config_1.port, config_1.hostname, function () {
     console.log("Listening on " + config_1.appHostname);
 });
+
 //# sourceMappingURL=index.js.map

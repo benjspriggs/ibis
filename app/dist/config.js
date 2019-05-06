@@ -15,4 +15,5 @@ exports.paths = {
 exports.port = parseInt(process.env["PORT"]) || 8080;
 exports.hostname = process.env["HOSTNAME"] || "localhost";
 exports.appHostname = "http://" + exports.hostname + ":" + exports.port;
+
 //# sourceMappingURL=config.js.map

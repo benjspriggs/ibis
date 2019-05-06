@@ -27,7 +27,7 @@ var app = express_1.default();
 var noSuchRoute = function (params) { return new Error("no such route for: '" + JSON.stringify(params) + "'"); };
 app.use(cors_1.default());
 app.use(common_2.requestLogger);
-app.use("/assets/", assets_1.default);
+app.use("/assets", assets_1.default);
 var hbsConfig = {
     "defaultLayout": path_1.join(config_1.paths.root, "views/layouts/default"),
     "extname": ".hbs",
@@ -139,4 +139,5 @@ app.get("/:route/:modality_code/:resource", function (req, res, next) {
     });
 });
 exports.default = app;
+
 //# sourceMappingURL=views.js.map

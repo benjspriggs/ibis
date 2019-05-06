@@ -12,4 +12,5 @@ else {
     views_1.default.disable("view cache");
 }
 exports.default = views_1.default;
+
 //# sourceMappingURL=app.js.map

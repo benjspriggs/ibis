@@ -4,7 +4,7 @@
         "outDir": "../../dist/public/scripts",
         "allowJs": true,
         "target": "es6",
-        "module": "umd",
+        "module": "es6",
         "typeRoots": ["./../../node_modules/@types", "./../../src/types"]
     },
     "include": ["scripts/**/*.ts", "scripts/**/*.js"]

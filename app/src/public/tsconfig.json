@@ -1,0 +1,11 @@
+{
+    "extends": "../../../tsconfig.json",
+    "compilerOptions": {
+        "outDir": "../../dist/public/scripts",
+        "allowJs": true,
+        "target": "es6",
+        "module": "es6",
+        "typeRoots": ["./../../node_modules/@types", "./../../src/types"]
+    },
+    "include": ["scripts/**/*.ts"]
+}

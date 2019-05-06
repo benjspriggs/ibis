@@ -13,11 +13,12 @@ router.use("/semantic", express.static(paths.semantic, {
 }))
 
 router.use("/", express.static(paths.public, {
-        index: false,
-        immutable: true,
-        maxAge: 10000,
-        lastModified: true,
-        fallthrough: false
-    }))
+    index: false,
+    immutable: true,
+    maxAge: 10000,
+    lastModified: true,
+    fallthrough: false,
+    extensions: ["js"]
+}))
 
 export default router

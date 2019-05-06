@@ -7,5 +7,5 @@
         "module": "es6",
         "typeRoots": ["./../../node_modules/@types", "./../../src/types"]
     },
-    "include": ["scripts/**/*.ts"]
+    "include": ["scripts/**/*.ts", "scripts/**/*.js"]
 }

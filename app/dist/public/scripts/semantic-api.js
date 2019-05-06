@@ -6,4 +6,5 @@ $.api.settings.api = {
     'search diseases': `${apiHostname}/data/diseases?q={query}&categorize=true`,
     'search': `${apiHostname}/data?q={query}`
 };
-//# sourceMappingURL=semantic.api.js.map
+
+//# sourceMappingURL=semantic-api.js.map

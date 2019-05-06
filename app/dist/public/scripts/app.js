@@ -1,4 +1,4 @@
-import "./semantic.api";
+import "./semantic-api";
 function formatBackendResource(url) {
     const u = new URL(url);
     const [_, first, ...rest] = u.pathname.split("/");
@@ -49,4 +49,5 @@ $(document).ready(() => {
         }
     });
 });
+
 //# sourceMappingURL=app.js.map

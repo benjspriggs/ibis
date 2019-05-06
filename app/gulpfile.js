@@ -12,13 +12,16 @@ const source = "src"
 const nodeTsConfig = ts.createProject("./tsconfig.json")
 const browserTsConfig = ts.createProject("./src/public/tsconfig.json")
 
-const buildWithMaps = (tsconfig) => {
+const buildWithMaps = (tsconfig, destination) => {
     return tsconfig.src()
         .pipe(sourcemaps.init())
         .pipe(tsconfig())
         .pipe(sourcemaps.write('.', { sourceRoot: "./", includeContent: false }))
-        .pipe(dest(distributable));
+        .pipe(dest(destination));
 };
+
+const buildNode = () => buildWithMaps(nodeTsConfig, distributable)
+const buildBrowser = () => buildWithMaps(browserTsConfig, distributable + '/public/scripts')
 
 /**
  * @param {string} prefix
@@ -35,6 +38,8 @@ const staticSources = ["semantic/**/*"]
  */
 function watchStaticAssets(done) {
     watch(staticAssets(source), series(cleanStaticAssets, copyStaticAssets))
+    watch(["src/**/*.ts", "!src/public/**/*.ts"], buildNode)
+    watch(["src/public/**/*"], buildBrowser)
     return done()
 }
 
@@ -78,7 +83,7 @@ task('copy', parallel(copyStaticAssets, copyStaticSources))
 task('clean', parallel(cleanStaticAssets, cleanStaticSources))
 
 task('watch', watchStaticAssets)
-task("node", () => buildWithMaps(nodeTsConfig));
-task("browser", () => buildWithMaps(browserTsConfig));
+task("node", buildNode);
+task("browser", buildBrowser);
 task('build', parallel('node', 'browser'))
 task('default', series('copy', 'build'))

@@ -1,4 +1,4 @@
-import "./semantic.api"
+import "./semantic-api"
 import { CategorizedSearchResult, SearchResult } from "ibis-api"
 import { Searchable } from "fomantic-ui"
 

@@ -4,3 +4,4 @@ app/semantic/dist/*
 data/
 db.json
 ibis-*
+.rpt2_cache/

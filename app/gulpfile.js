@@ -85,5 +85,5 @@ task('clean', parallel(cleanStaticAssets, cleanStaticSources))
 task('watch', watchStaticAssets)
 task("node", buildNode);
 task("browser", buildBrowser);
-task('build', parallel('node', 'browser'))
+task('build', series('node'))
 task('default', series('copy', 'build'))

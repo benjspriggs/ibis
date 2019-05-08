@@ -1,15 +1,20 @@
-import express from "express";
-import { paths } from "./config";
-let router = express.Router();
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
+const config_1 = require("./config");
+let router = express_1.default.Router();
 // if this 404s, make sure to build fomantic-ui
-router.use("/semantic", express.static(paths.semantic, {
+router.use("/semantic", express_1.default.static(config_1.paths.semantic, {
     index: false,
     immutable: true,
     maxAge: 1000000,
     lastModified: true,
     fallthrough: false
 }));
-router.use("/", express.static(paths.public, {
+router.use("/", express_1.default.static(config_1.paths.public, {
     index: false,
     immutable: true,
     maxAge: 10000,
@@ -17,6 +22,6 @@ router.use("/", express.static(paths.public, {
     fallthrough: false,
     extensions: ["js"]
 }));
-export default router;
+exports.default = router;
 
 //# sourceMappingURL=assets.js.map

@@ -1,3 +1,4 @@
+"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -6,27 +7,32 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { HTMLElement, TextNode, parse } from "node-html-parser";
-import { getModality, parseHeaderFromFile } from "ibis-lib";
-import express from "express";
-import fs from "fs";
-import { isEmpty } from "lodash";
-import path from "path";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const node_html_parser_1 = require("node-html-parser");
+const ibis_lib_1 = require("ibis-lib");
+const express_1 = __importDefault(require("express"));
+const fs_1 = __importDefault(require("fs"));
+const lodash_1 = require("lodash");
+const path_1 = __importDefault(require("path"));
 const nodeMatches = (condition) => (node) => condition.test(node.rawText);
 const childrenContainsDefinitionText = (condition) => (node) => node.childNodes.some(nodeMatches(condition));
 const emptyNode = (node) => node.rawText.trim() === "";
-export function getFileInfo(absoluteFilePath, modality, listing) {
+function getFileInfo(absoluteFilePath, modality, listing) {
     const promises = listing.map((filename) => __awaiter(this, void 0, void 0, function* () {
         return ({
             modality: modality,
             filename: filename.slice(),
-            header: parseHeaderFromFile(path.join(absoluteFilePath, modality, filename)),
+            header: ibis_lib_1.parseHeaderFromFile(path_1.default.join(absoluteFilePath, modality, filename)),
         });
     }));
     return Promise.all(promises);
 }
-export const getListing = (absoluteFilePath, modality) => new Promise((resolve, reject) => {
-    fs.readdir(path.join(absoluteFilePath, modality), (err, items) => {
+exports.getFileInfo = getFileInfo;
+exports.getListing = (absoluteFilePath, modality) => new Promise((resolve, reject) => {
+    fs_1.default.readdir(path_1.default.join(absoluteFilePath, modality), (err, items) => {
         if (err) {
             return reject(err);
         }
@@ -36,7 +42,7 @@ export const getListing = (absoluteFilePath, modality) => new Promise((resolve, 
 const addModalityListingToLocals = (absoluteFilePath) => (req, res, next) => __awaiter(this, void 0, void 0, function* () {
     const { modality } = req.params;
     try {
-        const listing = yield getListing(absoluteFilePath, modality);
+        const listing = yield exports.getListing(absoluteFilePath, modality);
         res.locals.listing = listing;
         next();
     }
@@ -69,7 +75,7 @@ const trimConsecutive = (childNodes, tag = "BR", maxConsecutive = 3) => {
     }
     let i = 0;
     return childNodes.reduce((newNodeList, curr) => {
-        if (curr instanceof HTMLElement) {
+        if (curr instanceof node_html_parser_1.HTMLElement) {
             if (curr.tagName === tag) {
                 if (i >= maxConsecutive) {
                     return newNodeList;
@@ -93,7 +99,7 @@ const trimLeft = (condition) => {
     const contains = nodeMatches(condition);
     const childrenContains = childrenContainsDefinitionText(condition);
     return (root) => {
-        if (root instanceof TextNode) {
+        if (root instanceof node_html_parser_1.TextNode) {
             if (contains(root) || childrenContains(root)) {
                 return root;
             }
@@ -118,18 +124,18 @@ const trimLeft = (condition) => {
         }
     };
 };
-export default (options) => {
-    let router = express.Router();
+exports.default = (options) => {
+    let router = express_1.default.Router();
     const afterDefinition = options.trimLeftPattern ? trimLeft(options.trimLeftPattern) : (root) => root;
     router.get("/:modality/:file", (req, res) => {
         const { modality, file } = req.params;
-        const filePath = path.join(options.absoluteFilePath, modality, file);
-        const data = fs.readFileSync(filePath);
-        const root = parse(data.toString(), { noFix: false });
-        const body = root.childNodes.find(node => node instanceof HTMLElement);
+        const filePath = path_1.default.join(options.absoluteFilePath, modality, file);
+        const data = fs_1.default.readFileSync(filePath);
+        const root = node_html_parser_1.parse(data.toString(), { noFix: false });
+        const body = root.childNodes.find(node => node instanceof node_html_parser_1.HTMLElement);
         const formattedBoy = afterDefinition(body);
         formattedBoy.childNodes = trimConsecutive(formattedBoy.childNodes);
-        const { version, tag, name, category } = parseHeaderFromFile(filePath);
+        const { version, tag, name, category } = ibis_lib_1.parseHeaderFromFile(filePath);
         res.send({
             modality: modality,
             filename: file,
@@ -153,9 +159,9 @@ export default (options) => {
         try {
             const meta = (yield getFileInfo(options.absoluteFilePath, modality, res.locals.listing))
                 .map(x => (Object.assign({ filepath: filepath(req, modality, x.filename) }, x)));
-            const empty = meta.filter((infoObject) => isEmpty(infoObject.header) || Object.values(infoObject.header).some(val => typeof val === "undefined"));
+            const empty = meta.filter((infoObject) => lodash_1.isEmpty(infoObject.header) || Object.values(infoObject.header).some(val => typeof val === "undefined"));
             res.send({
-                modality: Object.assign({ code: modality }, getModality(modality)),
+                modality: Object.assign({ code: modality }, ibis_lib_1.getModality(modality)),
                 meta: meta,
                 empty: empty
             });

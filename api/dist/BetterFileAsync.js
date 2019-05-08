@@ -7,17 +7,21 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import FileAsync from 'lowdb/adapters/FileAsync';
-import pify from 'pify';
-import write from 'write-file-atomic';
-import fs from 'graceful-fs';
-const readFile = pify(fs.readFile);
-const writeFile = pify(write);
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const FileAsync_1 = __importDefault(require("lowdb/adapters/FileAsync"));
+const pify_1 = __importDefault(require("pify"));
+const write_file_atomic_1 = __importDefault(require("write-file-atomic"));
+const graceful_fs_1 = __importDefault(require("graceful-fs"));
+const readFile = pify_1.default(graceful_fs_1.default.readFile);
+const writeFile = pify_1.default(write_file_atomic_1.default);
 const whitespace = /^\s*$/.compile();
-class BetterFileAsync extends FileAsync {
+class BetterFileAsync extends FileAsync_1.default {
     read() {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!fs.existsSync(this.source)) {
+            if (!graceful_fs_1.default.existsSync(this.source)) {
                 return writeFile(this.source, this.serialize(this.defaultValue)).then(() => this.defaultValue);
             }
             try {

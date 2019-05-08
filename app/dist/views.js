@@ -1,28 +1,33 @@
-import { exhbs } from "./helpers";
-import express from "express";
-import { fetchFromAPI } from "./helpers";
-import { modalities } from "./common";
-import cors from "cors";
-import assets from "./assets";
-import { requestLogger } from "./common";
-import { join } from "path";
-import { paths } from "./config";
-const app = express();
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const helpers_1 = require("./helpers");
+const express_1 = __importDefault(require("express"));
+const helpers_2 = require("./helpers");
+const common_1 = require("./common");
+const cors_1 = __importDefault(require("cors"));
+const assets_1 = __importDefault(require("./assets"));
+const common_2 = require("./common");
+const path_1 = require("path");
+const config_1 = require("./config");
+const app = express_1.default();
 const noSuchRoute = (params) => new Error(`no such route for: '${JSON.stringify(params)}'`);
-app.use(cors());
-app.use(requestLogger);
-app.use("/assets", assets);
+app.use(cors_1.default());
+app.use(common_2.requestLogger);
+app.use("/assets", assets_1.default);
 const hbsConfig = {
-    "defaultLayout": join(paths.root, "views/layouts/default"),
+    "defaultLayout": path_1.join(config_1.paths.root, "views/layouts/default"),
     "extname": ".hbs",
-    "layoutsDir": join(paths.root, "views/layouts"),
-    "partialsDir": join(paths.root, "views/partials")
+    "layoutsDir": path_1.join(config_1.paths.root, "views/layouts"),
+    "partialsDir": path_1.join(config_1.paths.root, "views/partials")
 };
 console.log("using", hbsConfig);
-app.engine(".hbs", exhbs.express4(hbsConfig));
-app.set("views", paths.views);
+app.engine(".hbs", helpers_1.exhbs.express4(hbsConfig));
+app.set("views", config_1.paths.views);
 app.set("view engine", ".hbs");
-export const menuItems = [
+exports.menuItems = [
     {
         destination: "",
         title: "Home"
@@ -49,23 +54,23 @@ export const menuItems = [
         external: true
     },
 ];
-export const getMenuItemBy = {
-    destination: (destination) => menuItems.find(item => item.destination === destination),
-    title: (title) => menuItems.find(item => item.title === title)
+exports.getMenuItemBy = {
+    destination: (destination) => exports.menuItems.find(item => item.destination === destination),
+    title: (title) => exports.menuItems.find(item => item.title === title)
 };
 app.get("/", (_, res) => {
-    res.render("home", getMenuItemBy.destination(""));
+    res.render("home", exports.getMenuItemBy.destination(""));
 });
-app.use("/:asset", express.static(join(__dirname, "public")));
+app.use("/:asset", express_1.default.static(path_1.join(__dirname, "public")));
 app.get("/:route", (req, res, next) => {
     const { route } = req.params;
-    const item = getMenuItemBy.destination(route);
+    const item = exports.getMenuItemBy.destination(route);
     if (typeof item === "undefined") {
         next();
         return;
     }
     if (item.endpoint) {
-        fetchFromAPI(item.endpoint).then((response) => {
+        helpers_2.fetchFromAPI(item.endpoint).then((response) => {
             if (response) {
                 res.render(route, (Object.assign({}, item, { data: response })));
             }
@@ -80,14 +85,14 @@ app.get("/:route", (req, res, next) => {
 });
 app.get("/:route/:modality_code", (req, res, next) => {
     const { route, modality_code } = req.params;
-    const item = getMenuItemBy.destination(route);
+    const item = exports.getMenuItemBy.destination(route);
     if (!item) {
         return next(noSuchRoute(req.params));
     }
-    fetchFromAPI(`${item.route}/${modality_code}`).then((response) => {
+    helpers_2.fetchFromAPI(`${item.route}/${modality_code}`).then((response) => {
         if (response) {
             res.render("listing", {
-                title: modalities[modality_code].displayName,
+                title: common_1.modalities[modality_code].displayName,
                 needs_modalities: true,
                 route: route,
                 data: response.data
@@ -103,11 +108,11 @@ app.get("/:route/:modality_code/:resource", (req, res, next) => {
     if (!route || !modality_code || !resource) {
         return next();
     }
-    const item = getMenuItemBy.destination(route);
+    const item = exports.getMenuItemBy.destination(route);
     if (!item) {
         return next(noSuchRoute(req.params));
     }
-    fetchFromAPI(`${item.route}/${modality_code}/${resource}`).then((response) => {
+    helpers_2.fetchFromAPI(`${item.route}/${modality_code}/${resource}`).then((response) => {
         if (!response) {
             res.render("error");
             return;
@@ -115,13 +120,13 @@ app.get("/:route/:modality_code/:resource", (req, res, next) => {
         // TODO: add type safety to API routes
         const data = response.data;
         res.render("single", {
-            title: `${modalities[modality_code].displayName} - ${data.name}`,
+            title: `${common_1.modalities[modality_code].displayName} - ${data.name}`,
             needs_modalities: true,
             route: route,
             data: data
         });
     });
 });
-export default app;
+exports.default = app;
 
 //# sourceMappingURL=views.js.map

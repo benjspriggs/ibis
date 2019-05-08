@@ -1,6 +1,9 @@
 (function (path, fs) {
 	'use strict';
 
+	path = path && path.hasOwnProperty('default') ? path['default'] : path;
+	fs = fs && fs.hasOwnProperty('default') ? fs['default'] : fs;
+
 	var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
 	function unwrapExports (x) {
@@ -18311,8 +18314,119 @@
 	  }
 	}.call(commonjsGlobal));
 	});
-	var lodash_1 = lodash.flatten;
 
+	var dist$1 = createCommonjsModule(function (module, exports) {
+	Object.defineProperty(exports, "__esModule", { value: true });
+
+
+
+
+	exports.modalities = {
+	    "acup": {
+	        displayName: "Acupuncture"
+	    },
+	    "bota": {
+	        displayName: "Botanical Medicine"
+	    },
+	    "chin": {
+	        displayName: "Chinese Medicine"
+	    },
+	    "diag": {
+	        displayName: "Diagnostic"
+	    },
+	    "home": {
+	        displayName: "Homeopathy"
+	    },
+	    "inte": {
+	        displayName: "WHO TF KNOWS"
+	    },
+	    "nutr": {
+	        displayName: "Nutrition"
+	    },
+	    "phys": {
+	        displayName: "Physical Medicine"
+	    },
+	    "psyc": {
+	        displayName: "Psychology (?)"
+	    },
+	    "vibr": {
+	        displayName: "Vibrators? Who tf knows"
+	    },
+	};
+	function getModality(codeOrDisplayName) {
+	    const lower = codeOrDisplayName.toLowerCase();
+	    if (lower in exports.modalities) {
+	        return ({ code: lower, data: exports.modalities[lower] });
+	    }
+	    else {
+	        const [code, modality] = Object.entries(exports.modalities).find(([_, modality]) => modality.displayName.toLowerCase() === codeOrDisplayName);
+	        return ({ code: code, data: modality });
+	    }
+	}
+	exports.getModality = getModality;
+	const flattenNode = (node) => {
+	    if (node instanceof dist.TextNode) {
+	        return [node.rawText.trim()];
+	    }
+	    else if (node instanceof dist.HTMLElement) {
+	        if (node.childNodes[0] instanceof dist.TextNode) {
+	            return node.childNodes.slice(0, 10).map(n => n.rawText.trim());
+	        }
+	    }
+	    return [];
+	};
+	const possibleNodes = (node) => {
+	    if (!node) {
+	        return [];
+	    }
+	    return lodash.flatten(node.childNodes
+	        .map(flattenNode)
+	        .filter(nodeText => nodeText.every(text => text !== "")));
+	};
+	function parseHeaderFromFile(filepath) {
+	    if (typeof filepath === "undefined") {
+	        throw new Error("undefined filepath");
+	    }
+	    const buffer = fs.readFileSync(filepath);
+	    const data = buffer.toString();
+	    const interestingNode = parseHeader(data);
+	    const [version, _, tag, name, category] = interestingNode;
+	    return ({
+	        version: version,
+	        tag: tag,
+	        name: name,
+	        category: category
+	    });
+	}
+	exports.parseHeaderFromFile = parseHeaderFromFile;
+	const versionPattern = /^-IBIS-(\d+)\.(\d+)\.(\d+)-$/;
+	// TODO: this doesn"t reliably parse the headers for most files
+	// @bspriggs investigate
+	function parseHeader(source) {
+	    const root = dist.parse(source, { noFix: false, lowerCaseTagName: false });
+	    const htmlRoot = root.childNodes
+	        .find(node => node instanceof dist.HTMLElement);
+	    if (!htmlRoot) {
+	        return [];
+	    }
+	    const head = htmlRoot.querySelector("HEAD");
+	    const body = htmlRoot.querySelector("BODY");
+	    const interestingNodes = [].concat(possibleNodes(htmlRoot), possibleNodes(head), possibleNodes(body));
+	    const first = interestingNodes.findIndex(node => versionPattern.test(node));
+	    // console.log(first)
+	    // console.dir(interestingNodes)
+	    return interestingNodes.slice(first, first + 5).map(s => s.slice());
+	}
+	exports.parseHeader = parseHeader;
+	exports.requestLogger = (req, _, next) => {
+	    console.log(JSON.stringify({
+	        date: new Date(),
+	        path: req.path,
+	        query: req.query,
+	        "user-agent": req.headers["user-agent"],
+	    }));
+	    next();
+	};
 	function detectApplicationRoot() {
 	    if (isPackaged()) {
 	        // https://www.npmjs.com/package/pkg#snapshot-filesystem
@@ -18330,12 +18444,28 @@
 	    const pkg = process.pkg;
 	    return !!pkg;
 	}
-	const applicationRoot = detectApplicationRoot();
+	exports.isPackaged = isPackaged;
+	exports.applicationRoot = detectApplicationRoot();
 
-	const port = parseInt(process.env.API_PORT, 10) || 3000;
-	const hostname = process.env.API_HOSTNAME || "localhost";
-	const apiHostname = `http://${hostname}:${port}`;
-	const ibisRoot = path.join(applicationRoot, "IBIS-Mac OS X");
+	});
+
+	unwrapExports(dist$1);
+	var dist_1$1 = dist$1.modalities;
+	var dist_2$1 = dist$1.getModality;
+	var dist_3$1 = dist$1.parseHeaderFromFile;
+	var dist_4$1 = dist$1.parseHeader;
+	var dist_5$1 = dist$1.requestLogger;
+	var dist_6$1 = dist$1.isPackaged;
+	var dist_7 = dist$1.applicationRoot;
+
+	var config_1 = createCommonjsModule(function (module, exports) {
+	Object.defineProperty(exports, "__esModule", { value: true });
+
+
+	exports.port = parseInt(process.env.API_PORT, 10) || 3000;
+	exports.hostname = process.env.API_HOSTNAME || "localhost";
+	exports.apiHostname = `http://${exports.hostname}:${exports.port}`;
+	const ibisRoot = path.join(dist$1.applicationRoot, "IBIS-Mac OS X");
 	const system = path.join(ibisRoot, "system");
 	const user = path.join(ibisRoot, "system");
 	const config = {
@@ -18347,19 +18477,27 @@
 	        user,
 	    },
 	    relative: {
-	        applicationRoot: (...folders) => path.join(applicationRoot, ...folders),
+	        applicationRoot: (...folders) => path.join(dist$1.applicationRoot, ...folders),
 	        ibisRoot: (...folders) => path.join(ibisRoot, ...folders),
 	    },
 	};
+	exports.default = config;
+
+	});
+
+	unwrapExports(config_1);
+	var config_2 = config_1.port;
+	var config_3 = config_1.hostname;
+	var config_4 = config_1.apiHostname;
 
 	//@ts-check
 
 	$.api.settings.verbose = true;
 
 	$.api.settings.api = {
-	    'search treatments': `${apiHostname}/data/treatments?q={query}`,
-	    'search diseases': `${apiHostname}/data/diseases?q={query}&categorize=true`,
-	    'search': `${apiHostname}/data?q={query}`
+	    'search treatments': `${config_4}/data/treatments?q={query}`,
+	    'search diseases': `${config_4}/data/diseases?q={query}&categorize=true`,
+	    'search': `${config_4}/data?q={query}`
 	};
 
 	function formatBackendResource(url) {

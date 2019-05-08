@@ -8,14 +8,11 @@ export default {
         file: './dist/public/scripts/app.js',
         format: 'iife'
     },
+    external: ['fs', 'path'],
  
     plugins: [
         resolve(),
         commonjs({
-            include: ['./node_modules/**', '../lib/node_modules/**', '../api/node_modules/**'],
-            namedExports: {
-                '../lib/node_modules/lodash/lodash.js': ['flatten']
-            }
         }),
         typescript({
             tsconfig: './src/public/tsconfig.json'

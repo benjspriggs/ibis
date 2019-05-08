@@ -1,7 +1,9 @@
-import { HTMLElement, TextNode, parse } from "node-html-parser";
-import { flatten } from "lodash";
-import { readFileSync } from "fs";
-export const modalities = {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const node_html_parser_1 = require("node-html-parser");
+const lodash_1 = require("lodash");
+const fs_1 = require("fs");
+exports.modalities = {
     "acup": {
         displayName: "Acupuncture"
     },
@@ -33,22 +35,23 @@ export const modalities = {
         displayName: "Vibrators? Who tf knows"
     },
 };
-export function getModality(codeOrDisplayName) {
+function getModality(codeOrDisplayName) {
     const lower = codeOrDisplayName.toLowerCase();
-    if (lower in modalities) {
-        return ({ code: lower, data: modalities[lower] });
+    if (lower in exports.modalities) {
+        return ({ code: lower, data: exports.modalities[lower] });
     }
     else {
-        const [code, modality] = Object.entries(modalities).find(([_, modality]) => modality.displayName.toLowerCase() === codeOrDisplayName);
+        const [code, modality] = Object.entries(exports.modalities).find(([_, modality]) => modality.displayName.toLowerCase() === codeOrDisplayName);
         return ({ code: code, data: modality });
     }
 }
+exports.getModality = getModality;
 const flattenNode = (node) => {
-    if (node instanceof TextNode) {
+    if (node instanceof node_html_parser_1.TextNode) {
         return [node.rawText.trim()];
     }
-    else if (node instanceof HTMLElement) {
-        if (node.childNodes[0] instanceof TextNode) {
+    else if (node instanceof node_html_parser_1.HTMLElement) {
+        if (node.childNodes[0] instanceof node_html_parser_1.TextNode) {
             return node.childNodes.slice(0, 10).map(n => n.rawText.trim());
         }
     }
@@ -58,15 +61,15 @@ const possibleNodes = (node) => {
     if (!node) {
         return [];
     }
-    return flatten(node.childNodes
+    return lodash_1.flatten(node.childNodes
         .map(flattenNode)
         .filter(nodeText => nodeText.every(text => text !== "")));
 };
-export function parseHeaderFromFile(filepath) {
+function parseHeaderFromFile(filepath) {
     if (typeof filepath === "undefined") {
         throw new Error("undefined filepath");
     }
-    const buffer = readFileSync(filepath);
+    const buffer = fs_1.readFileSync(filepath);
     const data = buffer.toString();
     const interestingNode = parseHeader(data);
     const [version, _, tag, name, category] = interestingNode;
@@ -77,13 +80,14 @@ export function parseHeaderFromFile(filepath) {
         category: category
     });
 }
+exports.parseHeaderFromFile = parseHeaderFromFile;
 const versionPattern = /^-IBIS-(\d+)\.(\d+)\.(\d+)-$/;
 // TODO: this doesn't reliably parse the headers for most files
 // @bspriggs investigate
-export function parseHeader(source) {
-    const root = parse(source, { noFix: false, lowerCaseTagName: false });
+function parseHeader(source) {
+    const root = node_html_parser_1.parse(source, { noFix: false, lowerCaseTagName: false });
     const htmlRoot = root.childNodes
-        .find(node => node instanceof HTMLElement);
+        .find(node => node instanceof node_html_parser_1.HTMLElement);
     if (!htmlRoot) {
         return [];
     }
@@ -95,7 +99,8 @@ export function parseHeader(source) {
     // console.dir(interestingNodes)
     return interestingNodes.slice(first, first + 5).map(s => s.slice());
 }
-export const requestLogger = (req, _, next) => {
+exports.parseHeader = parseHeader;
+exports.requestLogger = (req, _, next) => {
     console.log(JSON.stringify({
         date: new Date(),
         path: req.path,

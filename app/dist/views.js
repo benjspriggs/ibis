@@ -1,44 +1,28 @@
-"use strict";
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-var helpers_1 = require("./helpers");
-var express_1 = __importDefault(require("express"));
-var helpers_2 = require("./helpers");
-var common_1 = require("./common");
-var cors_1 = __importDefault(require("cors"));
-var assets_1 = __importDefault(require("./assets"));
-var common_2 = require("./common");
-var path_1 = require("path");
-var config_1 = require("./config");
-var app = express_1.default();
-var noSuchRoute = function (params) { return new Error("no such route for: '" + JSON.stringify(params) + "'"); };
-app.use(cors_1.default());
-app.use(common_2.requestLogger);
-app.use("/assets", assets_1.default);
-var hbsConfig = {
-    "defaultLayout": path_1.join(config_1.paths.root, "views/layouts/default"),
+import { exhbs } from "./helpers";
+import express from "express";
+import { fetchFromAPI } from "./helpers";
+import { modalities } from "./common";
+import cors from "cors";
+import assets from "./assets";
+import { requestLogger } from "./common";
+import { join } from "path";
+import { paths } from "./config";
+const app = express();
+const noSuchRoute = (params) => new Error(`no such route for: '${JSON.stringify(params)}'`);
+app.use(cors());
+app.use(requestLogger);
+app.use("/assets", assets);
+const hbsConfig = {
+    "defaultLayout": join(paths.root, "views/layouts/default"),
     "extname": ".hbs",
-    "layoutsDir": path_1.join(config_1.paths.root, "views/layouts"),
-    "partialsDir": path_1.join(config_1.paths.root, "views/partials")
+    "layoutsDir": join(paths.root, "views/layouts"),
+    "partialsDir": join(paths.root, "views/partials")
 };
 console.log("using", hbsConfig);
-app.engine(".hbs", helpers_1.exhbs.express4(hbsConfig));
-app.set("views", config_1.paths.views);
+app.engine(".hbs", exhbs.express4(hbsConfig));
+app.set("views", paths.views);
 app.set("view engine", ".hbs");
-exports.menuItems = [
+export const menuItems = [
     {
         destination: "",
         title: "Home"
@@ -65,25 +49,25 @@ exports.menuItems = [
         external: true
     },
 ];
-exports.getMenuItemBy = {
-    destination: function (destination) { return exports.menuItems.find(function (item) { return item.destination === destination; }); },
-    title: function (title) { return exports.menuItems.find(function (item) { return item.title === title; }); }
+export const getMenuItemBy = {
+    destination: (destination) => menuItems.find(item => item.destination === destination),
+    title: (title) => menuItems.find(item => item.title === title)
 };
-app.get("/", function (_, res) {
-    res.render("home", exports.getMenuItemBy.destination(""));
+app.get("/", (_, res) => {
+    res.render("home", getMenuItemBy.destination(""));
 });
-app.use("/:asset", express_1.default.static(path_1.join(__dirname, "public")));
-app.get("/:route", function (req, res, next) {
-    var route = req.params.route;
-    var item = exports.getMenuItemBy.destination(route);
+app.use("/:asset", express.static(join(__dirname, "public")));
+app.get("/:route", (req, res, next) => {
+    const { route } = req.params;
+    const item = getMenuItemBy.destination(route);
     if (typeof item === "undefined") {
         next();
         return;
     }
     if (item.endpoint) {
-        helpers_2.fetchFromAPI(item.endpoint).then(function (response) {
+        fetchFromAPI(item.endpoint).then((response) => {
             if (response) {
-                res.render(route, (__assign({}, item, { data: response })));
+                res.render(route, (Object.assign({}, item, { data: response })));
             }
             else {
                 res.render("error");
@@ -94,16 +78,16 @@ app.get("/:route", function (req, res, next) {
         res.render(route, item);
     }
 });
-app.get("/:route/:modality_code", function (req, res, next) {
-    var _a = req.params, route = _a.route, modality_code = _a.modality_code;
-    var item = exports.getMenuItemBy.destination(route);
+app.get("/:route/:modality_code", (req, res, next) => {
+    const { route, modality_code } = req.params;
+    const item = getMenuItemBy.destination(route);
     if (!item) {
         return next(noSuchRoute(req.params));
     }
-    helpers_2.fetchFromAPI(item.route + "/" + modality_code).then(function (response) {
+    fetchFromAPI(`${item.route}/${modality_code}`).then((response) => {
         if (response) {
             res.render("listing", {
-                title: common_1.modalities[modality_code].displayName,
+                title: modalities[modality_code].displayName,
                 needs_modalities: true,
                 route: route,
                 data: response.data
@@ -114,30 +98,30 @@ app.get("/:route/:modality_code", function (req, res, next) {
         }
     });
 });
-app.get("/:route/:modality_code/:resource", function (req, res, next) {
-    var _a = req.params, route = _a.route, modality_code = _a.modality_code, resource = _a.resource;
+app.get("/:route/:modality_code/:resource", (req, res, next) => {
+    const { route, modality_code, resource } = req.params;
     if (!route || !modality_code || !resource) {
         return next();
     }
-    var item = exports.getMenuItemBy.destination(route);
+    const item = getMenuItemBy.destination(route);
     if (!item) {
         return next(noSuchRoute(req.params));
     }
-    helpers_2.fetchFromAPI(item.route + "/" + modality_code + "/" + resource).then(function (response) {
+    fetchFromAPI(`${item.route}/${modality_code}/${resource}`).then((response) => {
         if (!response) {
             res.render("error");
             return;
         }
         // TODO: add type safety to API routes
-        var data = response.data;
+        const data = response.data;
         res.render("single", {
-            title: common_1.modalities[modality_code].displayName + " - " + data.name,
+            title: `${modalities[modality_code].displayName} - ${data.name}`,
             needs_modalities: true,
             route: route,
             data: data
         });
     });
 });
-exports.default = app;
+export default app;
 
 //# sourceMappingURL=views.js.map

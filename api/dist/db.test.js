@@ -1,4 +1,3 @@
-"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -7,224 +6,104 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
-    return result;
-};
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-var _this = this;
-Object.defineProperty(exports, "__esModule", { value: true });
-var db_1 = __importStar(require("./db"));
-var body_parser_1 = __importDefault(require("body-parser"));
-var express_1 = __importDefault(require("express"));
-var supertest_1 = __importDefault(require("supertest"));
-var ava_1 = __importDefault(require("ava"));
-var getApp = function () {
-    var app = express_1.default();
-    app.use(body_parser_1.default.json());
-    app.use("/", db_1.default);
+import db, { query } from "./db";
+import bodyparser from "body-parser";
+import express from "express";
+import request from "supertest";
+import test from "ava";
+const getApp = () => {
+    const app = express();
+    app.use(bodyparser.json());
+    app.use("/", db);
     return app;
 };
-ava_1.default("db:app:/", function (t) { return __awaiter(_this, void 0, void 0, function () {
-    var res;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                t.plan(2);
-                return [4 /*yield*/, supertest_1.default(getApp()).get("/")];
-            case 1:
-                res = _a.sent();
-                t.is(res.status, 200);
-                t.not(res.body, undefined);
-                return [2 /*return*/];
-        }
-    });
-}); });
-ava_1.default("db:app:/:query", function (t) { return __awaiter(_this, void 0, void 0, function () {
-    var res;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                t.plan(2);
-                return [4 /*yield*/, supertest_1.default(getApp()).get("/?q=string")];
-            case 1:
-                res = _a.sent();
-                t.is(res.status, 200);
-                t.not(res.body, undefined);
-                return [2 /*return*/];
-        }
-    });
-}); });
-ava_1.default("db:app:/diseases", function (t) { return __awaiter(_this, void 0, void 0, function () {
-    var res;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                t.plan(2);
-                return [4 /*yield*/, supertest_1.default(getApp()).get("/diseases")];
-            case 1:
-                res = _a.sent();
-                t.is(res.status, 200);
-                t.is(res.body.directory, "diseases");
-                return [2 /*return*/];
-        }
-    });
-}); });
-ava_1.default("db:app:/treatments", function (t) { return __awaiter(_this, void 0, void 0, function () {
-    var res;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                t.plan(2);
-                return [4 /*yield*/, supertest_1.default(getApp()).get("/treatments")];
-            case 1:
-                res = _a.sent();
-                t.is(res.status, 200);
-                t.is(res.body.directory, "treatments");
-                return [2 /*return*/];
-        }
-    });
-}); });
-ava_1.default("db:app:/treatments:categorized", function (t) { return __awaiter(_this, void 0, void 0, function () {
-    var res;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                t.plan(2);
-                return [4 /*yield*/, supertest_1.default(getApp()).get("/treatments?categorize=true")];
-            case 1:
-                res = _a.sent();
-                t.is(res.status, 200);
-                t.false(Array.isArray(res.body.results));
-                return [2 /*return*/];
-        }
-    });
-}); });
-ava_1.default("db:app:/diseases:categorized", function (t) { return __awaiter(_this, void 0, void 0, function () {
-    var res;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                t.plan(2);
-                return [4 /*yield*/, supertest_1.default(getApp()).get("/diseases?categorize=true")];
-            case 1:
-                res = _a.sent();
-                t.is(res.status, 200);
-                t.false(Array.isArray(res.body.results));
-                return [2 /*return*/];
-        }
-    });
-}); });
-ava_1.default("db:app:/treatments:not categorized", function (t) { return __awaiter(_this, void 0, void 0, function () {
-    var res;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                t.plan(2);
-                return [4 /*yield*/, supertest_1.default(getApp()).get("/treatments?categorize=false")];
-            case 1:
-                res = _a.sent();
-                t.is(res.status, 200);
-                t.true(Array.isArray(res.body.results));
-                return [2 /*return*/];
-        }
-    });
-}); });
-ava_1.default("db:app:/diseases:not categorized", function (t) { return __awaiter(_this, void 0, void 0, function () {
-    var res;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                t.plan(2);
-                return [4 /*yield*/, supertest_1.default(getApp()).get("/diseases?categorize=false")];
-            case 1:
-                res = _a.sent();
-                t.is(res.status, 200);
-                t.true(Array.isArray(res.body.results));
-                return [2 /*return*/];
-        }
-    });
-}); });
-ava_1.default("db:app:/foobar", function (t) { return __awaiter(_this, void 0, void 0, function () {
-    var res;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                t.plan(1);
-                return [4 /*yield*/, supertest_1.default(getApp()).get("/foobar")];
-            case 1:
-                res = _a.sent();
-                t.is(res.status, 404);
-                return [2 /*return*/];
-        }
-    });
-}); });
-ava_1.default("db:query:modality", function (t) {
-    t.deepEqual(db_1.query("foobar"), {
+test("db:app:/", (t) => __awaiter(this, void 0, void 0, function* () {
+    t.plan(2);
+    const res = yield request(getApp()).get("/");
+    t.is(res.status, 200);
+    t.not(res.body, undefined);
+}));
+test("db:app:/:query", (t) => __awaiter(this, void 0, void 0, function* () {
+    t.plan(2);
+    const res = yield request(getApp()).get("/?q=string");
+    t.is(res.status, 200);
+    t.not(res.body, undefined);
+}));
+test("db:app:/diseases", (t) => __awaiter(this, void 0, void 0, function* () {
+    t.plan(2);
+    const res = yield request(getApp()).get("/diseases");
+    t.is(res.status, 200);
+    t.is(res.body.directory, "diseases");
+}));
+test("db:app:/treatments", (t) => __awaiter(this, void 0, void 0, function* () {
+    t.plan(2);
+    const res = yield request(getApp()).get("/treatments");
+    t.is(res.status, 200);
+    t.is(res.body.directory, "treatments");
+}));
+test("db:app:/treatments:categorized", (t) => __awaiter(this, void 0, void 0, function* () {
+    t.plan(2);
+    const res = yield request(getApp()).get("/treatments?categorize=true");
+    t.is(res.status, 200);
+    t.false(Array.isArray(res.body.results));
+}));
+test("db:app:/diseases:categorized", (t) => __awaiter(this, void 0, void 0, function* () {
+    t.plan(2);
+    const res = yield request(getApp()).get("/diseases?categorize=true");
+    t.is(res.status, 200);
+    t.false(Array.isArray(res.body.results));
+}));
+test("db:app:/treatments:not categorized", (t) => __awaiter(this, void 0, void 0, function* () {
+    t.plan(2);
+    const res = yield request(getApp()).get("/treatments?categorize=false");
+    t.is(res.status, 200);
+    t.true(Array.isArray(res.body.results));
+}));
+test("db:app:/diseases:not categorized", (t) => __awaiter(this, void 0, void 0, function* () {
+    t.plan(2);
+    const res = yield request(getApp()).get("/diseases?categorize=false");
+    t.is(res.status, 200);
+    t.true(Array.isArray(res.body.results));
+}));
+test("db:app:/foobar", (t) => __awaiter(this, void 0, void 0, function* () {
+    t.plan(1);
+    const res = yield request(getApp()).get("/foobar");
+    t.is(res.status, 404);
+}));
+test("db:query:modality", (t) => {
+    t.deepEqual(query("foobar"), {
         text: "foobar",
     });
-    t.deepEqual(db_1.query("term modality:bota"), {
+    t.deepEqual(query("term modality:bota"), {
         modality: "bota",
         text: "term modality:bota",
     }, "it has a long name");
-    t.deepEqual(db_1.query("term m:bota"), {
+    t.deepEqual(query("term m:bota"), {
         modality: "bota",
         text: "term m:bota",
     }, "it has shorthands");
     try {
-        db_1.query("term m:bota m:vera");
+        query("term m:bota m:vera");
         t.fail("must not allow multiple modality codes");
     }
     catch (_) {
         // ignore
     }
-    t.deepEqual(db_1.query("term m:\"string modality\""), {
+    t.deepEqual(query(`term m:"string modality"`), {
         modality: "string modality",
-        text: "term m:\"string modality\"",
+        text: `term m:"string modality"`,
     }, "it captures double quotes");
-    t.deepEqual(db_1.query("term m:\"string modality\""), {
+    t.deepEqual(query(`term m:"string modality"`), {
         modality: "string modality",
-        text: "term m:\"string modality\"",
+        text: `term m:"string modality"`,
     }, "it captures single quotes");
-    t.deepEqual(db_1.query("term m:\"string modality\" word"), {
+    t.deepEqual(query(`term m:"string modality" word`), {
         modality: "string modality",
-        text: "term m:\"string modality\" word",
-    }, "it doesn\"t capture words after quotes");
-    t.deepEqual(db_1.query("term m:\"string modality\" word"), {
+        text: `term m:"string modality" word`,
+    }, `it doesn"t capture words after quotes`);
+    t.deepEqual(query(`term m:"string modality" word`), {
         modality: "string modality",
-        text: "term m:\"string modality\" word",
-    }, "it doesn\"t capture words after quotes");
+        text: `term m:"string modality" word`,
+    }, `it doesn"t capture words after quotes`);
 });
 //# sourceMappingURL=db.test.js.map

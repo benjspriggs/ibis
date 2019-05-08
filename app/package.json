@@ -8,7 +8,8 @@
     "start": "npm run serve",
     "serve": "node dist/index.js",
     "test": "ava --tap",
-    "build": "gulp"
+    "build": "gulp",
+    "build:browser": "rollup --config ./src/public/rollup.config.js"
   },
   "author": "Ben Spriggs",
   "license": "ISC",
@@ -41,6 +42,10 @@
     "gulp-newer": "^1.4.0",
     "gulp-sourcemaps": "^2.6.5",
     "gulp-typescript": "^5.0.1",
+    "rollup": "^1.11.3",
+    "rollup-plugin-commonjs": "^9.3.4",
+    "rollup-plugin-node-resolve": "^4.2.3",
+    "rollup-plugin-typescript2": "^0.21.0",
     "typescript": "^3.4.5"
   },
   "pkg": {

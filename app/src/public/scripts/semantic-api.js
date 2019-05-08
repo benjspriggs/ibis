@@ -1,5 +1,5 @@
 //@ts-check
-import { apiHostname } from "ibis-api/dist/config"
+const apiHostname = 'http://localhost:3000'
 
 $.api.settings.verbose = true
 

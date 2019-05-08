@@ -8,7 +8,7 @@
     "start": "npm run serve",
     "serve": "node dist/index.js",
     "test": "ava --tap",
-    "build": "gulp",
+    "build": "gulp && npm run build:browser",
     "build:browser": "rollup --config ./src/public/rollup.config.js"
   },
   "author": "Ben Spriggs",

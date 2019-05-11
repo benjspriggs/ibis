@@ -2,11 +2,11 @@ import db, { initialize as dbInitialize } from "./db"
 import { modalities, requestLogger } from "ibis-lib"
 
 import cors from "cors"
-import express from "express"
+import { default as express, Application }  from "express"
 import rx from "./rx"
 import tx from "./tx"
 
-const app = express()
+const app: Application = express()
 
 export const initialize = dbInitialize
 

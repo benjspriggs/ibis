@@ -12,4 +12,3 @@ router.use("/", file_1.default({
     absoluteFilePath: config_1.default.relative.ibisRoot("system", "rx"),
 }));
 exports.default = router;
-//# sourceMappingURL=rx.js.map

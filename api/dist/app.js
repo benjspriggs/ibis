@@ -30,4 +30,3 @@ app.use("/rx", rx_1.default);
 app.use("/tx", tx_1.default);
 app.use("/data", db_1.default);
 exports.default = app;
-//# sourceMappingURL=app.js.map

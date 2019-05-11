@@ -118,4 +118,3 @@ ava_1.default("db:query:modality", (t) => {
         text: `term m:"string modality" word`,
     }, `it doesn"t capture words after quotes`);
 });
-//# sourceMappingURL=db.test.js.map

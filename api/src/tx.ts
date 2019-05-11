@@ -1,12 +1,12 @@
 import { Header, parseHeaderFromFile } from "ibis-lib"
 
 import config from "./config"
-import express from "express"
+import { default as express, Router } from "express"
 import file from "./file"
 import fs from "fs"
 import { join } from "path"
 
-const router = express.Router()
+const router: Router = express.Router()
 
 interface TreatmentListing {
     modality: string,

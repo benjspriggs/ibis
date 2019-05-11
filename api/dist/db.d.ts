@@ -1,4 +1,5 @@
 import { Header, Modality } from "ibis-lib";
+import { Router } from "express";
 export interface Directory {
     url: string;
     modality: Modality;
@@ -13,7 +14,7 @@ export interface Query {
     modality?: string;
 }
 export declare function query(text: string): Query;
-declare const router: import("express-serve-static-core").Router;
+declare const router: Router;
 export interface SearchResult {
     query: string;
     directory: string;

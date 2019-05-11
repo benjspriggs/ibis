@@ -1,8 +1,8 @@
 import config from "./config"
-import express from "express"
+import { default as express, Router } from "express"
 import file from "./file"
 
-const router = express.Router()
+const router: Router = express.Router()
 
 router.use("/", file({
     endpoint: "rx",

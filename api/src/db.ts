@@ -4,7 +4,7 @@ import config, { apiHostname } from "./config"
 import { getFileInfo, getListing } from "./file";
 
 import BetterFileAsync from "./BetterFileAsync"
-import express from "express"
+import { default as express, Router } from "express"
 import fuse from "fuse.js"
 import lowdb from "lowdb"
 
@@ -101,7 +101,7 @@ async function getAllListings(resourcePrefix: string, abs: string): Promise<Dire
         })))
 }
 
-const router = express.Router()
+const router: Router = express.Router()
 
 router.get("/", async (req, res) => {
     const db = await database();

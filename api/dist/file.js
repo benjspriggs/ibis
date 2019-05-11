@@ -172,4 +172,3 @@ exports.default = (options) => {
     }));
     return router;
 };
-//# sourceMappingURL=file.js.map

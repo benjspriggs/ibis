@@ -28,4 +28,3 @@ exports.default = () => {
         console.log(`Listening on ${config_1.apiHostname}`);
     }));
 };
-//# sourceMappingURL=index.js.map

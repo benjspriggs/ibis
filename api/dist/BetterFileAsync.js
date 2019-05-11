@@ -47,4 +47,3 @@ class BetterFileAsync extends FileAsync_1.default {
     }
 }
 module.exports = BetterFileAsync;
-//# sourceMappingURL=BetterFileAsync.js.map

@@ -1,5 +1,6 @@
 import { initialize as dbInitialize } from "./db";
-declare const app: import("express-serve-static-core").Express;
+import { Application } from "express";
+declare const app: Application;
 export declare const initialize: typeof dbInitialize;
 export default app;
 //# sourceMappingURL=app.d.ts.map

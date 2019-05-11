@@ -19,7 +19,7 @@
     "test": "concurrently \"npm:test:api\" \"npm:test:app\"",
     "test:api": "cd api && npm run test",
     "test:app": "cd app && npm run test",
-    "watch": "npm run build:copy && concurrently --kill-others \"npm:watch:ts\" \"npm:watch:api\" \"npm:watch:app\"",
+    "watch": "concurrently --kill-others \"npm:watch:ts\" \"npm:watch:api\" \"npm:watch:app\"",
     "watch:ts": "tsc -w",
     "pkg": "concurrently \"npm:pkg:api\" \"npm:pkg:app\"",
     "pkg:api": "pkg api",

@@ -1,5 +1,6 @@
 import { apiHostname } from "ibis-api"
 import exhbs from "express-hbs"
+import fetch from "node-fetch"
 import { menuItems } from "./views"
 import { modalities } from "./common"
 import { paths } from "./config"
@@ -15,7 +16,7 @@ export const fetchFromAPI = (endpoint: string) => {
     const absolutePath = `${apiHostname}/${endpoint}`
     return fetch(absolutePath, {
         method: 'GET',
-        cache: 'default',
+        compress: true
     })
     .then(response => {
         if (!response.ok) {
@@ -23,10 +24,10 @@ export const fetchFromAPI = (endpoint: string) => {
         }
 
         return response.json();
-    })
-        .catch((err) => {
-            console.error(`api err on endpoint ${endpoint}/'${err.request.path}': ${err.response}`)
-        })
+    }, err => {
+        console.error(`api err on endpoint ${endpoint}: ${err.toString()}`)
+        throw err;
+    });
 };
 
 exhbs.registerHelper("modalities", () => {
@@ -63,6 +64,7 @@ exhbs.registerAsyncHelper("ibis_file", (info: any, cb: Function) => {
     fetchFromAPI(info.filepath.relative).then((data) => {
         cb(data)
     })
+    .catch(() => cb())
 })
 
 exhbs.registerAsyncHelper("api", (context: any, cb: Function) => {
@@ -71,6 +73,7 @@ exhbs.registerAsyncHelper("api", (context: any, cb: Function) => {
             cb(new exhbs.SafeString(response.data))
         }
     })
+    .catch(() => cb())
 })
 
 exhbs.registerHelper("hostname", (route: any) => {

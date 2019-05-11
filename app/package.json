@@ -20,6 +20,7 @@
     "handlebars": "^4.1.2",
     "ibis-api": "file:../api",
     "ibis-lib": "file:../lib",
+    "node-fetch": "^2.5.0",
     "node-html-parser": "^1.1.15"
   },
   "devDependencies": {
@@ -30,6 +31,7 @@
     "@types/jquery": "^3.3.29",
     "@types/js-beautify": "^1.8.0",
     "@types/lodash": "^4.14.123",
+    "@types/node-fetch": "^2.3.3",
     "ava": "^1.4.1",
     "common-shakeify": "^0.6.0",
     "del": "^4.1.0",

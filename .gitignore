@@ -5,4 +5,4 @@ data/
 db.json
 ibis-*
 .rpt2_cache/
-dist/*
+dist/

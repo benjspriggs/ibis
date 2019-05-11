@@ -1,5 +1,5 @@
 import { exhbs } from "./helpers"
-import express from "express"
+import { default as express, Application } from "express"
 import { Options } from "express-hbs"
 import { fetchFromAPI } from "./helpers"
 import { modalities } from "./common"
@@ -9,7 +9,7 @@ import { requestLogger } from "./common"
 import { join } from "path"
 import { paths } from "./config"
 
-const app = express()
+const app: Application = express()
 
 const noSuchRoute = (params: any) => new Error(`no such route for: '${JSON.stringify(params)}'`)
 

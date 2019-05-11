@@ -10,7 +10,6 @@ const distributable = "dist"
 const source = "src"
 
 const nodeTsConfig = ts.createProject("./tsconfig.json")
-const browserTsConfig = ts.createProject("./src/public/tsconfig.json")
 
 const buildWithMaps = (tsconfig, destination) => {
     return tsconfig.src()
@@ -21,7 +20,6 @@ const buildWithMaps = (tsconfig, destination) => {
 };
 
 const buildNode = () => buildWithMaps(nodeTsConfig, distributable)
-const buildBrowser = () => buildWithMaps(browserTsConfig, distributable + '/public/scripts')
 
 /**
  * @param {string} prefix
@@ -39,7 +37,6 @@ const staticSources = ["semantic/**/*"]
 function watchStaticAssets(done) {
     watch(staticAssets(source), series(cleanStaticAssets, copyStaticAssets))
     watch(["src/**/*.ts", "!src/public/**/*.ts"], buildNode)
-    watch(["src/public/**/*"], buildBrowser)
     return done()
 }
 
@@ -84,6 +81,5 @@ task('clean', parallel(cleanStaticAssets, cleanStaticSources))
 
 task('watch', watchStaticAssets)
 task("node", buildNode);
-task("browser", buildBrowser);
 task('build', series('node'))
 task('default', series('copy', 'build'))

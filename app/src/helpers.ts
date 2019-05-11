@@ -1,5 +1,4 @@
 import { apiHostname } from "ibis-api"
-import axios from "axios"
 import exhbs from "express-hbs"
 import { menuItems } from "./views"
 import { modalities } from "./common"
@@ -14,7 +13,17 @@ const menuLayoutPath = join(paths.views, "partials/menu")
 
 export const fetchFromAPI = (endpoint: string) => {
     const absolutePath = `${apiHostname}/${endpoint}`
-    return axios.get(absolutePath)
+    return fetch(absolutePath, {
+        method: 'GET',
+        cache: 'default',
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(response.statusText);
+        }
+
+        return response.json();
+    })
         .catch((err) => {
             console.error(`api err on endpoint ${endpoint}/'${err.request.path}': ${err.response}`)
         })

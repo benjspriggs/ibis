@@ -33,4 +33,3 @@ export interface CategorizedSearchMap {
 }
 export declare function initialize(): Promise<void>;
 export default router;
-//# sourceMappingURL=db.d.ts.map

@@ -19,8 +19,3 @@ export interface Header {
 export declare function parseHeaderFromFile(filepath: string): Header;
 export declare function parseHeader(source: string): string[];
 export declare const requestLogger: RequestHandler;
-/**
- * See https://www.npmjs.com/package/pkg#snapshot-filesystem
- */
-export declare function isPackaged(): boolean;
-export declare const applicationRoot: string;

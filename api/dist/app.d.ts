@@ -3,4 +3,3 @@ import { Application } from "express";
 declare const app: Application;
 export declare const initialize: typeof dbInitialize;
 export default app;
-//# sourceMappingURL=app.d.ts.map

@@ -6,4 +6,3 @@ export declare function getFileInfo(absoluteFilePath: string, modality: string, 
 export declare const getListing: (absoluteFilePath: string, modality: string) => Promise<string[]>;
 declare const _default;
 export default _default;
-//# sourceMappingURL=file.d.ts.map

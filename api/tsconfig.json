@@ -4,7 +4,7 @@
         "outDir": "dist",
         "declarationDir": "dist",
         "declaration": true,
-        "declarationMap": true,
+        "declarationMap": false,
         "allowJs": false
     }
 }

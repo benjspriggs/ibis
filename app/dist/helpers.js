@@ -4,7 +4,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const ibis_api_1 = require("ibis-api");
-const axios_1 = __importDefault(require("axios"));
 const express_hbs_1 = __importDefault(require("express-hbs"));
 exports.exhbs = express_hbs_1.default;
 const views_1 = require("./views");
@@ -15,7 +14,16 @@ express_hbs_1.default.cwd = config_1.paths.root;
 const menuLayoutPath = path_1.join(config_1.paths.views, "partials/menu");
 exports.fetchFromAPI = (endpoint) => {
     const absolutePath = `${ibis_api_1.apiHostname}/${endpoint}`;
-    return axios_1.default.get(absolutePath)
+    return fetch(absolutePath, {
+        method: 'GET',
+        cache: 'default',
+    })
+        .then(response => {
+        if (!response.ok) {
+            throw new Error(response.statusText);
+        }
+        return response.json();
+    })
         .catch((err) => {
         console.error(`api err on endpoint ${endpoint}/'${err.request.path}': ${err.response}`);
     });

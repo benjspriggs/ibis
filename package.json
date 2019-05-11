@@ -2,7 +2,6 @@
   "name": "ibis",
   "version": "1.0.0",
   "description": "Web version of IBIS (MedicineWorks)",
-  "bin": "dist/index.js",
   "scripts": {
     "start": "concurrently --kill-others \"npm:start:api\" \"npm:start:app\"",
     "install": "npm run install:lib && npm run install:api && npm run install:app",

@@ -94,16 +94,19 @@ async function getAllListings(resourcePrefix: string, abs: string): Promise<Dire
         Object.keys(modalities).map(async modality => {
             console.debug("getting", abs, modality)
 
-            try {
-                const listing = await getListing(abs, modality)
-                const fileInfos = await getFileInfo(abs, modality, listing)
-                console.debug("done", abs, modality)
+            let listing: string[];
 
-                return fileInfos.map(f => ({ ...f, url: `${resourcePrefix}/${modality}/${f.filename}`, modality: getModality(modality) }))
+            try {
+                listing = await getListing(abs, modality)
             } catch (err) {
-                console.error(err);
-                process.exit();
+                modality = modality.toUpperCase();
+                listing = await getListing(abs, modality)
             }
+
+            const fileInfos = await getFileInfo(abs, modality, listing)
+            console.debug("done", abs, modality)
+
+            return fileInfos.map(f => ({ ...f, url: `${resourcePrefix}/${modality}/${f.filename}`, modality: getModality(modality) }))
         })))
 }
 

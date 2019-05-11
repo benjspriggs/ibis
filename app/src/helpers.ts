@@ -68,9 +68,9 @@ exhbs.registerAsyncHelper("ibis_file", (info: any, cb: Function) => {
 })
 
 exhbs.registerAsyncHelper("api", (context: any, cb: Function) => {
-    fetchFromAPI(context.hash.endpoint).then((response) =>  {
-        if (response) {
-            cb(new exhbs.SafeString(response.data))
+    fetchFromAPI(context.hash.endpoint).then((data) =>  {
+        if (data) {
+            cb(new exhbs.SafeString(data))
         }
     })
     .catch(() => cb())

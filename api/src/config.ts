@@ -5,7 +5,7 @@ export const port: number = parseInt(process.env.API_PORT, 10) || 3000
 export const hostname: string = process.env.API_HOSTNAME || "localhost"
 export const apiHostname: string = `http://${hostname}:${port}`
 
-const ibisRoot: string = join(applicationRoot, "IBIS-Mac OS X")
+const ibisRoot: string = join(applicationRoot.live, "IBIS-Mac OS X")
 const system: string = join(ibisRoot, "system")
 const user: string = join(ibisRoot, "system")
 
@@ -18,7 +18,6 @@ interface IConfig {
         tx: string,
     },
     relative: {
-        applicationRoot: (...folders: string[]) => string,
         ibisRoot: (...folders: string[]) => string,
     }
 }
@@ -32,7 +31,6 @@ const config: IConfig = {
         user,
     },
     relative: {
-        applicationRoot: (...folders: string[]) => join(applicationRoot, ...folders),
         ibisRoot: (...folders: string[]) => join(ibisRoot, ...folders),
     },
 }

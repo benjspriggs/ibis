@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+
+<!-- sourced: https://fomantic-ui.com/examples/fixed.html -->
+
+<head>
+  <meta charset="UTF-8">
+  <title>IBIS - {{{title}}}</title>
+  <script src="https://code.jquery.com/jquery-3.1.1.min.js"
+    integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
+  <link rel="stylesheet" type="text/css" href="/assets/semantic/semantic.min.css">
+  <link rel="stylesheet" type="text/css" href="/assets/styles/default.css">
+  <link rel="icon" href="/assets/favicon.ico">
+  <script src="/assets/semantic/semantic.min.js"></script>
+  {{{block "pageStyles"}}}
+  <style type="text/css">
+  </style>
+</head>
+
+<body>
+  {{#if needs_modalities}}
+  {{> modality_menu (modalities)}}
+  {{/if}}
+  <div class="pusher">
+  <div class="ui inverted menu">
+    <a id="modality-menu-toggle" 
+    class="ui item {{#unless needs_modalities}}disabled{{/unless}} inverted icon">
+    <i class="book medical icon"></i>
+    </a>
+    {{{menu}}}
+    <a class="ui inverted item icon"><i class="search icon"></i></a>
+  </div>
+
+    <div class="ui container">
+      <div class="ui text container">
+        <h1 class="ui header">{{title}}</h1>
+        {{{body}}}
+      </div>
+    </div>
+    <div class="ui inverted vertical footer segment">
+      {{> footer}}
+    </div>
+
+  </div>
+</body>
+
+<script src="/assets/scripts/app.js" type="module"></script>
+
+{{{block "scripts"}}}
+
+</html>

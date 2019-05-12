@@ -1,8 +1,7 @@
 import { isPackaged, applicationRoot } from "ibis-lib"
 import { join } from "path"
-import { readdir } from "fs"
 
-const root = isPackaged() ? applicationRoot : join(applicationRoot, "app/dist/")
+const root = isPackaged() ? applicationRoot.packaged : join(applicationRoot.packaged, "app/dist/")
 const views = join(root, "views")
 const semantic = join(root, "semantic/dist")
 const _public = join(root, "public")

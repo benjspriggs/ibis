@@ -137,9 +137,6 @@ export function parseHeader(source: string): string[] {
 
     const first = interestingNodes.findIndex(node => versionPattern.test(node))
 
-    // console.log(first)
-    // console.dir(interestingNodes)
-
     return interestingNodes.slice(first, first + 5).map(s => s.slice())
 }
 
@@ -159,13 +156,22 @@ interface pkgOptions {
     defaultEntrypoint?: string;
 }
 
+function getLiveApplicationRoot() {
+    if (isPackaged()) {
+        return dirname(process.execPath)
+    } else {
+        return join(__dirname, '../..')
+    }
+}
+
 function detectApplicationRoot() {
     if (isPackaged()) {
         // https://www.npmjs.com/package/pkg#snapshot-filesystem
         const pkg: pkgOptions = (process as any).pkg
         return dirname(pkg.entrypoint);
     } else {
-        return join(__dirname, "../..")
+        const path = getLiveApplicationRoot()
+        return path
     }
 }
 
@@ -178,4 +184,7 @@ export function isPackaged(): boolean {
     return !!pkg
 }
 
-export const applicationRoot: string = detectApplicationRoot()
+export const applicationRoot = {
+    packaged: detectApplicationRoot(),
+    live: getLiveApplicationRoot()
+}

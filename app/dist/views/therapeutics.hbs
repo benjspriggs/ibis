@@ -1,0 +1,8 @@
+<div class="ui container">
+    {{#if needs_modalities}}
+    {{> search_box for='treatments'}}
+    {{/if}}
+    {{#each data.meta}}
+    {{> htm}}
+    {{/each}}
+</div>

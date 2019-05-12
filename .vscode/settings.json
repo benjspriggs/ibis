@@ -6,6 +6,7 @@
         "**/.git/subtree-cache/**": true,
         "**/node_modules/*/**": true,
         "**/*.d.ts": true,
-        "**/*.map": true
+        "**/*.map": true,
+        "**/dist/*/**": true
     }
 }

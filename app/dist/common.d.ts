@@ -1,4 +1,5 @@
 import { RequestHandler } from "express";
+import { modalities } from "ibis-lib";
 export interface Modality {
     code: string;
     data: ModalityData;
@@ -6,9 +7,7 @@ export interface Modality {
 export interface ModalityData {
     displayName: string;
 }
-export declare const modalities: {
-    [code: string]: ModalityData;
-};
+export { modalities as modalities };
 export declare function getModality(codeOrDisplayName: string): Modality;
 export interface Header {
     version: string;

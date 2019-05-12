@@ -1,12 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -21,12 +13,10 @@ const nodeMatches = (condition) => (node) => condition.test(node.rawText);
 const childrenContainsDefinitionText = (condition) => (node) => node.childNodes.some(nodeMatches(condition));
 const emptyNode = (node) => node.rawText.trim() === "";
 function getFileInfo(absoluteFilePath, modality, listing) {
-    const promises = listing.map((filename) => __awaiter(this, void 0, void 0, function* () {
-        return ({
-            modality: modality,
-            filename: filename.slice(),
-            header: ibis_lib_1.parseHeaderFromFile(path_1.default.join(absoluteFilePath, modality, filename)),
-        });
+    const promises = listing.map(async (filename) => ({
+        modality: modality,
+        filename: filename.slice(),
+        header: ibis_lib_1.parseHeaderFromFile(path_1.default.join(absoluteFilePath, modality, filename)),
     }));
     return Promise.all(promises);
 }
@@ -39,10 +29,10 @@ exports.getListing = (absoluteFilePath, modality) => new Promise((resolve, rejec
         resolve(items);
     });
 });
-const addModalityListingToLocals = (absoluteFilePath) => (req, res, next) => __awaiter(this, void 0, void 0, function* () {
+const addModalityListingToLocals = (absoluteFilePath) => async (req, res, next) => {
     const { modality } = req.params;
     try {
-        const listing = yield exports.getListing(absoluteFilePath, modality);
+        const listing = await exports.getListing(absoluteFilePath, modality);
         res.locals.listing = listing;
         next();
     }
@@ -50,7 +40,7 @@ const addModalityListingToLocals = (absoluteFilePath) => (req, res, next) => __a
         next(e);
         return;
     }
-});
+};
 const trimEmptyNodes = (root) => {
     if (root.childNodes.length === 0) {
         if (!emptyNode(root)) {
@@ -154,10 +144,10 @@ exports.default = (options) => {
         };
     }
     const filepath = (req, modality, filename) => resolved(req, `${options.endpoint}/${modality}/${filename}`);
-    router.get("/:modality", addModalityListingToLocals(options.absoluteFilePath), (req, res, next) => __awaiter(this, void 0, void 0, function* () {
+    router.get("/:modality", addModalityListingToLocals(options.absoluteFilePath), async (req, res, next) => {
         const { modality } = req.params;
         try {
-            const meta = (yield getFileInfo(options.absoluteFilePath, modality, res.locals.listing))
+            const meta = (await getFileInfo(options.absoluteFilePath, modality, res.locals.listing))
                 .map(x => (Object.assign({ filepath: filepath(req, modality, x.filename) }, x)));
             const empty = meta.filter((infoObject) => lodash_1.isEmpty(infoObject.header) || Object.values(infoObject.header).some(val => typeof val === "undefined"));
             res.send({
@@ -169,6 +159,6 @@ exports.default = (options) => {
         catch (e) {
             next(e);
         }
-    }));
+    });
     return router;
 };

@@ -1,5 +1,6 @@
 import { HTMLElement, Node, TextNode, parse } from "node-html-parser"
 import { NextFunction, Request, RequestHandler } from "express"
+import { modalities } from "ibis-lib"
 
 import { flatten } from "lodash"
 import { readFileSync } from "fs"
@@ -13,37 +14,8 @@ export interface ModalityData {
     displayName: string
 }
 
-export const modalities: { [code: string]: ModalityData } = {
-    "acup": {
-        displayName: "Acupuncture"
-    },
-    "bota": {
-        displayName: "Botanical Medicine"
-    },
-    "chin": {
-        displayName: "Chinese Medicine"
-    },
-    "diag": {
-        displayName: "Diagnostic"
-    },
-    "home": {
-        displayName: "Homeopathy"
-    },
-    "inte": {
-        displayName: "WHO TF KNOWS"
-    },
-    "nutr": {
-        displayName: "Nutrition"
-    },
-    "phys": {
-        displayName: "Physical Medicine"
-    },
-    "psyc": {
-        displayName: "Psychology (?)"
-    },
-    "vibr": {
-        displayName: "Vibrators? Who tf knows"
-    },
+export {
+    modalities as modalities
 }
 
 export function getModality(codeOrDisplayName: string): Modality {

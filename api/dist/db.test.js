@@ -1,12 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
@@ -29,59 +21,59 @@ const getApp = () => {
     app.use("/", db_1.default);
     return app;
 };
-ava_1.default("db:app:/", (t) => __awaiter(this, void 0, void 0, function* () {
+ava_1.default("db:app:/", async (t) => {
     t.plan(2);
-    const res = yield supertest_1.default(getApp()).get("/");
+    const res = await supertest_1.default(getApp()).get("/");
     t.is(res.status, 200);
     t.not(res.body, undefined);
-}));
-ava_1.default("db:app:/:query", (t) => __awaiter(this, void 0, void 0, function* () {
+});
+ava_1.default("db:app:/:query", async (t) => {
     t.plan(2);
-    const res = yield supertest_1.default(getApp()).get("/?q=string");
+    const res = await supertest_1.default(getApp()).get("/?q=string");
     t.is(res.status, 200);
     t.not(res.body, undefined);
-}));
-ava_1.default("db:app:/diseases", (t) => __awaiter(this, void 0, void 0, function* () {
+});
+ava_1.default("db:app:/diseases", async (t) => {
     t.plan(2);
-    const res = yield supertest_1.default(getApp()).get("/diseases");
+    const res = await supertest_1.default(getApp()).get("/diseases");
     t.is(res.status, 200);
     t.is(res.body.directory, "diseases");
-}));
-ava_1.default("db:app:/treatments", (t) => __awaiter(this, void 0, void 0, function* () {
+});
+ava_1.default("db:app:/treatments", async (t) => {
     t.plan(2);
-    const res = yield supertest_1.default(getApp()).get("/treatments");
+    const res = await supertest_1.default(getApp()).get("/treatments");
     t.is(res.status, 200);
     t.is(res.body.directory, "treatments");
-}));
-ava_1.default("db:app:/treatments:categorized", (t) => __awaiter(this, void 0, void 0, function* () {
+});
+ava_1.default("db:app:/treatments:categorized", async (t) => {
     t.plan(2);
-    const res = yield supertest_1.default(getApp()).get("/treatments?categorize=true");
+    const res = await supertest_1.default(getApp()).get("/treatments?categorize=true");
     t.is(res.status, 200);
     t.false(Array.isArray(res.body.results));
-}));
-ava_1.default("db:app:/diseases:categorized", (t) => __awaiter(this, void 0, void 0, function* () {
+});
+ava_1.default("db:app:/diseases:categorized", async (t) => {
     t.plan(2);
-    const res = yield supertest_1.default(getApp()).get("/diseases?categorize=true");
+    const res = await supertest_1.default(getApp()).get("/diseases?categorize=true");
     t.is(res.status, 200);
     t.false(Array.isArray(res.body.results));
-}));
-ava_1.default("db:app:/treatments:not categorized", (t) => __awaiter(this, void 0, void 0, function* () {
+});
+ava_1.default("db:app:/treatments:not categorized", async (t) => {
     t.plan(2);
-    const res = yield supertest_1.default(getApp()).get("/treatments?categorize=false");
+    const res = await supertest_1.default(getApp()).get("/treatments?categorize=false");
     t.is(res.status, 200);
     t.true(Array.isArray(res.body.results));
-}));
-ava_1.default("db:app:/diseases:not categorized", (t) => __awaiter(this, void 0, void 0, function* () {
+});
+ava_1.default("db:app:/diseases:not categorized", async (t) => {
     t.plan(2);
-    const res = yield supertest_1.default(getApp()).get("/diseases?categorize=false");
+    const res = await supertest_1.default(getApp()).get("/diseases?categorize=false");
     t.is(res.status, 200);
     t.true(Array.isArray(res.body.results));
-}));
-ava_1.default("db:app:/foobar", (t) => __awaiter(this, void 0, void 0, function* () {
+});
+ava_1.default("db:app:/foobar", async (t) => {
     t.plan(1);
-    const res = yield supertest_1.default(getApp()).get("/foobar");
+    const res = await supertest_1.default(getApp()).get("/foobar");
     t.is(res.status, 404);
-}));
+});
 ava_1.default("db:query:modality", (t) => {
     t.deepEqual(db_1.query("foobar"), {
         text: "foobar",

@@ -1,12 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
@@ -70,27 +62,25 @@ function searchOptions(options) {
 const searchDirectory = searchOptions({
     keys: ["header", "header.name"]
 });
-function getAllListings(resourcePrefix, abs) {
-    return __awaiter(this, void 0, void 0, function* () {
-        return [].concat(...yield Promise.all(Object.keys(ibis_lib_1.modalities).map((modality) => __awaiter(this, void 0, void 0, function* () {
-            console.debug("getting", abs, modality);
-            let listing;
-            try {
-                listing = yield file_1.getListing(abs, modality);
-            }
-            catch (err) {
-                modality = modality.toUpperCase();
-                listing = yield file_1.getListing(abs, modality);
-            }
-            const fileInfos = yield file_1.getFileInfo(abs, modality, listing);
-            console.debug("done", abs, modality);
-            return fileInfos.map(f => (Object.assign({}, f, { url: `${resourcePrefix}/${modality}/${f.filename}`, modality: ibis_lib_1.getModality(modality) })));
-        }))));
-    });
+async function getAllListings(resourcePrefix, abs) {
+    return [].concat(...await Promise.all(Object.keys(ibis_lib_1.modalities).map(async (modality) => {
+        console.debug("getting", abs, modality);
+        let listing;
+        try {
+            listing = await file_1.getListing(abs, modality);
+        }
+        catch (err) {
+            modality = modality.toUpperCase();
+            listing = await file_1.getListing(abs, modality);
+        }
+        const fileInfos = await file_1.getFileInfo(abs, modality, listing);
+        console.debug("done", abs, modality);
+        return fileInfos.map(f => (Object.assign({}, f, { url: `${resourcePrefix}/${modality}/${f.filename}`, modality: ibis_lib_1.getModality(modality) })));
+    })));
 }
 const router = express_1.default.Router();
-router.get("/", (req, res) => __awaiter(this, void 0, void 0, function* () {
-    const db = yield database();
+router.get("/", async (req, res) => {
+    const db = await database();
     if (!req.query.q) {
         res.send(db.value());
         return;
@@ -98,7 +88,7 @@ router.get("/", (req, res) => __awaiter(this, void 0, void 0, function* () {
     const t = db.get("treatments");
     const d = db.get("diseases");
     res.send(searchDirectory(req.query.q, [].concat(...t.value(), ...d.value())));
-}));
+});
 function formatSearchResponse(query, directory, results, categorize = false) {
     if (categorize) {
         return ({
@@ -127,9 +117,9 @@ function formatSearchResponse(query, directory, results, categorize = false) {
         });
     }
 }
-router.get("/:sub", (req, res) => __awaiter(this, void 0, void 0, function* () {
+router.get("/:sub", async (req, res) => {
     const { sub } = req.params;
-    const db = yield database();
+    const db = await database();
     if (!Object.keys(db.value()).includes(sub)) {
         res.sendStatus(404);
         return;
@@ -144,24 +134,22 @@ router.get("/:sub", (req, res) => __awaiter(this, void 0, void 0, function* () {
         const results = searchDirectory(req.query.q, values);
         res.send(formatSearchResponse(q, sub, results, _categorize));
     }
-}));
-function initialize() {
-    return __awaiter(this, void 0, void 0, function* () {
-        const db = yield database();
-        console.debug("initializing...");
-        if (db.get("treatments").value().length !== 0) {
-            console.debug("initialized (cached)");
-            return;
-        }
-        const txs = yield getAllListings(`${config_1.apiHostname}/tx`, config_1.default.relative.ibisRoot("system", "tx"));
-        const rxs = yield getAllListings(`${config_1.apiHostname}/rx`, config_1.default.relative.ibisRoot("system", "rx"));
-        console.debug("got all the magic");
-        db.get("diseases").splice(0, 0, ...txs).write();
-        db.get("treatments").splice(0, 0, ...rxs).write();
-        console.debug("initialized");
-        // get ALL the files everywhere
-        // put them in the diseases/ tx/ rx
-    });
+});
+async function initialize() {
+    const db = await database();
+    console.debug("initializing...");
+    if (db.get("treatments").value().length !== 0) {
+        console.debug("initialized (cached)");
+        return;
+    }
+    const txs = await getAllListings(`${config_1.apiHostname}/tx`, config_1.default.relative.ibisRoot("system", "tx"));
+    const rxs = await getAllListings(`${config_1.apiHostname}/rx`, config_1.default.relative.ibisRoot("system", "rx"));
+    console.debug("got all the magic");
+    db.get("diseases").splice(0, 0, ...txs).write();
+    db.get("treatments").splice(0, 0, ...rxs).write();
+    console.debug("initialized");
+    // get ALL the files everywhere
+    // put them in the diseases/ tx/ rx
 }
 exports.initialize = initialize;
 exports.default = router;

@@ -1,47 +1,17 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const node_html_parser_1 = require("node-html-parser");
+const ibis_lib_1 = require("ibis-lib");
+exports.modalities = ibis_lib_1.modalities;
 const lodash_1 = require("lodash");
 const fs_1 = require("fs");
-exports.modalities = {
-    "acup": {
-        displayName: "Acupuncture"
-    },
-    "bota": {
-        displayName: "Botanical Medicine"
-    },
-    "chin": {
-        displayName: "Chinese Medicine"
-    },
-    "diag": {
-        displayName: "Diagnostic"
-    },
-    "home": {
-        displayName: "Homeopathy"
-    },
-    "inte": {
-        displayName: "WHO TF KNOWS"
-    },
-    "nutr": {
-        displayName: "Nutrition"
-    },
-    "phys": {
-        displayName: "Physical Medicine"
-    },
-    "psyc": {
-        displayName: "Psychology (?)"
-    },
-    "vibr": {
-        displayName: "Vibrators? Who tf knows"
-    },
-};
 function getModality(codeOrDisplayName) {
     const lower = codeOrDisplayName.toLowerCase();
-    if (lower in exports.modalities) {
-        return ({ code: lower, data: exports.modalities[lower] });
+    if (lower in ibis_lib_1.modalities) {
+        return ({ code: lower, data: ibis_lib_1.modalities[lower] });
     }
     else {
-        const [code, modality] = Object.entries(exports.modalities).find(([_, modality]) => modality.displayName.toLowerCase() === codeOrDisplayName);
+        const [code, modality] = Object.entries(ibis_lib_1.modalities).find(([_, modality]) => modality.displayName.toLowerCase() === codeOrDisplayName);
         return ({ code: code, data: modality });
     }
 }

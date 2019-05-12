@@ -25,13 +25,13 @@ export const modalities: { [code: string]: ModalityData } = {
         displayName: "Chinese Medicine"
     },
     "diag": {
-        displayName: "Diagnostic"
+        displayName: "Diagnoses"
     },
     "home": {
         displayName: "Homeopathy"
     },
     "inte": {
-        displayName: "WHO TF KNOWS"
+        displayName: "Integrative Therapies"
     },
     "nutr": {
         displayName: "Nutrition"
@@ -40,10 +40,10 @@ export const modalities: { [code: string]: ModalityData } = {
         displayName: "Physical Medicine"
     },
     "psyc": {
-        displayName: "Psychology (?)"
+        displayName: "Psychospiritual Approaches"
     },
     "vibr": {
-        displayName: "Vibrators? Who tf knows"
+        displayName: "Vibrational Therapies"
     },
 }
 

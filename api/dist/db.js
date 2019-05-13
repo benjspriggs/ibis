@@ -85,9 +85,9 @@ router.get("/", async (req, res) => {
         res.send(db.value());
         return;
     }
-    const t = db.get("treatments");
-    const d = db.get("diseases");
-    res.send(searchDirectory(req.query.q, [].concat(...t.value(), ...d.value())));
+    const t = db.get("treatments").value();
+    const d = db.get("diseases").value();
+    res.send(searchDirectory(req.query.q, [].concat(...t, ...d)));
 });
 function formatSearchResponse(query, directory, results, categorize = false) {
     if (categorize) {

@@ -120,10 +120,10 @@ router.get("/", async (req, res) => {
         return
     }
 
-    const t = db.get("treatments")
-    const d = db.get("diseases")
+    const t: Directory[] = db.get("treatments").value()
+    const d: Directory[] = db.get("diseases").value()
 
-    res.send(searchDirectory(req.query.q, ([] as Directory[]).concat(...t.value(), ...d.value())))
+    res.send(searchDirectory(req.query.q, ([] as Directory[]).concat(...t, ...d)))
 })
 
 export interface SearchResult {

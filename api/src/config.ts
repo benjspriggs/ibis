@@ -3,7 +3,7 @@ import { join } from "path"
 
 export const port: number = parseInt(process.env.API_PORT, 10) || 3000
 export const hostname: string = process.env.API_HOSTNAME || "localhost"
-export const apiHostname: string = `http://${hostname}:${port}`
+export const apiHostname: string = `https://${hostname}:${port}`
 
 const ibisRoot: string = join(applicationRoot.live, "IBIS-Mac OS X")
 const system: string = join(ibisRoot, "system")

@@ -2,7 +2,7 @@ import { applicationRoot } from "ibis-lib"
 import { join } from "path"
 
 export const port: number = parseInt(process.env.API_PORT, 10) || 3000
-export const hostname: string = process.env.API_HOSTNAME || "localhost"
+export const hostname: string = process.env.API_HOSTNAME || "127.0.0.1"
 export const apiHostname: string = `https://${hostname}:${port}`
 
 const ibisRoot: string = join(applicationRoot.live, "IBIS-Mac OS X")

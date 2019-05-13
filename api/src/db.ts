@@ -118,12 +118,12 @@ router.get("/", async (req, res) => {
     if (!req.query.q) {
         res.send(db.value())
         return
+    } else {
+        const t = db.get("treatments").value()
+        const d = db.get("diseases").value()
+
+        res.send(searchDirectory(req.query.q, [].concat(t, d)))
     }
-
-    const t: Directory[] = db.get("treatments").value()
-    const d: Directory[] = db.get("diseases").value()
-
-    res.send(searchDirectory(req.query.q, ([] as Directory[]).concat(...t, ...d)))
 })
 
 export interface SearchResult {

@@ -147,6 +147,9 @@ export function parseHeader(source: string): string[] {
 export const requestLogger: RequestHandler = (req: Request, _, next: NextFunction) => {
     console.log(JSON.stringify(
         {
+            host: req.host,
+            version: req.httpVersion,
+            ip: req.ip,
             date: new Date(),
             path: req.path,
             query: req.query,

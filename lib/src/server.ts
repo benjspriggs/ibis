@@ -5,7 +5,7 @@ import { IncomingMessage, ServerResponse } from "http"
 export const createServer = (app: (request: IncomingMessage, response: ServerResponse) => void, options?: spdy.ServerOptions) => new Promise<spdy.Server>((resolve, reject) => {
     pem.createCertificate({
         days: 1,
-        selfSigned: false
+        selfSigned: true
     }, (err, keys) => {
         if (err) {
             reject(err)

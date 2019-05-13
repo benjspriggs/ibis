@@ -5,6 +5,10 @@ import { flatten } from "lodash"
 import { join, dirname } from "path"
 import { readFileSync } from "fs"
 
+export {
+    createServer
+} from "./server"
+
 export interface Modality {
     code: string,
     data: ModalityData

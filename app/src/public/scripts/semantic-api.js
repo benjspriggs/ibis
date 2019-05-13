@@ -1,5 +1,5 @@
 //@ts-check
-const apiHostname = 'https://localhost:3000'
+const apiHostname = `${location.protocol}//127.0.0.1:3000`
 
 $.api.settings.verbose = true
 

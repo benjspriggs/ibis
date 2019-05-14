@@ -5,3 +5,5 @@ data/
 db.json
 ibis-*
 .rpt2_cache/
+*.key
+*.crt

@@ -1,4 +1,4 @@
-import { isPackaged, applicationRoot } from "ibis-lib"
+import { isPackaged, applicationRoot, isHttpsEnabled } from "ibis-lib"
 import { join } from "path"
 
 const root = isPackaged() ? applicationRoot.packaged : join(applicationRoot.packaged, "app/dist/")
@@ -15,4 +15,4 @@ export const paths = {
 
 export const port = parseInt(process.env["PORT"]) || 8080
 export const hostname = process.env["HOSTNAME"] || "127.0.0.1"
-export const appHostname = `${hostname}:${port}`
+export const appHostname = `${isHttpsEnabled() ? "https" : "http"}://${hostname}:${port}`

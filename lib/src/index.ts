@@ -6,7 +6,8 @@ import { join, dirname } from "path"
 import { readFileSync } from "fs"
 
 export {
-    h2
+    h2,
+    isHttpsEnabled
 } from "./server"
 
 export interface Modality {

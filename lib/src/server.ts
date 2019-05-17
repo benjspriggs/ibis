@@ -13,11 +13,18 @@ export interface ServerOptions {
 const parseServerOptions = () => new Promise<ServerOptions>((resolve, reject) => {
     try {
         program
-            .option("-k, --key [key]", "The HTTPs key to use")
-            .option("-c, --cert [cert]", "The HTTPs cert to use")
+            .option("-k, --key [key]", "The HTTPs key to use. Can also be set via HTTPS_KEY_PATH.")
+            .option("-c, --cert [cert]", "The HTTPs cert to use. Can also be set via HTTPS_CERT_PATH.")
             .parse(process.argv)
 
-        resolve(program as ServerOptions)
+        const options = {
+            key: program.key || process.env.HTTPS_KEY_PATH,
+            cert: program.cert || process.env.HTTPS_CERT_PATH
+        }
+
+        console.log(options)
+
+        resolve(options)
     } catch (e) {
         reject(e)
     }
@@ -43,6 +50,10 @@ const createServer = (app: (request: IncomingMessage, response: ServerResponse) 
         })
     }
 })
+
+export const isHttpsEnabled = () => {
+    return process.env.HTTPS_KEY_PATH && process.env.HTTPS_CERT_PATH;
+}
 
 export const h2 = async (app: (request: IncomingMessage, response: ServerResponse) => void) => {
     const options = await parseServerOptions()

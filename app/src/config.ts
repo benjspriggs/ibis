@@ -15,4 +15,4 @@ export const paths = {
 
 export const port = parseInt(process.env["PORT"]) || 8080
 export const hostname = process.env["HOSTNAME"] || "127.0.0.1"
-export const appHostname = `https://${hostname}:${port}`
+export const appHostname = `${hostname}:${port}`

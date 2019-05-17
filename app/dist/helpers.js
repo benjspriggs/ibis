@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const ibis_api_1 = require("ibis-api");
 const express_hbs_1 = __importDefault(require("express-hbs"));
 exports.exhbs = express_hbs_1.default;
-const node_fetch_1 = __importDefault(require("node-fetch"));
+const got_1 = __importDefault(require("got"));
 const views_1 = require("./views");
 const common_1 = require("./common");
 const config_1 = require("./config");
@@ -15,18 +15,14 @@ express_hbs_1.default.cwd = config_1.paths.root;
 const menuLayoutPath = path_1.join(config_1.paths.views, "partials/menu");
 exports.fetchFromAPI = (endpoint) => {
     const absolutePath = `${ibis_api_1.apiHostname}/${endpoint}`;
-    return node_fetch_1.default(absolutePath, {
+    console.log('fetching from api:', absolutePath);
+    return got_1.default(absolutePath, {
         method: 'GET',
-        compress: true
+        json: true
     })
-        .then(response => {
-        if (!response.ok) {
-            throw new Error(response.statusText);
-        }
-        return response.json();
-    }, err => {
+        .then(response => response.body)
+        .catch(err => {
         console.error(`api err on endpoint ${endpoint}: ${err.toString()}`);
-        throw err;
     });
 };
 express_hbs_1.default.registerHelper("modalities", () => {

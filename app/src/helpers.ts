@@ -1,6 +1,6 @@
 import { apiHostname } from "ibis-api"
 import exhbs from "express-hbs"
-import fetch from "node-fetch"
+import got from "got"
 import { menuItems } from "./views"
 import { modalities } from "./common"
 import { paths } from "./config"
@@ -14,20 +14,15 @@ const menuLayoutPath = join(paths.views, "partials/menu")
 
 export const fetchFromAPI = (endpoint: string) => {
     const absolutePath = `${apiHostname}/${endpoint}`
-    return fetch(absolutePath, {
+    console.log('fetching from api:', absolutePath)
+    return got(absolutePath, {
         method: 'GET',
-        compress: true
+        json: true
     })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error(response.statusText);
-        }
-
-        return response.json();
-    }, err => {
+    .then(response => response.body)
+    .catch(err => {
         console.error(`api err on endpoint ${endpoint}: ${err.toString()}`)
-        throw err;
-    });
+    })
 };
 
 exhbs.registerHelper("modalities", () => {

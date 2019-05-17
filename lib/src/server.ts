@@ -1,4 +1,5 @@
 import spdy from "spdy"
+import http from "http"
 import pem from "pem"
 import { IncomingMessage, ServerResponse } from "http"
 import program from "commander"
@@ -43,15 +44,17 @@ const createServer = (app: (request: IncomingMessage, response: ServerResponse) 
     }
 })
 
-export const h2 = (app: (request: IncomingMessage, response: ServerResponse) => void) =>
-    parseServerOptions()
-        .then(options => {
-            if (options.key && options.cert) {
-                return createServer(app, {
-                    key: readFileSync(options.key),
-                    cert: readFileSync(options.cert)
-                })
-            } else {
-                return createServer(app)
-            }
+export const h2 = async (app: (request: IncomingMessage, response: ServerResponse) => void) => {
+    const options = await parseServerOptions()
+
+    if (options.key && options.cert) {
+        console.log('setting up https')
+        return createServer(app, {
+            key: readFileSync(options.key),
+            cert: readFileSync(options.cert)
         })
+    } else {
+        console.log('setting up http')
+        return Promise.resolve(http.createServer(app));
+    }
+}

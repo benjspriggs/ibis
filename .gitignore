@@ -7,3 +7,4 @@ ibis-*
 .rpt2_cache/
 *.key
 *.crt
+*.pem

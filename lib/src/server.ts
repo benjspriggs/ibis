@@ -1,6 +1,25 @@
 import spdy from "spdy"
 import pem from "pem"
 import { IncomingMessage, ServerResponse } from "http"
+import program from "commander"
+
+export interface ServerOptions {
+    key?: string,
+    cert?: string
+}
+
+export const parseServerOptions = () => new Promise<ServerOptions>((resolve, reject) => {
+    try {
+        program
+            .option("-k, --key <key>", "The HTTPs key to use")
+            .option("-c, --cert <cert>", "The HTTPs cert to use")
+            .parse(process.argv)
+
+        resolve(program as ServerOptions)
+    } catch (e) {
+        reject(e)
+    }
+})
 
 export const createServer = (app: (request: IncomingMessage, response: ServerResponse) => void, options?: spdy.ServerOptions) => new Promise<spdy.Server>((resolve, reject) => {
     if (options && options.key && options.cert) {

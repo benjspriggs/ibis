@@ -10,8 +10,9 @@
   "author": "Ben Spriggs",
   "license": "ISC",
   "dependencies": {
-    "@types/spdy": "^3.4.4",
     "@types/pem": "^1.9.5",
+    "@types/spdy": "^3.4.4",
+    "commander": "^2.20.0",
     "express": "^4.16.4",
     "lodash": "^4.17.11",
     "node-html-parser": "^1.1.12",

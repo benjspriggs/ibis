@@ -1,10 +1,17 @@
 import { appHostname, hostname, port } from "./config"
-import { createServer } from "ibis-lib"
+import { createServer, parseServerOptions } from "ibis-lib"
 
 import app from "./app"
+import fs from "fs"
 
-createServer(app)
-    .then(server => {
-        console.log(`Listening on ${appHostname}`)
-        server.listen(port, hostname)
-    })
+parseServerOptions()
+        .then(options => {
+                return createServer(app, {
+                        key: fs.readFileSync(options.key),
+                        cert: fs.readFileSync(options.cert)
+                })
+        })
+        .then(server => {
+                console.log(`Listening on ${appHostname}`)
+                server.listen(port, hostname)
+        })

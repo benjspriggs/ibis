@@ -6,7 +6,9 @@ import { join, dirname } from "path"
 import { readFileSync } from "fs"
 
 export {
-    createServer
+    createServer,
+    ServerOptions,
+    parseServerOptions
 } from "./server"
 
 export interface Modality {

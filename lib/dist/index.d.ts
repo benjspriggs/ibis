@@ -1,5 +1,5 @@
 import { RequestHandler } from "express";
-export { createServer } from "./server";
+export { createServer, ServerOptions, parseServerOptions } from "./server";
 export interface Modality {
     code: string;
     data: ModalityData;

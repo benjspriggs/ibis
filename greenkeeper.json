@@ -2,9 +2,9 @@
   "groups": {
     "default": {
       "packages": [
-        "ibis-api/package.json",
-        "ibis-app/package.json",
-        "ibis-lib/package.json",
+        "packages/ibis-api/package.json",
+        "packages/ibis-app/package.json",
+        "packages/ibis-lib/package.json",
         "package.json"
       ]
     }

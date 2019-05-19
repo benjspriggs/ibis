@@ -2,11 +2,9 @@
   "groups": {
     "default": {
       "packages": [
-        "api/package.json",
-        "app/dist/semantic/tasks/config/admin/templates/package.json",
-        "app/package.json",
-        "app/semantic/tasks/config/admin/templates/package.json",
-        "lib/package.json",
+        "ibis-api/package.json",
+        "ibis-app/package.json",
+        "ibis-lib/package.json",
         "package.json"
       ]
     }

@@ -19,8 +19,8 @@
     "express-hbs": "^2.1.2",
     "got": "^9.6.0",
     "handlebars": "^4.1.2",
-    "ibis-api": "file:../api",
-    "ibis-lib": "file:../lib",
+    "ibis-api": "file:../ibis-api",
+    "ibis-lib": "file:../ibis-lib",
     "node-html-parser": "^1.1.15"
   },
   "pkg": {
@@ -32,5 +32,8 @@
     "scripts": [
       "dist/*.js"
     ]
+  },
+  "devDependencies": {
+    "fomantic-ui": "^2.7.5"
   }
 }

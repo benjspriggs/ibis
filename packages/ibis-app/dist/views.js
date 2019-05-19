@@ -29,9 +29,8 @@ app.set("views", config_1.paths.views);
 app.set("view engine", ".hbs");
 exports.menuItems = [
     {
-        destination: "home",
+        destination: "",
         title: "Home",
-        route: "/"
     },
     {
         destination: "therapeutics",
@@ -56,7 +55,7 @@ exports.getMenuItemBy = {
     title: (title) => exports.menuItems.find(item => item.title === title)
 };
 app.get("/", (_, res) => {
-    res.render("therapeutics", exports.getMenuItemBy.destination(""));
+    res.render("home", exports.getMenuItemBy.destination(""));
 });
 app.use("/:asset", express_1.default.static(path_1.join(__dirname, "public")));
 app.get("/:route", (req, res, next) => {

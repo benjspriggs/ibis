@@ -44,9 +44,8 @@ export const menuItems: {
     route?: string
 }[] = [
         {
-            destination: "home",
+            destination: "",
             title: "Home",
-            route: "/"
         },
         {
             destination: "therapeutics",
@@ -73,7 +72,7 @@ export const getMenuItemBy = {
 }
 
 app.get("/", (_, res: express.Response) => {
-    res.render("therapeutics", getMenuItemBy.destination(""))
+    res.render("home", getMenuItemBy.destination(""))
 })
 
 app.use("/:asset", express.static(join(__dirname, "public")))

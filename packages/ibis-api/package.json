@@ -5,10 +5,10 @@
   "main": "dist/index.js",
   "bin": "dist/start.js",
   "scripts": {
-    "start": "npm run serve",
-    "serve": "node dist/start.js",
+    "start": "node dist/start.js",
     "test": "ava --tap",
-    "build": "tsc --project tsconfig.json && tsc --project tsconfig.js.json"
+    "build": "tsc --project tsconfig.json && tsc --project tsconfig.js.json",
+    "lint": "tslint --project . -t verbose"
   },
   "author": "Ben Spriggs",
   "license": "ISC",

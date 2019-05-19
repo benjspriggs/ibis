@@ -5,23 +5,10 @@
   "bin": "dist/index.js",
   "scripts": {
     "start": "lerna run start --parallel",
-    "watch:app": "cd app && npm run serve",
-    "watch:api": "cd api && npm run serve",
     "build": "lerna run build",
-    "build:api": "cd api && npm run build",
-    "build:app": "cd app && npm run build",
-    "build:lib": "cd lib && npm run build",
-    "test": "concurrently \"npm:test:api\" \"npm:test:app\"",
-    "test:api": "cd api && npm run test",
-    "test:app": "cd app && npm run test",
-    "watch": "lerna run watch --parallel",
-    "pkg": "concurrently \"npm:pkg:api\" \"npm:pkg:app\"",
-    "pkg:api": "pkg api",
-    "pkg:app": "pkg app",
-    "lint": "npm run lint:lib && npm run lint:api && npm run lint:app",
-    "lint:lib": "tslint --project lib -t verbose",
-    "lint:api": "tslint --project api -t verbose",
-    "lint:app": "tslint --project app -t verbose"
+    "test": "lerna run test --parallel",
+    "pkg": "lerna run pkg --parallel",
+    "lint": "lerna run lint --parallel"
   },
   "repository": {
     "type": "git",

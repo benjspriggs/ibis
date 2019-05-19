@@ -5,11 +5,11 @@
   "main": "dist/index.js",
   "bin": "dist/index.js",
   "scripts": {
-    "start": "npm run serve",
-    "serve": "node dist/index.js",
+    "start": "node dist/index.js",
     "test": "ava --tap",
     "build": "gulp && npm run build:browser",
-    "build:browser": "rollup --config ./src/public/rollup.config.js"
+    "build:browser": "rollup --config ./src/public/rollup.config.js",
+    "lint": "tslint --project . -t verbose"
   },
   "author": "Ben Spriggs",
   "license": "ISC",

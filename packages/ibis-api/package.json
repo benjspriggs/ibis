@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "dist/index.js",
+  "bin": "start.js",
   "scripts": {
-    "start": "node dist/start.js",
+    "start": "node start.js",
     "test": "ava --tap",
     "build": "tsc --project tsconfig.json && tsc --project tsconfig.js.json",
     "pkg": "pkg dist/start.js --out-path dist",

@@ -2,9 +2,10 @@
   "name": "ibis-app",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/index.js",
+  "main": "start.js",
+  "bin": "start.js",
   "scripts": {
-    "start": "node dist/index.js",
+    "start": "node start.js",
     "test": "ava --tap",
     "build": "gulp && npm run build:browser",
     "build:browser": "rollup --config ./src/public/rollup.config.js",

@@ -5,7 +5,7 @@ import { h2 } from "ibis-lib"
 export { port, hostname, apiHostname, default as config } from "./config"
 export { SearchResult, CategorizedSearchMap, CategorizedSearchResult } from "./db"
 
-export default () => {
+export const start = () => {
     h2(app)
         .then(async server => {
             await initialize()

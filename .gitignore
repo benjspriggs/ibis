@@ -9,3 +9,4 @@ ibis-api-*
 *.key
 *.crt
 *.pem
+*.log

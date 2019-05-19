@@ -5,8 +5,6 @@
   "bin": "dist/index.js",
   "scripts": {
     "start": "lerna run start --parallel",
-    "start:api": "cd api && npm run start",
-    "start:app": "cd app && npm run start",
     "watch:app": "cd app && npm run serve",
     "watch:api": "cd api && npm run serve",
     "build": "lerna run build",

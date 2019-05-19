@@ -124,6 +124,7 @@ app.get("/:route/:modality_code", (req, res, next) => {
     fetchFromAPI(`${item.route}/${modality_code}`).then((data) => {
         if (data) {
             res.render("listing", {
+                ...item,
                 title: modality.data.displayName,
                 needs_modalities: true,
                 route: route,
@@ -166,6 +167,7 @@ app.get("/:route/:modality_code/:resource", (req, res, next) => {
 
         // TODO: add type safety to API routes
         res.render("single", {
+            ...item,
             title: `${modality.data.displayName} - ${data.name}`,
             needs_modalities: true,
             route: route,

@@ -92,12 +92,7 @@ app.get("/:route/:modality_code", (req, res, next) => {
     }
     helpers_2.fetchFromAPI(`${item.route}/${modality_code}`).then((data) => {
         if (data) {
-            res.render("listing", {
-                title: modality.data.displayName,
-                needs_modalities: true,
-                route: route,
-                data: data
-            });
+            res.render("listing", Object.assign({}, item, { title: modality.data.displayName, needs_modalities: true, route: route, data: data }));
         }
         else {
             res.render("error");
@@ -123,12 +118,7 @@ app.get("/:route/:modality_code/:resource", (req, res, next) => {
             return;
         }
         // TODO: add type safety to API routes
-        res.render("single", {
-            title: `${modality.data.displayName} - ${data.name}`,
-            needs_modalities: true,
-            route: route,
-            data: data
-        });
+        res.render("single", Object.assign({}, item, { title: `${modality.data.displayName} - ${data.name}`, needs_modalities: true, route: route, data: data }));
     });
 });
 exports.default = app;

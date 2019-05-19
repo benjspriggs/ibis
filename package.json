@@ -46,6 +46,7 @@
     "gulp-better-rollup": "^4.0.1",
     "gulp-typescript": "^5.0.1",
     "husky": "^2.2.0",
+    "lerna": "^3.14.1",
     "pkg": "^4.4.0",
     "tslint": "^5.13.1",
     "tslint-eslint-rules": "^5.4.0",
@@ -56,6 +57,5 @@
     "ignore": [
       "api/db.json"
     ]
-  },
-  "dependencies": {}
+  }
 }

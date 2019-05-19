@@ -24,7 +24,7 @@ export const getListing = (absoluteFilePath: string, modality: string) => new Pr
         if (err) {
             return reject(err)
         }
-        resolve(items)
+        resolve(items.filter(item => !item.startsWith(".")))
     })
 })
 

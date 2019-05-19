@@ -44,8 +44,9 @@ export const menuItems: {
     route?: string
 }[] = [
         {
-            destination: "",
-            title: "Home"
+            destination: "home",
+            title: "Home",
+            route: "/"
         },
         {
             destination: "therapeutics",
@@ -60,10 +61,6 @@ export const menuItems: {
             route: "rx"
         },
         {
-            destination: "contact",
-            title: "Contact"
-        },
-        {
             destination: "https://github.com/benjspriggs/ibis",
             title: "Source",
             external: true
@@ -76,7 +73,7 @@ export const getMenuItemBy = {
 }
 
 app.get("/", (_, res: express.Response) => {
-    res.render("home", getMenuItemBy.destination(""))
+    res.render("therapeutics", getMenuItemBy.destination(""))
 })
 
 app.use("/:asset", express.static(join(__dirname, "public")))

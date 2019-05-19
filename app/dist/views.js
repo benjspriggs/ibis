@@ -29,8 +29,9 @@ app.set("views", config_1.paths.views);
 app.set("view engine", ".hbs");
 exports.menuItems = [
     {
-        destination: "",
-        title: "Home"
+        destination: "home",
+        title: "Home",
+        route: "/"
     },
     {
         destination: "therapeutics",
@@ -45,10 +46,6 @@ exports.menuItems = [
         route: "rx"
     },
     {
-        destination: "contact",
-        title: "Contact"
-    },
-    {
         destination: "https://github.com/benjspriggs/ibis",
         title: "Source",
         external: true
@@ -59,7 +56,7 @@ exports.getMenuItemBy = {
     title: (title) => exports.menuItems.find(item => item.title === title)
 };
 app.get("/", (_, res) => {
-    res.render("home", exports.getMenuItemBy.destination(""));
+    res.render("therapeutics", exports.getMenuItemBy.destination(""));
 });
 app.use("/:asset", express_1.default.static(path_1.join(__dirname, "public")));
 app.get("/:route", (req, res, next) => {

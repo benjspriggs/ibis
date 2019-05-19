@@ -9,7 +9,7 @@
     "test": "ava --tap",
     "build": "gulp && npm run build:browser",
     "build:browser": "rollup --config ./src/public/rollup.config.js",
-    "pkg": "pkg dist/index.js --out-path dist",
+    "pkg": "pkg . --out-path dist",
     "lint": "tslint --project . -t verbose"
   },
   "author": "Ben Spriggs",

@@ -8,7 +8,7 @@
     "start": "node start.js",
     "test": "ava --tap",
     "build": "tsc --project tsconfig.json && tsc --project tsconfig.js.json",
-    "pkg": "pkg dist/start.js --out-path dist",
+    "pkg": "pkg . --out-path dist",
     "lint": "tslint --project . -t verbose"
   },
   "author": "Ben Spriggs",

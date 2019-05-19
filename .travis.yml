@@ -6,3 +6,17 @@ node_js:
 cache: npm
 before_script: npm run build
 script: npm test
+before_deploy: npm run pkg
+deploy:
+  provider: releases
+  api_key: ${GITHUB_OAUTH_TOKEN}
+  file:
+    - "packages/ibis-app/dist/ibis-app-linux"
+    - "packages/ibis-app/dist/ibis-app-macos"
+    - "packages/ibis-app/dist/ibis-app-win.exe"
+    - "packages/ibis-api/dist/ibis-api-linux"
+    - "packages/ibis-api/dist/ibis-api-macos"
+    - "packages/ibis-api/dist/ibis-api-win.exe"
+  skip_cleanup: true
+  on:
+    tags: true

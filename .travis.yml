@@ -2,5 +2,5 @@ language: node_js
 node_js:
   - "7"
 cache: npm
-before_script: npm build
+before_script: npm run build
 script: npm test

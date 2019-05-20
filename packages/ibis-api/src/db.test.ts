@@ -100,12 +100,12 @@ test("db:query:modality", (t) => {
 
     t.deepEqual(query("term modality:bota"), {
         modality: "bota",
-        text: "term modality:bota",
+        text: "term",
     }, "it has a long name")
 
     t.deepEqual(query("term m:bota"), {
         modality: "bota",
-        text: "term m:bota",
+        text: "term",
     }, "it has shorthands")
 
     try {
@@ -117,22 +117,22 @@ test("db:query:modality", (t) => {
 
     t.deepEqual(query(`term m:"string modality"`), {
         modality: "string modality",
-        text: `term m:"string modality"`,
+        text: `term`,
     }, "it captures double quotes")
 
     t.deepEqual(query(`term m:"string modality"`), {
         modality: "string modality",
-        text: `term m:"string modality"`,
+        text: `term`,
     }, "it captures single quotes")
 
     t.deepEqual(query(`term m:"string modality" word`), {
         modality: "string modality",
-        text: `term m:"string modality" word`,
+        text: `term  word`,
     }, `it doesn"t capture words after quotes`)
 
     t.deepEqual(query(`term m:"string modality" word`), {
         modality: "string modality",
-        text: `term m:"string modality" word`,
+        text: `term  word`,
     }, `it doesn"t capture words after quotes`)
 })
 

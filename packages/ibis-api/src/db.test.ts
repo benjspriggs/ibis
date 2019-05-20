@@ -1,4 +1,5 @@
-import db, { SearchResult, query } from "./db"
+import db, { SearchResult, query, directoryFilter } from "./db"
+import { getModality } from "ibis-lib"
 
 import bodyparser from "body-parser"
 import express from "express"
@@ -133,4 +134,40 @@ test("db:query:modality", (t) => {
         modality: "string modality",
         text: `term m:"string modality" word`,
     }, `it doesn"t capture words after quotes`)
+})
+
+test("db:directoryFilter:modality:false", (t) => {
+    var f = directoryFilter({
+        text: 'anything',
+        modality: 'bota'
+    })
+
+    t.is(false, f({
+        url: '',
+        modality: getModality('home'),
+        header: {
+            version: '',
+            tag: '',
+            name: '',
+            category: ''
+        }
+    }))
+})
+
+test("db:directoryFilter:modality:true", (t) => {
+    var f = directoryFilter({
+        text: 'anything',
+        modality: 'bota'
+    })
+
+    t.is(true, f({
+        url: '',
+        modality: getModality('bota'),
+        header: {
+            version: '',
+            tag: '',
+            name: '',
+            category: ''
+        }
+    }))
 })

@@ -57,10 +57,24 @@ export function query(text: string): Query {
     return result
 }
 
-function searchOptions<DataType>(options?: fuse.FuseOptions<DataType>): (query: string, data: DataType[]) => DataType[] {
-    return (query, data) => {
+/**
+ * Returns a filter that filters out {@link Directory} based on the {@link query}.
+ * @param query A query
+ */
+export const directoryFilter = (query: Query) => (dir: Directory) => query.modality ? dir.modality.code === query.modality : true;
+
+interface SearchOptions<T> extends fuse.FuseOptions<T> {
+    f?: (query: Query) => (t: T) => boolean;
+}
+
+function searchOptions<DataType>(options?: SearchOptions<DataType>): (q: string, data: DataType[]) => DataType[] {
+    return (q, data) => {
         if (!data) {
             return []
+        }
+
+        if (options && options.f) {
+            data = data.filter(options.f(query(q)));
         }
 
         const values = Array.from(data)
@@ -75,7 +89,7 @@ function searchOptions<DataType>(options?: fuse.FuseOptions<DataType>): (query: 
             ...options
         })
 
-        const results = search.search(query)
+        const results = search.search(q)
 
         if ("matches" in (results as any)) {
             return results as any
@@ -86,7 +100,8 @@ function searchOptions<DataType>(options?: fuse.FuseOptions<DataType>): (query: 
 }
 
 const searchDirectory = searchOptions<Directory>({
-    keys: ["header", "header.name"] as any
+    keys: ["header", "header.name"] as any,
+    f: directoryFilter
 })
 
 async function getAllListings(resourcePrefix: string, abs: string): Promise<Directory[]> {

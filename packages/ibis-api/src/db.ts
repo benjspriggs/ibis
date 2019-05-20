@@ -76,25 +76,19 @@ function searchOptions<DataType>(options?: SearchOptions<DataType>): (q: string,
         }
 
         if (options && options.f) {
-            var _q = query(q)
-            var m = getModality(_q.modality);
+            var formattedQuery = query(q)
+            var parsedModality = getModality(formattedQuery.modality);
 
-            console.log(_q)
-
-            if (m) {
-                console.log('hit on modality', m)
-                console.log('filtering from', data.length)
+            if (parsedModality) {
                 data = data.filter(options.f({
-                    text: _q.text,
-                    modality: m.code
+                    text: formattedQuery.text,
+                    modality: parsedModality.code
                 }))
-                console.log('filtered to', data.length)
+                q = formattedQuery.text
             }
         }
 
-        const values = Array.from(data)
-
-        const search = new fuse(values, {
+        const search = new fuse(data, {
             shouldSort: true,
             threshold: 0.25,
             location: 0,
@@ -103,6 +97,8 @@ function searchOptions<DataType>(options?: SearchOptions<DataType>): (q: string,
             minMatchCharLength: 1,
             ...options
         })
+
+        console.log('searching', data.length, 'entries on', `'${q}'`)
 
         const results = search.search(q)
 

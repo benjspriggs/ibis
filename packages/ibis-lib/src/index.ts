@@ -62,8 +62,13 @@ export function getModality(codeOrDisplayName?: string): Modality {
     if (lower in modalities) {
         return ({ code: lower, data: modalities[lower] });
     } else {
-        const [code, modality] = Object.entries(modalities).find(([_, modality]) => modality.displayName.toLowerCase() === codeOrDisplayName)
-        return ({ code: code, data: modality })
+        const pair = Object.entries(modalities).find(([_, modality]) => modality.displayName.toLowerCase() === codeOrDisplayName)
+
+        if (pair) {
+            return ({ code: pair[0], data: pair[1] })
+        } else {
+            return
+        }
     }
 }
 

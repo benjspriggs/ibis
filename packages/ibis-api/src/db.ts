@@ -49,9 +49,11 @@ export function query(text: string): Query {
             throw new Error("multiple modality codes not allowed")
         }
 
-        const matchedModality = modalityPattern.exec(text)[1]
+        const match = modalityPattern.exec(text)
+        const matchedModality = match[1]
 
         result.modality = matchedModality.replace(/[""]/g, "")
+        result.text = result.text.replace(modalityPattern, '').trim()
     }
 
     return result
@@ -81,10 +83,12 @@ function searchOptions<DataType>(options?: SearchOptions<DataType>): (q: string,
 
             if (m) {
                 console.log('hit on modality', m)
+                console.log('filtering from', data.length)
                 data = data.filter(options.f({
                     text: _q.text,
                     modality: m.code
                 }))
+                console.log('filtered to', data.length)
             }
         }
 

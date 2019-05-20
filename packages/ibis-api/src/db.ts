@@ -74,7 +74,18 @@ function searchOptions<DataType>(options?: SearchOptions<DataType>): (q: string,
         }
 
         if (options && options.f) {
-            data = data.filter(options.f(query(q)));
+            var _q = query(q)
+            var m = getModality(_q.modality);
+
+            console.log(_q)
+
+            if (m) {
+                console.log('hit on modality', m)
+                data = data.filter(options.f({
+                    text: _q.text,
+                    modality: m.code
+                }))
+            }
         }
 
         const values = Array.from(data)

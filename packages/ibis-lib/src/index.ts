@@ -52,7 +52,11 @@ export const modalities: { [code: string]: ModalityData } = {
     },
 }
 
-export function getModality(codeOrDisplayName: string): Modality {
+export function getModality(codeOrDisplayName?: string): Modality {
+    if (!codeOrDisplayName) {
+        return
+    }
+
     const lower = codeOrDisplayName.toLowerCase()
 
     if (lower in modalities) {

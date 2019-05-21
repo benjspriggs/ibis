@@ -1,0 +1,13 @@
+{
+    "version": "2",
+    "exclude_patterns": [
+        "**/semantic/",
+        "dist/",
+        "**/node_modules/",
+        "script/",
+        "**/spec/",
+        "**/test/",
+        "**/tests/",
+        "**/*.d.ts"
+    ]
+}

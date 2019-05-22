@@ -1,8 +1,8 @@
 import test from "ava"
 
-import { getModality, modalities } from "./common"
+import { getModality, modalities } from "./index"
 
-test("common:getModality", (t) => {
+test("index:getModality", (t) => {
     const acup = "acup"
 
     t.not(getModality(acup), undefined);

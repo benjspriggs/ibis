@@ -6,5 +6,5 @@ node_js:
 cache: npm
 before_script: 
   - npm run build
-  - ls -la
+  - find . -name "*.test.js" | grep -v node_modules
 script: npm test

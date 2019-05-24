@@ -3,7 +3,7 @@ import db, { SearchResult, query } from "./db"
 import bodyparser from "body-parser"
 import express from "express"
 import request from "supertest"
-import test from "ava"
+import test, { ExecutionContext } from "ava"
 
 const getApp = () => {
     const app = express()
@@ -12,85 +12,73 @@ const getApp = () => {
     return app
 }
 
-test("db:app:/", async (t) => {
-    t.plan(2)
+const getAppAndAssertResponse = (url: string, withResponse: (_: request.Response) => void) => 
+    request(getApp()).get(url)
+        .then((r) => {
+            withResponse(r)
+        })
 
-    const res = await request(getApp()).get("/")
+test("db:app:/", (t) => 
+    getAppAndAssertResponse("/", res => {
+        t.is(res.status, 200)
+        t.not(res.body, undefined)
+    })
+)
 
-    t.is(res.status, 200)
-    t.not(res.body, undefined)
-})
+test("db:app:/:query", (t) =>
+    getAppAndAssertResponse("/?q=string", res => {
+        t.is(res.status, 200)
+        t.not(res.body, undefined)
+    })
+)
 
-test("db:app:/:query", async (t) => {
-    t.plan(2)
+test("db:app:/diseases", (t) => 
+    getAppAndAssertResponse("/diseases", res => {
+        t.is(res.status, 200)
+        t.is((res.body as SearchResult).directory, "diseases")
+    })
+)
 
-    const res = await request(getApp()).get("/?q=string")
+test("db:app:/treatments", (t) => 
+    getAppAndAssertResponse("/treatments", res => {
+        t.is(res.status, 200)
+        t.is((res.body as SearchResult).directory, "treatments")
+    })
+)
 
-    t.is(res.status, 200)
-    t.not(res.body, undefined)
-})
+test("db:app:/treatments:categorized", (t) => 
+    getAppAndAssertResponse("/treatments?categorize=true", res => {
+        t.is(res.status, 200)
+        t.false(Array.isArray(res.body.results))
+    })
+)
 
-test("db:app:/diseases", async (t) => {
-    t.plan(2)
+test("db:app:/diseases:categorized", (t) =>
+    getAppAndAssertResponse("/diseases?categorize=true", res => {
+        t.is(res.status, 200)
+        t.false(Array.isArray(res.body.results))
+    })
+)
 
-    const res = await request(getApp()).get("/diseases")
+test("db:app:/treatments:not categorized", (t) =>
+    getAppAndAssertResponse("/treatments?categorize=false", res => {
+        t.is(res.status, 200)
+        t.true(Array.isArray(res.body.results))
+    })
+)
 
-    t.is(res.status, 200)
-    t.is((res.body as SearchResult).directory, "diseases")
-})
+test("db:app:/diseases:not categorized", (t) =>
+    getAppAndAssertResponse("/diseases?categorize=false", res => {
+        t.is(res.status, 200)
+        t.true(Array.isArray(res.body.results))
+    })
+)
 
-test("db:app:/treatments", async (t) => {
-    t.plan(2)
-
-    const res = await request(getApp()).get("/treatments")
-
-    t.is(res.status, 200)
-    t.is((res.body as SearchResult).directory, "treatments")
-})
-
-test("db:app:/treatments:categorized", async (t) => {
-    t.plan(2)
-
-    const res = await request(getApp()).get("/treatments?categorize=true")
-
-    t.is(res.status, 200)
-    t.false(Array.isArray(res.body.results))
-})
-
-test("db:app:/diseases:categorized", async (t) => {
-    t.plan(2)
-
-    const res = await request(getApp()).get("/diseases?categorize=true")
-
-    t.is(res.status, 200)
-    t.false(Array.isArray(res.body.results))
-})
-
-test("db:app:/treatments:not categorized", async (t) => {
-    t.plan(2)
-
-    const res = await request(getApp()).get("/treatments?categorize=false")
-
-    t.is(res.status, 200)
-    t.true(Array.isArray(res.body.results))
-})
-
-test("db:app:/diseases:not categorized", async (t) => {
-    t.plan(2)
-
-    const res = await request(getApp()).get("/diseases?categorize=false")
-
-    t.is(res.status, 200)
-    t.true(Array.isArray(res.body.results))
-})
-
-test("db:app:/foobar", async (t) => {
-    t.plan(1)
-
-    const res = await request(getApp()).get("/foobar")
-
-    t.is(res.status, 404)
-})
+test("db:app:/foobar", (t) => 
+    getAppAndAssertResponse("/foobar", res => {
+        t.is(res.status, 404)
+    })
+)
 
 test("db:query:modality", (t) => {
     t.deepEqual(query("foobar"), {

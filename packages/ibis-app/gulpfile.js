@@ -77,7 +77,11 @@ exports.ls = function (cb) {
 
 task('copy', parallel(copyStaticAssets, copyStaticSources))
 
-task('clean', parallel(cleanStaticAssets, cleanStaticSources))
+task('clean', () => {
+    return del(distributable)
+})
+
+task('clean-static', parallel(cleanStaticAssets, cleanStaticSources))
 
 task('watch', watchStaticAssets)
 task("node", buildNode);

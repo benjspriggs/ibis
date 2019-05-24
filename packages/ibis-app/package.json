@@ -6,7 +6,6 @@
   "bin": "start.js",
   "scripts": {
     "start": "node start.js",
-    "test": "ava --tap",
     "build": "gulp && npm run build:browser",
     "build:browser": "rollup --config ./src/public/rollup.config.js",
     "pkg": "pkg dist/index.js --out-path dist",

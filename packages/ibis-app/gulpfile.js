@@ -1,6 +1,6 @@
 //@ts-check
 const { src, dest, watch, series, parallel, task } = require("gulp")
-const { default: del } = require("del")
+const del = require("del")
 const newer = require("gulp-newer")
 const glob = require("glob")
 const ts = require("gulp-typescript")

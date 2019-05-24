@@ -146,11 +146,16 @@ export interface CategorizedSearchMap {
 }
 
 function formatSearchResponse(query: string, directory: string, results: Directory[], categorize: boolean = false): SearchResult | CategorizedSearchResult {
-    if (categorize) {
-        return ({
-            query: query,
-            directory: directory,
-            results: (results as Directory[]).reduce<CategorizedSearchMap>((acc, cur) => {
+    let searchResponse: SearchResult | CategorizedSearchResult = {
+        query: query,
+        directory: directory,
+        results: null
+    }
+
+    if (!categorize) {
+        searchResponse.results = results
+    } else {
+        searchResponse.results = results.reduce<CategorizedSearchMap>((acc, cur) => {
                 const name = cur.modality.data.displayName
 
                 if (!(name in acc)) {
@@ -164,14 +169,9 @@ function formatSearchResponse(query: string, directory: string, results: Directo
 
                 return acc
             }, {})
-        })
-    } else {
-        return ({
-            query: query,
-            directory: directory,
-            results: results
-        })
     }
+
+    return searchResponse
 }
 
 router.get("/:sub", async (req, res) => {

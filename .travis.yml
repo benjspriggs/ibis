@@ -4,5 +4,7 @@ node_js:
   - "9"
   - "10"
 cache: npm
-before_script: npm run build
+before_script: 
+  - npm run build
+  - ls -la
 script: npm test

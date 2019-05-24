@@ -9,7 +9,8 @@
     "test": "ava --tap",
     "build": "tsc --project tsconfig.json && tsc --project tsconfig.js.json",
     "pkg": "pkg dist/start.js --out-path dist",
-    "lint": "tslint --project . -t verbose"
+    "lint": "tslint --project . -t verbose",
+    "clean": "rimraf dist"
   },
   "author": "Ben Spriggs",
   "license": "ISC",

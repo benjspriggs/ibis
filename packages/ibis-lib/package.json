@@ -5,6 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
+    "clean": "rimraf dist",
     "lint": "tslint --project . -t verbose"
   },
   "author": "Ben Spriggs",

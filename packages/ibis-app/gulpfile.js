@@ -1,6 +1,6 @@
 //@ts-check
 const { src, dest, watch, series, parallel, task } = require("gulp")
-const { default: del } = require("del")
+const del = require("del")
 const newer = require("gulp-newer")
 const glob = require("glob")
 const ts = require("gulp-typescript")
@@ -77,7 +77,11 @@ exports.ls = function (cb) {
 
 task('copy', parallel(copyStaticAssets, copyStaticSources))
 
-task('clean', parallel(cleanStaticAssets, cleanStaticSources))
+task('clean', () => {
+    return del(distributable)
+})
+
+task('clean-static', parallel(cleanStaticAssets, cleanStaticSources))
 
 task('watch', watchStaticAssets)
 task("node", buildNode);

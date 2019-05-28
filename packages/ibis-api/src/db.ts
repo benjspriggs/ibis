@@ -19,6 +19,18 @@ function database(): Promise<lowdb.LowdbAsync<Database>> {
     return lowdb(adapter)
 }
 
+/**
+ * Default options used when searching using Fuse.
+ */
+const defaultFuseOptions = {
+    shouldSort: true,
+    threshold: 0.25,
+    location: 0,
+    distance: 50,
+    maxPatternLength: 32,
+    minMatchCharLength: 1,
+}
+
 export interface Directory {
     url: string,
     modality: Modality,
@@ -88,25 +100,11 @@ function searchOptions<DataType>(options?: SearchOptions<DataType>): (q: string,
             }
         }
 
-        const search = new fuse(data, {
-            shouldSort: true,
-            threshold: 0.25,
-            location: 0,
-            distance: 50,
-            maxPatternLength: 32,
-            minMatchCharLength: 1,
-            ...options
-        })
+        const search = new fuse(data, { ...defaultFuseOptions, ...options})
 
         console.log('searching', data.length, 'entries on', `'${q}'`)
 
-        const results = search.search(q)
-
-        if ("matches" in (results as any)) {
-            return results as any
-        } else {
-            return results
-        }
+        return search.search(q)
     }
 }
 
@@ -182,19 +180,19 @@ function formatSearchResponse(query: string, directory: string, results: Directo
         searchResponse.results = results
     } else {
         searchResponse.results = results.reduce<CategorizedSearchMap>((acc, cur) => {
-                const name = cur.modality.data.displayName
+            const name = cur.modality.data.displayName
 
-                if (!(name in acc)) {
-                    acc[name] = {
-                        name: name,
-                        results: [cur]
-                    }
-                } else {
-                    acc[name].results.push(cur)
+            if (!(name in acc)) {
+                acc[name] = {
+                    name: name,
+                    results: [cur]
                 }
+            } else {
+                acc[name].results.push(cur)
+            }
 
-                return acc
-            }, {})
+            return acc
+        }, {})
     }
 
     return searchResponse

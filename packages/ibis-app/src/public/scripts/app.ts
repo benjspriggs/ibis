@@ -5,20 +5,27 @@ import { Searchable } from "fomantic-ui"
 declare var $: JQueryStatic
 
 function formatBackendResource(url: string) {
-    const u = new URL(url)
+    let first: string;
+    let rest: string[];
 
-    const [
-        _,
-        first,
-        ...rest
-     ] = u.pathname.split("/")
+    try {
+        const u = new URL(url)
+
+        const parts = u.pathname.split("/")
+        first = parts[1];
+        rest = parts.splice(2);
+    } catch (e) {
+        const parts = url.split("/")
+        first = parts[0];
+        rest = parts.splice(1);
+    }
 
      if (first === "rx") {
          return `/materia-medica/${rest.join("/")}`
      } else if (first == "tx") {
          return `/therapeutics/${rest.join("/")}`
      } else {
-         throw new Error("unknown: " + first)
+         throw new Error("unknown backend resource: " + url)
      }
 }
 
@@ -35,6 +42,11 @@ $(document).ready(() => {
         onSuccess: (data: any) => {
             console.dir(data)
         }
+    });
+
+    ($("a[data-role='entry-link']")).each((_, element) => {
+        var relativePath = $(element).attr('data-relative-location');
+        $(element).attr('href', formatBackendResource(relativePath));
     });
 
     ($(".ui.search") as Searchable).search({

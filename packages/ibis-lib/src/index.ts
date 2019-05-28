@@ -52,14 +52,23 @@ export const modalities: { [code: string]: ModalityData } = {
     },
 }
 
-export function getModality(codeOrDisplayName: string): Modality {
+export function getModality(codeOrDisplayName?: string): Modality {
+    if (!codeOrDisplayName) {
+        return
+    }
+
     const lower = codeOrDisplayName.toLowerCase()
 
     if (lower in modalities) {
         return ({ code: lower, data: modalities[lower] });
+    }
+
+    const modalityCodePair = Object.entries(modalities).find(([_, modality]) => modality.displayName.toLowerCase() === codeOrDisplayName)
+
+    if (modalityCodePair) {
+        return ({ code: modalityCodePair[0], data: modalityCodePair[1] })
     } else {
-        const [code, modality] = Object.entries(modalities).find(([_, modality]) => modality.displayName.toLowerCase() === codeOrDisplayName)
-        return ({ code: code, data: modality })
+        return
     }
 }
 

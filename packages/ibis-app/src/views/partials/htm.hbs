@@ -1,6 +1,6 @@
 <div class="container text">
     <h2 class="ui header">
-        <a href="{{filepath.absolute}}">{{title_case header.name}}</a>
+        <a data-role="entry-link" data-relative-location="{{filepath.relative}}" data-absolute-location="{{filepath.absolute}}" href="{{filepath.absolute}}">{{title_case header.name}}</a>
         {{#with header}}
         <div class="ui label">{{version}}</div>
         <div class="sub header">

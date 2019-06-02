@@ -6,11 +6,11 @@
   "bin": "start.js",
   "scripts": {
     "start": "node start.js",
-    "test": "ava --tap",
     "build": "gulp && npm run build:browser",
     "build:browser": "rollup --config ./src/public/rollup.config.js",
     "pkg": "pkg . --out-path dist",
-    "lint": "tslint --project . -t verbose"
+    "lint": "tslint --project . -t verbose",
+    "clean": "gulp clean"
   },
   "author": "Ben Spriggs",
   "license": "ISC",

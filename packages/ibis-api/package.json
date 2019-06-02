@@ -9,19 +9,20 @@
     "test": "ava --tap",
     "build": "tsc --project tsconfig.json && tsc --project tsconfig.js.json",
     "pkg": "pkg . --out-path dist",
-    "lint": "tslint --project . -t verbose"
+    "lint": "tslint --project . -t verbose",
+    "clean": "rimraf dist"
   },
   "author": "Ben Spriggs",
   "license": "ISC",
   "dependencies": {
-    "axios": "^0.18.0",
+    "axios": "^0.19.0",
     "cors": "^2.8.5",
     "express": "^4.16.4",
     "fuse.js": "^3.4.2",
     "ibis-lib": "file:../ibis-lib",
     "lowdb": "^1.0.0",
     "node-html-parser": "^1.1.12",
-    "write-file-atomic": "^2.4.2"
+    "write-file-atomic": "^3.0.0"
   },
   "pkg": {
     "scripts": [

@@ -19,6 +19,18 @@ function database(): Promise<lowdb.LowdbAsync<Database>> {
     return lowdb(adapter)
 }
 
+/**
+ * Default options used when searching using Fuse.
+ */
+const defaultFuseOptions = {
+    shouldSort: true,
+    threshold: 0.25,
+    location: 0,
+    distance: 50,
+    maxPatternLength: 32,
+    minMatchCharLength: 1,
+}
+
 export interface Directory {
     url: string,
     modality: Modality,
@@ -49,44 +61,56 @@ export function query(text: string): Query {
             throw new Error("multiple modality codes not allowed")
         }
 
-        const matchedModality = modalityPattern.exec(text)[1]
+        const match = modalityPattern.exec(text)
+        const matchedModality = match[1]
 
         result.modality = matchedModality.replace(/[""]/g, "")
+        result.text = result.text.replace(modalityPattern, '').trim()
     }
 
     return result
 }
 
-function searchOptions<DataType>(options?: fuse.FuseOptions<DataType>): (query: string, data: DataType[]) => DataType[] {
-    return (query, data) => {
+/**
+ * Returns a filter that filters out {@link Directory} based on the {@link query}.
+ * @param query A query
+ */
+export const directoryFilter = (query: Query) => (dir: Directory) => query.modality ? dir.modality.code === query.modality : true;
+
+interface SearchOptions<T> extends fuse.FuseOptions<T> {
+    f?: (query: Query) => (t: T) => boolean;
+}
+
+function searchOptions<DataType>(options?: SearchOptions<DataType>): (q: string, data: DataType[]) => DataType[] {
+    return (q, data) => {
         if (!data) {
             return []
         }
 
-        const values = Array.from(data)
+        if (options && options.f) {
+            var formattedQuery = query(q)
+            var parsedModality = getModality(formattedQuery.modality);
 
-        const search = new fuse(values, {
-            shouldSort: true,
-            threshold: 0.25,
-            location: 0,
-            distance: 50,
-            maxPatternLength: 32,
-            minMatchCharLength: 1,
-            ...options
-        })
-
-        const results = search.search(query)
-
-        if ("matches" in (results as any)) {
-            return results as any
-        } else {
-            return results
+            if (parsedModality) {
+                data = data.filter(options.f({
+                    text: formattedQuery.text,
+                    modality: parsedModality.code
+                }))
+                q = formattedQuery.text
+            }
         }
+
+        const search = new fuse(data, { ...defaultFuseOptions, ...options})
+
+        console.log('searching', data.length, 'entries on', `'${q}'`)
+
+        return search.search(q)
     }
 }
 
 const searchDirectory = searchOptions<Directory>({
-    keys: ["header", "header.name"] as any
+    keys: ["header", "header.name"] as any,
+    f: directoryFilter
 })
 
 async function getAllListings(resourcePrefix: string, abs: string): Promise<Directory[]> {
@@ -146,32 +170,32 @@ export interface CategorizedSearchMap {
 }
 
 function formatSearchResponse(query: string, directory: string, results: Directory[], categorize: boolean = false): SearchResult | CategorizedSearchResult {
-    if (categorize) {
-        return ({
-            query: query,
-            directory: directory,
-            results: (results as Directory[]).reduce<CategorizedSearchMap>((acc, cur) => {
-                const name = cur.modality.data.displayName
-
-                if (!(name in acc)) {
-                    acc[name] = {
-                        name: name,
-                        results: [cur]
-                    }
-                } else {
-                    acc[name].results.push(cur)
-                }
-
-                return acc
-            }, {})
-        })
-    } else {
-        return ({
-            query: query,
-            directory: directory,
-            results: results
-        })
+    let searchResponse: SearchResult | CategorizedSearchResult = {
+        query: query,
+        directory: directory,
+        results: null
     }
+
+    if (!categorize) {
+        searchResponse.results = results
+    } else {
+        searchResponse.results = results.reduce<CategorizedSearchMap>((acc, cur) => {
+            const name = cur.modality.data.displayName
+
+            if (!(name in acc)) {
+                acc[name] = {
+                    name: name,
+                    results: [cur]
+                }
+            } else {
+                acc[name].results.push(cur)
+            }
+
+            return acc
+        }, {})
+    }
+
+    return searchResponse
 }
 
 router.get("/:sub", async (req, res) => {

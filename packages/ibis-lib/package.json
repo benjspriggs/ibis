@@ -5,6 +5,8 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
+    "test": "ava --tap",
+    "clean": "rimraf dist",
     "lint": "tslint --project . -t verbose"
   },
   "author": "Ben Spriggs",

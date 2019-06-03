@@ -35,6 +35,7 @@
     ]
   },
   "devDependencies": {
-    "fomantic-ui": "^2.7.5"
+    "fomantic-ui": "^2.7.5",
+    "rollup": "1.12.0"
   }
 }

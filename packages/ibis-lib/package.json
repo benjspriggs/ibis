@@ -20,8 +20,5 @@
     "node-html-parser": "^1.1.12",
     "pem": "^1.14.2",
     "spdy": "^4.0.0"
-  },
-  "devDependencies": {
-    "rollup": "1.12.0"
   }
 }

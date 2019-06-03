@@ -29,8 +29,5 @@
       "dist/*.js",
       "!dist/*.test.js"
     ]
-  },
-  "devDependencies": {
-    "rollup": "1.12.0"
   }
 }

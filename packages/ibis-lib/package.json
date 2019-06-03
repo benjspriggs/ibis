@@ -4,9 +4,9 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "gulp build",
     "test": "ava --tap",
-    "clean": "rimraf dist",
+    "clean": "gulp clean",
     "lint": "tslint --project . -t verbose"
   },
   "author": "Ben Spriggs",

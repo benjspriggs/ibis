@@ -1,12 +1,13 @@
 // @ts-check
-const del = require("del")
-const gulp = require("gulp")
-const { build } = require("./../gulpfile.js")
+const { task } = require("gulp")
+const { project } = require("./../../gulpfile")
 
-gulp.task('clean', () => del("./dist"))
+const { build, clean } = project({
+    paths: {
+        dist: "./dist",
+        tsconfig: ["./tsconfig.json", "./tsconfig.js.json"]
+    }
+})
 
-gulp.task('buildJS', () => build("./tsconfig.js.json").pipe(gulp.dest("./dist")))
-
-gulp.task('buildTS', () => build("./tsconfig.json").pipe(gulp.dest("./dist")))
-
-gulp.task('build', gulp.parallel(['buildJS', 'buildTS']))
+exports.build = build;
+exports.clean = clean;

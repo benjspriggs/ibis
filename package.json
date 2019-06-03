@@ -50,6 +50,7 @@
     "gulp-newer": "^1.4.0",
     "gulp-sourcemaps": "^2.6.5",
     "gulp-typescript": "^5.0.1",
+    "gulp-uglify": "^3.0.2",
     "husky": "^2.2.0",
     "lerna": "^3.14.1",
     "pkg": "^4.4.0",

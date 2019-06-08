@@ -10,7 +10,7 @@ const { project } = require("./../../gulpfile")
 const distributable = package.paths.dist
 const source = "src"
 
-const { build, clean } = project(package)
+const { build, clean, compress, bundle } = project(package)
 
 /**
  * @param {string} prefix
@@ -74,4 +74,6 @@ task('clean-static', parallel(cleanStaticAssets, cleanStaticSources))
 
 task('watch', watchStaticAssets)
 task('build', build)
+task('compress', compress)
+task('bundle', bundle)
 task('default', series('copy', 'build'))

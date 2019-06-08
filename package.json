@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Web version of IBIS (MedicineWorks)",
   "scripts": {
+    "install": "lerna run install --parallel",
     "start": "lerna run start --parallel",
     "build": "lerna run build",
     "test": "lerna run test --parallel",

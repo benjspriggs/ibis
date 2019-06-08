@@ -8,7 +8,7 @@
     "start": "node start.js",
     "test": "ava --tap",
     "build": "gulp build",
-    "pkg": "pkg dist/start.js --out-path dist",
+    "pkg": "gulp package",
     "lint": "tslint --project . -t verbose",
     "clean": "gulp clean"
   },

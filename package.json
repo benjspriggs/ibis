@@ -6,7 +6,7 @@
     "start": "lerna run start --parallel",
     "build": "lerna run build",
     "test": "lerna run test --parallel",
-    "pkg": "lerna run pkg --parallel",
+    "pkg": "lerna run pkg",
     "lint": "lerna run lint --parallel",
     "clean": "lerna run clean --parallel"
   },

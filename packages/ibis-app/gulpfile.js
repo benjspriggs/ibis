@@ -1,4 +1,5 @@
 //@ts-check
+const package = require("./package.json")
 const { src, dest, watch, series, parallel, task } = require("gulp")
 const del = require("del")
 const newer = require("gulp-newer")
@@ -6,15 +7,10 @@ const glob = require("glob")
 
 const { project } = require("./../../gulpfile")
 
-const distributable = "dist"
+const distributable = package.paths.dist
 const source = "src"
 
-const { build, clean } = project({
-    paths: {
-        dist: distributable,
-        tsconfig: "./tsconfig.json"
-    }
-})
+const { build, clean } = project(package)
 
 /**
  * @param {string} prefix

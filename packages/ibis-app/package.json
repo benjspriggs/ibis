@@ -34,5 +34,9 @@
     "scripts": [
       "dist/*.js"
     ]
+  },
+  "paths": {
+    "dist": "./dist",
+    "tsconfig": "./tsconfig.json"
   }
 }

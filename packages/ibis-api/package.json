@@ -29,5 +29,9 @@
       "dist/*.js",
       "!dist/*.test.js"
     ]
+  },
+  "paths": {
+    "dist": "./dist",
+    "tsconfig": ["./tsconfig.json", "./tsconfig.js.json"]
   }
 }

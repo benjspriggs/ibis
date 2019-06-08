@@ -6,8 +6,51 @@
 
 Serves an old app via node: <http://ouribis.com>.
 
-## TODO
+## get started
 
-- [ ] Add short notes on how to get started
-- [ ] Add menus for existing content
-- [ ] Use ajax requests for fetching data for handlebar templates
+Install all packages (examples assume `npm`):
+
+```bash
+npm i
+```
+
+Build:
+
+```bash
+npm run build
+```
+
+Start the app:
+
+```bash
+npm start
+```
+
+This project assumes that you have a copy of the old IBIS app, which you can drop in `packages` to have `ibis-api` pick up all the sources, and cache them in our own format.
+
+The app starts on <http://localhost:8080> by default, and the api starts on <http://localhost:3000>. Both of these are respectively configurable via:
+
+| environment variable | what it configures | default |
+|-|-|-|
+| `APP_HOSTNAME` | The hostname for `ibis-app` | `'localhost'` |
+| `APP_PORT` | The port for `ibis-app` | `8080` |
+| `API_HOSTNAME` | The hostname for `ibis-api` | `'localhost'` |
+| `API_PORT` | The port for `ibis-api` | `3000` |
+
+These are both initially configured in `config.ts` for both packages.
+
+## architecture
+
+Each project in [`packages`](packages/) is a component of this app. `ibis-lib` holds common code between `ibis-api` and `ibis-app`, the frontend and backend respectively.
+
+Each project uses `gulp` to automate build processes, and `dist/` is generally the folder where built artefacts go.
+
+## packaging
+
+This project uses `pkg` to create an executable that anyone can run, without installing `node`:
+
+```bash
+npm run pkg
+```
+
+Make sure that you've built everything (`npm run build`) before running this.

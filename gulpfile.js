@@ -9,6 +9,7 @@ const commonjs = require("rollup-plugin-commonjs")
 
 function project({
     paths: {
+        main: main = "./start.js",
         tsconfig: tsconfig = "./tsconfig.json",
         dist: dist = "./dist",
         out: out = "./out"
@@ -48,11 +49,21 @@ function project({
 
     const clean = gulp.parallel(cleanFolder(dist), cleanFolder(out))
 
+    const bundle = gulp.series(clean, localBuild, compress)
+
+    function package(done) {
+        const { exec } = require("pkg")
+
+        return exec([main, '--out-path', dist])
+            .then(_ => done())
+    }
+
     return {
         build: localBuild,
         clean: clean,
         compress: compress,
-        bundle: gulp.series(clean, localBuild, compress)
+        bundle: bundle,
+        package: gulp.series(bundle, package)
     }
 }
 

@@ -3,15 +3,15 @@ const sourcemaps = require("gulp-sourcemaps")
 const ts = require("gulp-typescript")
 const del = require("del")
 const gulp = require("gulp")
+const rollup = require("gulp-better-rollup")
+const { uglify } = require("rollup-plugin-uglify")
+const commonjs = require("rollup-plugin-commonjs")
 
-/**
- * 
- * @param {{ paths: { dist: string, tsconfig: string | string[] }}} param0 
- */
 function project({
     paths: {
-        tsconfig: tsconfig,
-        dist: dist
+        tsconfig: tsconfig = "./tsconfig.json",
+        dist: dist = "./dist",
+        out: out = "./out"
     }
 }) {
     function localBuild(done) {
@@ -25,9 +25,34 @@ function project({
         }
     }
 
+    function compress(){
+        return gulp.src([`${dist}/**/*.js`, `!${dist}/**/*.test.js`])
+            .pipe(rollup({
+                plugins: [
+                    commonjs({
+                        include: /node_modules/
+                    }),
+                    uglify()
+                ],
+            }, {
+                format: "iife"
+            }))
+            .pipe(gulp.dest(out))
+    }
+
+    function cleanFolder(folder){
+        const cleanTask = () => del(folder)
+        cleanTask.displayName = "Removing all files in " + folder
+        return cleanTask
+    }
+
+    const clean = gulp.parallel(cleanFolder(dist), cleanFolder(out))
+
     return {
         build: localBuild,
-        clean: () => del(dist)
+        clean: clean,
+        compress: compress,
+        bundle: gulp.series(clean, localBuild, compress)
     }
 }
 

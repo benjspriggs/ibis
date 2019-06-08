@@ -1,6 +1,7 @@
 IBIS-Mac*
 node_modules/
 dist/
+out/
 packages/ibis-app/semantic/dist/*
 data/
 db.json

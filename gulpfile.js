@@ -18,7 +18,9 @@ function project({
     function localBuild(done) {
         if (Array.isArray(tsconfig)) {
             const tasks = tsconfig.map(config => {
-                return () => build(config).pipe(gulp.dest(dist))
+                const nestedTask = () => build(config).pipe(gulp.dest(dist))
+                nestedTask.displayName = "Building Typescript sources from tsconfig: " + config
+                return nestedTask
             })
             return gulp.parallel(...tasks)(done)
         } else {
@@ -51,11 +53,10 @@ function project({
 
     const bundle = gulp.series(clean, localBuild, compress)
 
-    function package(done) {
+    function package() {
         const { exec } = require("pkg")
 
         return exec([main, '--out-path', dist])
-            .then(_ => done())
     }
 
     return {

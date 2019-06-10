@@ -5,6 +5,7 @@
   "scripts": {
     "start": "lerna run start --parallel",
     "build": "lerna run build",
+    "compress": "lerna run compress",
     "test": "lerna run test --parallel",
     "pkg": "lerna run pkg",
     "lint": "lerna run lint --parallel",
@@ -21,6 +22,7 @@
   },
   "homepage": "https://github.com/benjspriggs/ibis#readme",
   "devDependencies": {
+    "@babel/preset-env": "^7.4.5",
     "@types/browserify": "^12.0.36",
     "@types/cors": "^2.8.4",
     "@types/express": "^4.16.1",
@@ -38,6 +40,7 @@
     "@types/supertest": "^2.0.7",
     "@types/write-file-atomic": "^2.1.1",
     "ava": "^2.0.0",
+    "babel-preset-env": "^1.7.0",
     "body-parser": "^1.18.3",
     "browserify": "^16.2.3",
     "common-shakeify": "^0.6.0",
@@ -55,7 +58,9 @@
     "lerna": "^3.14.1",
     "pkg": "^4.4.0",
     "rollup": "1.14.4",
+    "rollup-plugin-babel": "^4.3.2",
     "rollup-plugin-commonjs": "^10.0.0",
+    "rollup-plugin-json": "^4.0.0",
     "rollup-plugin-node-resolve": "^5.0.0",
     "rollup-plugin-typescript2": "^0.21.0",
     "rollup-plugin-uglify": "^6.0.2",

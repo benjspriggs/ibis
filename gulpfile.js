@@ -6,8 +6,10 @@ const gulp = require("gulp")
 const debug = require("gulp-debug")
 const rollup = require("gulp-better-rollup")
 const { uglify } = require("rollup-plugin-uglify")
+const json = require("rollup-plugin-json")
 const commonjs = require("rollup-plugin-commonjs")
 const resolve = require("rollup-plugin-node-resolve")
+const babel = require("rollup-plugin-babel")
 
 function project({
     paths: {
@@ -31,20 +33,25 @@ function project({
     }
 
     function compress(){
-        return gulp.src([`${dist}/**/*.js`, `!${dist}/**/*.test.js`])
+        return gulp.src(`${dist}/index.js`)
             .pipe(debug({ title: "compressing" }))
             .pipe(rollup({
                 plugins: [
+                    json(),
                     resolve({
                         preferBuiltins: true
                     }),
-                    commonjs({
-                        include: /node_modules/
+                    babel({
+                        exclude: "node_modules/**",
+                        presets: ["@babel/preset-env"],
                     }),
+                    commonjs(),
                     uglify()
                 ],
             }, {
                 format: "cjs",
+                exports: "named",
+                file: "index.js",
                 browser: false
             }))
             .pipe(gulp.dest(out))

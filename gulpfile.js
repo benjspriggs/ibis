@@ -3,6 +3,7 @@ const sourcemaps = require("gulp-sourcemaps")
 const ts = require("gulp-typescript")
 const del = require("del")
 const gulp = require("gulp")
+const debug = require("gulp-debug")
 const rollup = require("gulp-better-rollup")
 const { uglify } = require("rollup-plugin-uglify")
 const commonjs = require("rollup-plugin-commonjs")
@@ -31,16 +32,20 @@ function project({
 
     function compress(){
         return gulp.src([`${dist}/**/*.js`, `!${dist}/**/*.test.js`])
+            .pipe(debug({ title: "compressing" }))
             .pipe(rollup({
                 plugins: [
-                    resolve(),
+                    resolve({
+                        preferBuiltins: true
+                    }),
                     commonjs({
                         include: /node_modules/
                     }),
                     uglify()
                 ],
             }, {
-                format: "umd"
+                format: "cjs",
+                browser: false
             }))
             .pipe(gulp.dest(out))
     }

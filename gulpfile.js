@@ -6,6 +6,7 @@ const gulp = require("gulp")
 const rollup = require("gulp-better-rollup")
 const { uglify } = require("rollup-plugin-uglify")
 const commonjs = require("rollup-plugin-commonjs")
+const resolve = require("rollup-plugin-node-resolve")
 
 function project({
     paths: {
@@ -32,13 +33,14 @@ function project({
         return gulp.src([`${dist}/**/*.js`, `!${dist}/**/*.test.js`])
             .pipe(rollup({
                 plugins: [
+                    resolve(),
                     commonjs({
                         include: /node_modules/
                     }),
                     uglify()
                 ],
             }, {
-                format: "iife"
+                format: "umd"
             }))
             .pipe(gulp.dest(out))
     }

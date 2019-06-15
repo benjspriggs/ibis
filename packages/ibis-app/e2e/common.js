@@ -3,16 +3,8 @@ const { withEntrypoint } = require("ibis-lib");
 const test = require("ava");
 const { get } = require("request");
 
-module.exports = function(options) {
-    const port = 8080 + Math.floor(Math.random() * 100)
-
-    process.env.APP_PORT = port.toString();
-
-    const withApi = withEntrypoint(options)
-
-    test("It should serve a 200 for root", withApi, async (t) => {
-        await new Promise((resolve, reject) => {
-            get(`http://localhost:${port}`)
+const fetchAndOk = (url) => (t) => new Promise((resolve, reject) => {
+            get(url)
                 .on('response', (response) => {
                     t.is(200, response.statusCode)
                     t.truthy(response.headers)
@@ -20,11 +12,31 @@ module.exports = function(options) {
                 })
                 .on('error', reject)
         });
-    })
 
-    test.todo("It should serve CSS from the static path")
+const fetchAndNotOk = (url) => (t) => new Promise((resolve, reject) => {
+            get(url)
+                .on('response', (response) => {
+                    t.not(200, response.statusCode)
+                    t.truthy(response.headers)
+                    resolve()
+                })
+                .on('error', reject)
+        });
 
-    test.todo("It should serve HTML")
+module.exports = function(options) {
+    const port = 8080 + Math.floor(Math.random() * 100)
 
-    test.todo("It should 404 on nonexistent paths")
+    process.env.APP_PORT = port.toString();
+
+    const withApp = withEntrypoint(options)
+
+    test("It should serve a 200 for root", withApp, fetchAndOk(`http://localhost:${port}`))
+
+    test("It should serve JS from the static path", withApp, fetchAndOk(`http://localhost:${port}/assets/scripts/app.js`))
+
+    test("It should serve CSS from the static path",  withApp, fetchAndOk(`http://localhost:${port}/assets/semantic/semantic.min.css`))
+
+    test("It should serve HTML", withApp, fetchAndOk(`http://localhost:${port}/`))
+
+    test("It should 404 on nonexistent paths", withApp, fetchAndNotOk(`http://localhost:${port}/assets/magic/and/fooey`))
 };

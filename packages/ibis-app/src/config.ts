@@ -13,6 +13,6 @@ export const paths = {
     public: _public
 }
 
-export const port = parseInt(process.env["PORT"]) || 8080
-export const hostname = process.env["HOSTNAME"] || "127.0.0.1"
+export const port = parseInt(process.env["APP_PORT"]) || 8080
+export const hostname = process.env["APP_HOSTNAME"] || "127.0.0.1"
 export const appHostname = `${isHttpsEnabled() ? "https" : "http"}://${hostname}:${port}`

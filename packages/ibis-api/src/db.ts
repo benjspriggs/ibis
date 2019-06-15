@@ -236,15 +236,17 @@ export async function initialize() {
         return
     }
 
-    const txs = await getAllListings(`${apiHostname}/tx`, config.relative.ibisRoot("system", "tx"))
-    const rxs = await getAllListings(`${apiHostname}/rx`, config.relative.ibisRoot("system", "rx"))
-    console.debug("got all the magic")
+    try {
+        const txs = await getAllListings(`${apiHostname}/tx`, config.relative.ibisRoot("system", "tx"))
+        const rxs = await getAllListings(`${apiHostname}/rx`, config.relative.ibisRoot("system", "rx"))
+        console.debug("got all the magic")
 
-    db.get("diseases").splice(0, 0, ...txs).write()
-    db.get("treatments").splice(0, 0, ...rxs).write()
-    console.debug("initialized")
-    // get ALL the files everywhere
-    // put them in the diseases/ tx/ rx
+        db.get("diseases").splice(0, 0, ...txs).write()
+        db.get("treatments").splice(0, 0, ...rxs).write()
+        console.debug("initialized")
+    } catch (e) {
+        console.error(`unable to initialize: ${e}`)
+    }
 }
 
 export default router

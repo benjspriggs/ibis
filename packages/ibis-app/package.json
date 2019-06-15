@@ -33,7 +33,7 @@
       "dist/semantic/**/*"
     ],
     "scripts": [
-      "out/*.js"
+      "out/**/*.js"
     ]
   },
   "paths": {
@@ -41,6 +41,7 @@
     "tsconfig": "./tsconfig.json"
   },
   "ava": {
+    "tap": true,
     "files": [
       "dist/**/*.test.js",
       "e2e/**/*.test.js"

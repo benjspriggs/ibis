@@ -5,7 +5,7 @@ import { spawn } from "child_process";
 import { join } from "path";
 import { get } from "request";
 
-function withPkg(t, run) {
+function withEntrypoint(t, run) {
     const apiEntrypoint = join(__dirname, "..", "start.js")
     console.debug("starting api e2e test from", apiEntrypoint.blue)
 
@@ -36,7 +36,7 @@ function withPkg(t, run) {
     })
 }
 
-test("It it should serve a 200 for root", withPkg, async (t, api) => {
+test("It it should serve a 200 for root", withEntrypoint, async (t, api) => {
     await new Promise((resolve, reject) => {
         get("http://localhost:3000")
             .on('response', (response) => {

@@ -21,4 +21,10 @@ module.exports = function(options) {
                 .on('error', reject)
         });
     })
+
+    test.todo("It should serve CSS from the static path")
+
+    test.todo("It should serve HTML")
+
+    test.todo("It should 404 on nonexistent paths")
 };

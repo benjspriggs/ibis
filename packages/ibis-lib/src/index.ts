@@ -10,6 +10,10 @@ export {
     isHttpsEnabled
 } from "./server"
 
+export {
+    withEntrypoint
+} from "./helpers"
+
 export interface Modality {
     code: string,
     data: ModalityData

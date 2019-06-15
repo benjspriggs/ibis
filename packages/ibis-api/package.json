@@ -26,8 +26,8 @@
   },
   "pkg": {
     "scripts": [
-      "dist/*.js",
-      "!dist/*.test.js"
+      "out/*.js",
+      "!out/*.test.js"
     ]
   },
   "paths": {

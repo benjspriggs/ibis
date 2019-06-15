@@ -7,5 +7,5 @@ export const start = () => h2(app)
         .then(server => {
                 console.log(`Listening on ${appHostname}`)
                 server.listen(port, hostname)
-                process.send("initialized")
+                process.send && process.send("initialized")
         })

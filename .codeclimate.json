@@ -8,6 +8,7 @@
         "**/spec/",
         "**/test/",
         "**/tests/",
+        "**/e2e/",
         "**/*.test.ts",
         "**/*.test.js",
         "**/*.d.ts"

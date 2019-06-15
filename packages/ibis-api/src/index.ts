@@ -11,5 +11,6 @@ export const start = () => {
             await initialize()
             server.listen(port, hostname)
             console.log(`Listening on ${apiHostname}`)
+            process.send("initialized")
         })
 }

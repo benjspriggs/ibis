@@ -29,6 +29,10 @@ function spawnProcessOnInitializationMessage(options: Options) {
 
         appUnderTest.on('exit', (code, signal) => {
             console.log("executable ended with code", code, signal)
+
+            if (code > 0) {
+                reject(`setup for ${prefix} failed with code ${code}`)
+            }
         })
 
         appUnderTest.on('message', () => resolve(appUnderTest))

@@ -63,7 +63,7 @@ function project({
 
     const clean = gulp.parallel(cleanFolder(dist), cleanFolder(out))
 
-    const bundle = gulp.series(clean, localBuild, compress)
+    const bundle = compress
 
     function package() {
         const { exec } = require("pkg")

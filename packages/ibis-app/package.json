@@ -41,7 +41,8 @@
   },
   "ava": {
     "files": [
-      "dist/**/*.test.js"
+      "dist/**/*.test.js",
+      "e2e/**/*.test.js"
     ]
   }
 }

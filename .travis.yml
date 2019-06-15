@@ -5,5 +5,6 @@ node_js:
   - "10"
 cache: npm
 before_script:
+  - npm run build
   - npm run pkg
 script: npm test

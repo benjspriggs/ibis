@@ -68,7 +68,7 @@ function project({
     function package() {
         const { exec } = require("pkg")
 
-        return exec([main, '--out-path', dist])
+        return exec([main, '--out-path', dist, "--debug"])
     }
 
     return {

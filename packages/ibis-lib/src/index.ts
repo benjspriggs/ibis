@@ -11,7 +11,8 @@ export {
 } from "./server"
 
 export {
-    withEntrypoint
+    withEntrypoint,
+    Options
 } from "./helpers"
 
 export interface Modality {

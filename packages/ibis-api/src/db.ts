@@ -239,8 +239,9 @@ export async function initialize() {
     try {
         const txs = await getAllListings(`${apiHostname}/tx`, config.relative.ibisRoot("system", "tx"))
         const rxs = await getAllListings(`${apiHostname}/rx`, config.relative.ibisRoot("system", "rx"))
-        console.debug("got all the magic")
+        console.debug(`fetched all listings from legacy IBIS directory: '${config.relative.ibisRoot(".")}'`)
 
+        console.debug("writing all legacy listings to db")
         db.get("diseases").splice(0, 0, ...txs).write()
         db.get("treatments").splice(0, 0, ...rxs).write()
         console.debug("initialized")

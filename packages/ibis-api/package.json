@@ -6,7 +6,7 @@
   "bin": "start.js",
   "scripts": {
     "start": "node start.js",
-    "test": "ava --tap",
+    "test": "ava",
     "build": "gulp build",
     "pkg": "gulp package",
     "lint": "tslint --project . -t verbose",
@@ -33,5 +33,12 @@
   "paths": {
     "dist": "./dist",
     "tsconfig": ["./tsconfig.json", "./tsconfig.js.json"]
+  },
+  "ava": {
+    "tap": true,
+    "files": [
+      "dist/**/*.test.js",
+      "e2e/**/*.test.js"
+    ]
   }
 }

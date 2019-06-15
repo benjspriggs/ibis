@@ -38,5 +38,10 @@
   "paths": {
     "dist": "./dist",
     "tsconfig": "./tsconfig.json"
+  },
+  "ava": {
+    "files": [
+      "dist/**/*.test.js"
+    ]
   }
 }

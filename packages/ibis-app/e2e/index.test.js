@@ -1,6 +1,6 @@
 // @ts-check
-import tests from "./common"
-import { join } from "path"
+const tests = require("./common");
+const { join } = require("path");
 
 tests({
     command: "node", 

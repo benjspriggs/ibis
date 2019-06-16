@@ -3,8 +3,8 @@ const { withEntrypoint } = require("ibis-lib");
 const test = require("ava");
 const { get } = require("request");
 
-const fetchAndOk = (url) => (t, port) => new Promise((resolve, reject) => {
-            get(url(port))
+const fetchAndOk = (endpoint) => (t, port) => new Promise((resolve, reject) => {
+            get(`http://localhost:${port}${endpoint}`)
                 .on('response', (response) => {
                     t.is(200, response.statusCode)
                     t.truthy(response.headers)
@@ -13,8 +13,8 @@ const fetchAndOk = (url) => (t, port) => new Promise((resolve, reject) => {
                 .on('error', reject)
         });
 
-const fetchAndNotOk = (url) => (t, port) => new Promise((resolve, reject) => {
-            get(url(port))
+const fetchAndNotOk = (endpoint) => (t, port) => new Promise((resolve, reject) => {
+            get(`http://localhost:${port}/${endpoint}`)
                 .on('response', (response) => {
                     t.not(200, response.statusCode)
                     t.truthy(response.headers)
@@ -24,23 +24,15 @@ const fetchAndNotOk = (url) => (t, port) => new Promise((resolve, reject) => {
         });
 
 module.exports = function(options) {
-    const randomPort = (t, run) => {
-        const port = 8080 + Math.floor(Math.random() * 100)
+    const withApp = withEntrypoint({ ...options, port_env: "APP_PORT" })
 
-        process.env.APP_PORT = port.toString();
+    test("It should serve a 200 for root", withApp, fetchAndOk('/'))
 
-        return run(t, port)
-    }
+    test("It should serve JS from the static path", withApp, fetchAndOk("/assets/scripts/app.js"))
 
-    const withApp = withEntrypoint(options)
+    test("It should serve CSS from the static path", withApp, fetchAndOk("/assets/semantic/semantic.min.css"))
 
-    test("It should serve a 200 for root", randomPort, withApp, fetchAndOk(port => `http://localhost:${port}`))
+    test("It should serve HTML", withApp, fetchAndOk("/"))
 
-    test("It should serve JS from the static path", randomPort, withApp, fetchAndOk(port => `http://localhost:${port}/assets/scripts/app.js`))
-
-    test("It should serve CSS from the static path",  randomPort, withApp, fetchAndOk(port => `http://localhost:${port}/assets/semantic/semantic.min.css`))
-
-    test("It should serve HTML", randomPort, withApp, fetchAndOk(port => `http://localhost:${port}/`))
-
-    test("It should 404 on nonexistent paths", randomPort, withApp, fetchAndNotOk(port => `http://localhost:${port}/assets/magic/and/fooey`))
+    test("It should 404 on nonexistent paths", withApp, fetchAndNotOk("/assets/magic/and/fooey"))
 };

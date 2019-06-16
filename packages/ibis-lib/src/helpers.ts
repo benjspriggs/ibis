@@ -8,7 +8,7 @@ export interface Options {
     port_env: string
 }
 
-function spawnProcessOnInitializationMessage(options: Options) {
+function spawnProcessOnInitializationMessage(options: Options, log: (...args: any[]) => void) {
     const {
         command,
         args,
@@ -17,7 +17,7 @@ function spawnProcessOnInitializationMessage(options: Options) {
     } = options;
 
     function logPrefixed(d: any) {
-        console.log(`${prefix}: ${d.toString()}`)
+        log(`${prefix}: ${d.toString()}`)
     }
 
     return new Promise<ChildProcess>((resolve, reject) => {
@@ -25,20 +25,16 @@ function spawnProcessOnInitializationMessage(options: Options) {
             stdio: ['pipe', 'pipe', 'pipe', 'ipc']
         })
 
+        appUnderTest.on('message', () => resolve(appUnderTest))
+
         appUnderTest.stdout.on('data', logPrefixed)
         appUnderTest.stderr.on('data', logPrefixed)
 
         appUnderTest.on('exit', (code, signal) => {
-            console.log("executable ended with code", code, signal)
-
-            if (code > 0) {
-                reject(`setup for ${prefix} failed with code ${code}`)
-            }
+            reject(`setup for ${prefix} unexpectedly closed with exit code ${code}`)
         })
 
-        appUnderTest.on('message', () => resolve(appUnderTest))
-
-        setTimeout(() => reject(`setup for '${prefix}' timed out (${timeout} ms)`), timeout)
+        setTimeout(() => reject(`setup for '${prefix}' timed out (took more than ${timeout} ms to send initialization message)`), timeout)
     });
 }
 
@@ -52,21 +48,25 @@ export function withEntrypoint(options: Options) {
         prefix = "app",
     } = options;
 
+    const id = Math.random().toString(36).substr(2, 9)
+
+    const log = (...args: any[]) => process.stdout.write([`[${id}]`].concat(args).join(' '))
+
     return function helper(t: any, run: any) {
-        console.debug(`starting e2e test for ${prefix}`, JSON.stringify(options))
+        log(`starting e2e test for ${prefix}`, JSON.stringify(options), '\n')
 
         const port = 8000 + Math.floor(Math.random() * 1000)
 
         process.env[port_env] = port.toString();
 
-        return spawnProcessOnInitializationMessage(options)
+        return spawnProcessOnInitializationMessage(options, log)
             .then(async (app) => {
                 try {
-                    console.log(`starting ${prefix} test`)
+                    log(`starting ${prefix} test\n`)
                     await run(t, port, app);
-                    console.log(`finished ${prefix} test`)
+                    log(`finished ${prefix} test\n`)
                 } finally {
-                    console.log(`tearing down ${prefix}`)
+                    log(`tearing down ${prefix}\n`)
                     app.kill();
                 }
             })

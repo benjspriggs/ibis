@@ -9,6 +9,7 @@
     "build": "gulp && npm run build:browser",
     "build:browser": "rollup --config ./src/public/rollup.config.js",
     "test": "ava",
+    "e2e": "ava --tap e2e/index.test.js e2e/pkg.test.js",
     "pkg": "gulp package",
     "lint": "tslint --project . -t verbose",
     "clean": "gulp clean"
@@ -41,6 +42,8 @@
     "tsconfig": "./tsconfig.json"
   },
   "ava": {
+    "babel": false,
+    "compileEnhancements": false,
     "tap": true,
     "files": [
       "dist/**/*.test.js",

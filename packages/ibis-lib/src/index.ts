@@ -178,22 +178,13 @@ interface pkgOptions {
     defaultEntrypoint?: string;
 }
 
-function getLiveApplicationRoot() {
-    if (isPackaged()) {
-        return dirname(process.execPath)
-    } else {
-        return join(__dirname, '../..')
-    }
-}
-
 function detectApplicationRoot() {
     if (isPackaged()) {
         // https://www.npmjs.com/package/pkg#snapshot-filesystem
         const pkg: pkgOptions = (process as any).pkg
         return dirname(pkg.entrypoint);
     } else {
-        const path = getLiveApplicationRoot()
-        return path
+        return join(__dirname, '../..')
     }
 }
 
@@ -206,7 +197,4 @@ export function isPackaged(): boolean {
     return !!pkg
 }
 
-export const applicationRoot = {
-    packaged: detectApplicationRoot(),
-    live: getLiveApplicationRoot()
-}
+export const applicationRoot = detectApplicationRoot

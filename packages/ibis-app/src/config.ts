@@ -1,7 +1,7 @@
 import { isPackaged, applicationRoot, isHttpsEnabled } from "ibis-lib"
 import { join } from "path"
 
-const root = isPackaged() ? applicationRoot.packaged : join(applicationRoot.packaged, "ibis-app/dist/")
+const root = isPackaged() ? applicationRoot() : join(applicationRoot(), "ibis-app/dist/")
 const views = join(root, "views")
 const semantic = join(root, "semantic/dist")
 const _public = join(root, "public")

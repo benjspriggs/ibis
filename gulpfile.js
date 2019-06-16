@@ -13,7 +13,6 @@ const babel = require("rollup-plugin-babel")
 
 function project({
     paths: {
-        main: main = "./start.js",
         tsconfig: tsconfig = "./tsconfig.json",
         dist: dist = "./dist",
         out: out = "./out"
@@ -68,7 +67,7 @@ function project({
     function package() {
         const { exec } = require("pkg")
 
-        return exec([main, '--out-path', dist])
+        return exec(["./package.json", '--out-path', dist])
     }
 
     return {

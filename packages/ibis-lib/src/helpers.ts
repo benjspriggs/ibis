@@ -4,7 +4,8 @@ export interface Options {
     command: string,
     args: string[],
     prefix?: string,
-    timeout?: number
+    timeout?: number,
+    port_env: string
 }
 
 function spawnProcessOnInitializationMessage(options: Options) {
@@ -12,7 +13,7 @@ function spawnProcessOnInitializationMessage(options: Options) {
         command,
         args,
         prefix,
-        timeout = 2000
+        timeout = 5000
     } = options;
 
     function logPrefixed(d: any) {
@@ -47,17 +48,22 @@ function spawnProcessOnInitializationMessage(options: Options) {
  */
 export function withEntrypoint(options: Options) {
     const {
+        port_env,
         prefix = "app",
     } = options;
 
     return function helper(t: any, run: any) {
         console.debug(`starting e2e test for ${prefix}`, JSON.stringify(options))
 
+        const port = 8000 + Math.floor(Math.random() * 1000)
+
+        process.env[port_env] = port.toString();
+
         return spawnProcessOnInitializationMessage(options)
             .then(async (app) => {
                 try {
                     console.log(`starting ${prefix} test`)
-                    await run(t, app);
+                    await run(t, port, app);
                     console.log(`finished ${prefix} test`)
                 } finally {
                     console.log(`tearing down ${prefix}`)

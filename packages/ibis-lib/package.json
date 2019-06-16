@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "gulp build",
-    "test": "ava --tap",
+    "test": "ava",
     "clean": "gulp clean",
     "lint": "tslint --project . -t verbose"
   },
@@ -24,5 +24,11 @@
   "paths": {
     "dist": "./dist",
     "tsconfig": "./tsconfig.json"
+  },
+  "ava": {
+    "tap": true,
+    "files": [
+      "dist/**/*.test.js"
+    ]
   }
 }

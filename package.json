@@ -7,7 +7,7 @@
     "build": "lerna run build",
     "compress": "lerna run compress",
     "test": "lerna run test --parallel",
-    "e2e": "lerna run e2e --parallel",
+    "e2e": "lerna run e2e",
     "pkg": "lerna run pkg",
     "lint": "lerna run lint --parallel",
     "clean": "lerna run clean --parallel"

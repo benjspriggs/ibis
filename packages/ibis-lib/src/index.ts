@@ -15,6 +15,10 @@ export {
     Options
 } from "./helpers"
 
+export {
+    applicationRoot
+} from "./pkg"
+
 export interface Modality {
     code: string,
     data: ModalityData
@@ -172,29 +176,3 @@ export const requestLogger: RequestHandler = (req: Request, _, next: NextFunctio
         }))
     next()
 }
-
-interface pkgOptions {
-    entrypoint?: string;
-    defaultEntrypoint?: string;
-}
-
-function detectApplicationRoot() {
-    if (isPackaged()) {
-        // https://www.npmjs.com/package/pkg#snapshot-filesystem
-        const pkg: pkgOptions = (process as any).pkg
-        return dirname(pkg.entrypoint);
-    } else {
-        return join(__dirname, '../..')
-    }
-}
-
-/**
- * See https://www.npmjs.com/package/pkg#snapshot-filesystem
- */
-export function isPackaged(): boolean {
-    const pkg: pkgOptions = (process as any).pkg
-
-    return !!pkg
-}
-
-export const applicationRoot = detectApplicationRoot

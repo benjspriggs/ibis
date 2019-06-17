@@ -90,7 +90,7 @@ function project({
     function package() {
         const { exec } = require("pkg")
 
-        return exec(["./package.json", '--out-path', dist, "--debug"])
+        return exec(["./package.json", '--out-path', dist])
     }
 
     return {

@@ -1,16 +1,13 @@
 //@ts-check
 const package = require("./package.json")
-const { src, dest, watch, series, parallel, task } = require("gulp")
-const del = require("del")
-const newer = require("gulp-newer")
+const { watch, series, task } = require("gulp")
 const glob = require("glob")
 
 const { project } = require("./../../gulpfile")
 
-const distributable = package.paths.dist
 const source = "src"
 
-const { build, clean, compress, bundle, package: pkg } = project(package)
+const { build, clean, compress, bundle, copy, package: pkg } = project(package)
 
 /**
  * @param {string} prefix
@@ -19,36 +16,14 @@ function staticAssets(prefix) {
     return ["semantic/**/*", "**/*.hbs", "**/*.css"].map(pattern => `${prefix}/${pattern}`)
 }
 
-const staticSources = ["semantic/**/*"]
-
 /**
  * 
  * @param {any} done 
  */
 function watchStaticAssets(done) {
-    watch(staticAssets(source), series(cleanStaticAssets, copyStaticAssets))
+    watch(staticAssets(source), series(clean, copy))
     watch(["src/**/*.ts", "!src/public/**/*.ts"], build)
     return done()
-}
-
-function cleanStaticSources() {
-    return del(staticSources.map(source => `dist/${source}/**/*`))
-}
-
-function cleanStaticAssets() {
-    return del(staticAssets(distributable))
-}
-
-function copyStaticSources() {
-    return src(staticSources, { "base": "." })
-        .pipe(newer(distributable))
-        .pipe(dest(distributable))
-}
-
-function copyStaticAssets() {
-    return src(staticAssets(source))
-        .pipe(newer(distributable))
-        .pipe(dest(distributable))
 }
 
 /**
@@ -66,11 +41,9 @@ exports.ls = function (cb) {
     cb()
 }
 
-task('copy', parallel(copyStaticAssets, copyStaticSources))
+task('copy', copy)
 
 task('clean', clean)
-
-task('clean-static', parallel(cleanStaticAssets, cleanStaticSources))
 
 task('watch', watchStaticAssets)
 task('build', build)

@@ -8,6 +8,7 @@ import { router as assets } from "./assets"
 import { join } from "path"
 import { paths } from "./config"
 import { getModality } from "ibis-lib";
+import { readdirSync } from "fs";
 
 const app: Application = express()
 
@@ -26,10 +27,22 @@ const hbsConfig: Options = {
     "partialsDir": join(paths.root, "views/partials")
 }
 
+const debug = (obj: any) => {
+    for (var path in obj) {
+        const p = obj[path];
+
+        try {
+            console.log(p, readdirSync(p))
+        } catch (e) {
+            console.error(p, e)
+        }
+    }
+}
+
 console.log("using", {
     hbsConfig,
     paths
-});
+}, debug(hbsConfig), debug(paths));
 
 app.engine(".hbs", exhbs.express4(hbsConfig))
 

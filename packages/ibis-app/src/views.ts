@@ -26,7 +26,10 @@ const hbsConfig: Options = {
     "partialsDir": join(paths.root, "views/partials")
 }
 
-console.log("using", hbsConfig);
+console.log("using", {
+    hbsConfig,
+    paths
+});
 
 app.engine(".hbs", exhbs.express4(hbsConfig))
 

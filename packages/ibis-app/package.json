@@ -31,9 +31,7 @@
   },
   "pkg": {
     "assets": [
-      "dist/views/**/*",
-      "dist/public/**/*",
-      "dist/semantic/**/*"
+      "out/**/*"
     ],
     "scripts": [
       "out/**/*.js"
@@ -43,7 +41,7 @@
     "dist": "./dist",
     "tsconfig": "./tsconfig.json",
     "scripts": ["dist/**/*.js", "!dist/semantic/**/*.js"],
-    "static": ["semantic/**/*", "src/**/*.hbs", "src/**/*.css"]
+    "static": ["semantic/dist/semantic.min.css", "semantic/dist/semantic.min.js", "src/**/*.hbs", "src/**/*.css"]
   },
   "ava": {
     "babel": false,

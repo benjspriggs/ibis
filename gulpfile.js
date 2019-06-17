@@ -8,13 +8,13 @@ const rollup = require("gulp-better-rollup")
 const newer = require("gulp-newer")
 const { terser } = require("rollup-plugin-terser")
 const json = require("rollup-plugin-json")
-const commonjs = require("rollup-plugin-commonjs")
 const resolve = require("rollup-plugin-node-resolve")
 const babel = require("rollup-plugin-babel")
 
 function project({
     paths: {
         tsconfig: tsconfig = "./tsconfig.json",
+        src: src = "./src",
         dist: dist = "./dist",
         out: out = "./out",
         scripts: scripts = ["dist/**/*.js"],
@@ -65,7 +65,8 @@ function project({
 
     function copyStaticSourcesToDestination(done) {
         if (static && static.length > 1) {
-            return gulp.src(static, { "base": "." })
+            return gulp.src(static, { "root": src })
+                .pipe(debug({ title: "copying static to distributable" }))
                 .pipe(newer(dist))
                 .pipe(gulp.dest(dist))
         } else {
@@ -75,7 +76,8 @@ function project({
 
     function copyStaticSourcesToCompressed(done) {
         if (static && static.length > 1) {
-            return gulp.src(static, { "base": "." })
+            return gulp.src(static, { "root": src })
+                .pipe(debug({ title: "copying static to compressed" }))
                 .pipe(newer(out))
                 .pipe(gulp.dest(out))
         } else {
@@ -85,12 +87,19 @@ function project({
 
     const clean = gulp.parallel(cleanFolder(dist), cleanFolder(out))
 
-    const bundle = gulp.parallel(compress, copyStaticSourcesToCompressed)
+    const bundle = gulp.series(copyStaticSourcesToCompressed, compress)
 
-    function package() {
-        const { exec } = require("pkg")
+    function package(done) {
+        try {
+            const args = ["./package.json", '--out-path', dist]
+            const { exec } = require("pkg")
 
-        return exec(["./package.json", '--out-path', dist])
+            return exec(args)
+                .catch(done)
+                .then(done)
+        } catch (e) {
+            done(e)
+        }
     }
 
     return {

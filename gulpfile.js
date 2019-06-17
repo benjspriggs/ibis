@@ -15,7 +15,8 @@ function project({
     paths: {
         tsconfig: tsconfig = "./tsconfig.json",
         dist: dist = "./dist",
-        out: out = "./out"
+        out: out = "./out",
+        scripts: scripts = ["dist/**/*.js"]
     }
 }) {
     function localBuild(done) {
@@ -32,7 +33,7 @@ function project({
     }
 
     function compress(){
-        return gulp.src([`${dist}/**/*.js`, `!${dist}/**/*.test.js`])
+        return gulp.src(scripts)
             .pipe(debug({ title: "compressing" }))
             .pipe(rollup({
                 plugins: [
@@ -67,7 +68,7 @@ function project({
     function package() {
         const { exec } = require("pkg")
 
-        return exec(["./package.json", '--out-path', dist])
+        return exec(["./package.json", '--out-path', dist, "--debug"])
     }
 
     return {

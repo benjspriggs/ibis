@@ -39,7 +39,8 @@
   },
   "paths": {
     "dist": "./dist",
-    "tsconfig": "./tsconfig.json"
+    "tsconfig": "./tsconfig.json",
+    "scripts": ["dist/**/*.js", "!dist/semantic/**/*.js"]
   },
   "ava": {
     "babel": false,

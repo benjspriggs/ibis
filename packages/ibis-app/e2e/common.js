@@ -36,8 +36,6 @@ module.exports = function(options) {
 
     test("It should serve WOFF fonts from the static path", withApp, fetchAndOk("/assets/fonts/icons.wof"))
 
-    test("It should serve WOFF2 from the static path", withApp, fetchAndOk("/assets/fonts/icons.wof2"))
-
     test("It should serve HTML", withApp, fetchAndOk("/"))
 
     test("It should 404 on nonexistent paths", withApp, fetchAndNotOk("/assets/magic/and/fooey"))

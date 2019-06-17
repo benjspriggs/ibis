@@ -42,7 +42,8 @@
   "paths": {
     "dist": "./dist",
     "tsconfig": "./tsconfig.json",
-    "scripts": ["dist/**/*.js", "!dist/semantic/**/*.js"]
+    "scripts": ["dist/**/*.js", "!dist/semantic/**/*.js"],
+    "static": ["semantic/**/*", "src/**/*.hbs", "src/**/*.css"]
   },
   "ava": {
     "babel": false,

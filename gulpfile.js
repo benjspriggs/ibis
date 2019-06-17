@@ -5,6 +5,7 @@ const del = require("del")
 const gulp = require("gulp")
 const debug = require("gulp-debug")
 const rollup = require("gulp-better-rollup")
+const newer = require("gulp-newer")
 const { terser } = require("rollup-plugin-terser")
 const json = require("rollup-plugin-json")
 const commonjs = require("rollup-plugin-commonjs")
@@ -16,7 +17,8 @@ function project({
         tsconfig: tsconfig = "./tsconfig.json",
         dist: dist = "./dist",
         out: out = "./out",
-        scripts: scripts = ["dist/**/*.js"]
+        scripts: scripts = ["dist/**/*.js"],
+        static: static = []
     }
 }) {
     function localBuild(done) {
@@ -61,9 +63,29 @@ function project({
         return cleanTask
     }
 
+    function copyStaticSourcesToDestination(done) {
+        if (static && static.length > 1) {
+            return gulp.src(static, { "base": "." })
+                .pipe(newer(dist))
+                .pipe(gulp.dest(dist))
+        } else {
+            done()
+        }
+    }
+
+    function copyStaticSourcesToCompressed(done) {
+        if (static && static.length > 1) {
+            return gulp.src(static, { "base": "." })
+                .pipe(newer(out))
+                .pipe(gulp.dest(out))
+        } else {
+            done()
+        }
+    }
+
     const clean = gulp.parallel(cleanFolder(dist), cleanFolder(out))
 
-    const bundle = compress
+    const bundle = gulp.parallel(compress, copyStaticSourcesToCompressed)
 
     function package() {
         const { exec } = require("pkg")
@@ -72,7 +94,8 @@ function project({
     }
 
     return {
-        build: localBuild,
+        copy: copyStaticSourcesToDestination,
+        build: gulp.series(copyStaticSourcesToDestination, localBuild),
         clean: clean,
         compress: compress,
         bundle: bundle,

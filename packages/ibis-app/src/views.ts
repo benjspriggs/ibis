@@ -27,6 +27,7 @@ const hbsConfig: Options = {
     "partialsDir": join(paths.root, "views/partials")
 }
 
+/*
 const debug = (obj: any) => {
     for (var path in obj) {
         const p = obj[path];
@@ -43,6 +44,7 @@ console.log("using", {
     hbsConfig,
     paths
 }, debug(hbsConfig), debug(paths));
+*/
 
 app.engine(".hbs", exhbs.express4(hbsConfig))
 

@@ -2,9 +2,9 @@ import { exhbs } from "./helpers"
 import { default as express, Application } from "express"
 import { Options } from "express-hbs"
 import { fetchFromAPI } from "./helpers"
-import { modalities, requestLogger } from "ibis-lib"
-import cors from "cors"
-import assets from "./assets"
+import { requestLogger } from "ibis-lib"
+import { default as cors } from "cors"
+import { router as assets } from "./assets"
 import { join } from "path"
 import { paths } from "./config"
 import { getModality } from "ibis-lib";
@@ -174,4 +174,6 @@ app.get("/:route/:modality_code/:resource", (req, res, next) => {
     })
 })
 
-export default app
+export {
+    app
+}

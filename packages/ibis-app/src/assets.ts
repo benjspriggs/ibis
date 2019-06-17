@@ -1,4 +1,4 @@
-import express from "express"
+import { default as express } from "express"
 import { paths } from "./config"
 
 let router: express.Router = express.Router()
@@ -21,4 +21,6 @@ router.use("/", express.static(paths.public, {
     extensions: ["js"]
 }))
 
-export default router
+export {
+    router
+}

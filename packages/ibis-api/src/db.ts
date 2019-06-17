@@ -1,6 +1,6 @@
 import { Header, Modality, getModality, modalities } from "ibis-lib"
 import { join } from "path"
-import config, { apiHostname } from "./config"
+import { config, apiHostname } from "./config"
 import { getFileInfo, getListing } from "./file";
 
 import BetterFileAsync from "./BetterFileAsync"
@@ -250,4 +250,6 @@ export async function initialize() {
     }
 }
 
-export default router
+export {
+    router
+}

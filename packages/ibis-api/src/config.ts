@@ -22,7 +22,7 @@ interface IConfig {
     }
 }
 
-const config: IConfig = {
+export const config: IConfig = {
     paths: {
         ibisRoot,
         rx: join(system, "rx"),
@@ -34,5 +34,3 @@ const config: IConfig = {
         ibisRoot: (...folders: string[]) => join(ibisRoot, ...folders),
     },
 }
-
-export default config

@@ -1,5 +1,5 @@
 import { apiHostname, hostname, port } from "./config"
-import app, { initialize } from "./app"
+import { app, initialize } from "./app"
 import { h2 } from "ibis-lib"
 
 export { port, hostname, apiHostname, default as config } from "./config"

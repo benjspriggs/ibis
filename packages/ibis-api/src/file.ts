@@ -1,10 +1,10 @@
 import { HTMLElement, Node, TextNode, parse } from "node-html-parser"
 import { Header, getModality, parseHeaderFromFile } from "ibis-lib"
 
-import express from "express"
-import fs from "fs"
+import { default as express } from "express"
+import { default as fs } from "fs"
 import { isEmpty } from "lodash"
-import path from "path"
+import { default as path } from "path"
 
 const nodeMatches = (condition: RegExp) => (node: Node) => condition.test(node.rawText)
 const childrenContainsDefinitionText = (condition: RegExp) => (node: Node): boolean => node.childNodes.some(nodeMatches(condition))
@@ -126,7 +126,7 @@ const trimLeft = (condition: RegExp) => {
     }
 }
 
-export default (options: { endpoint: string, absoluteFilePath: string, trimLeftPattern?: RegExp }) => {
+export const router = (options: { endpoint: string, absoluteFilePath: string, trimLeftPattern?: RegExp }) => {
     let router = express.Router()
 
     const afterDefinition = options.trimLeftPattern ? trimLeft(options.trimLeftPattern) : (root: Node) => root

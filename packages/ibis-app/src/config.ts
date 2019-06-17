@@ -1,7 +1,7 @@
 import { applicationRoot, isHttpsEnabled } from "ibis-lib"
 import { join } from "path"
 
-const root = join(applicationRoot(), "ibis-app/dist")
+const root = __dirname
 const views = join(root, "views")
 const semantic = join(root, "semantic/dist")
 const _public = join(root, "public")

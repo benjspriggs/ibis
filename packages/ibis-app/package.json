@@ -41,7 +41,18 @@
     "dist": "./dist",
     "tsconfig": "./tsconfig.json",
     "scripts": ["dist/**/*.js", "!dist/semantic/**/*.js"],
-    "static": ["semantic/dist/semantic.min.css", "semantic/dist/semantic.min.js", "src/**/*.hbs", "src/**/*.css"]
+    "vendor": [
+      "semantic/dist/semantic.min.css",
+      "semantic/dist/semantic.min.js",
+      "semantic/dist/basic/assets/fonts/icons.eot",
+      "semantic/dist/basic/assets/fonts/icons.ttf",
+      "semantic/dist/basic/assets/fonts/icons.woff",
+      "semantic/dist/basic/assets/fonts/icons.svg"
+    ],
+    "static": [
+      "src/**/*.hbs",
+      "src/**/*.css"
+    ]
   },
   "ava": {
     "babel": false,

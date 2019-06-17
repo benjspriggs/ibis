@@ -18,9 +18,32 @@ function project({
         dist: dist = "./dist",
         out: out = "./out",
         scripts: scripts = ["dist/**/*.js"],
-        static: static = []
+        /**
+         * Assumed to be copied from {@link src}.
+         */
+        static: static = [],
+        /**
+         * Copied as is to {@link dist} and {@link out}.
+         */
+        vendor: vendor = []
     }
 }) {
+    const stream = (a, base) => gulp.src(a, { base: base })
+
+    const copy = (title, a, base) => (destination) => (done) => {
+        if (a && a.length <= 0) {
+            done()
+        } else {
+            return stream(a, base)
+                .pipe(debug({ title: `${title} -> ${destination}` }))
+                .pipe(newer(destination))
+                .pipe(gulp.dest(destination))
+        }
+    }
+
+    const copyStatic = copy("copying static assets", static, src)
+    const copyVendor = copy("copying vendor assets", vendor, ".")
+
     function localBuild(done) {
         if (Array.isArray(tsconfig)) {
             const tasks = tsconfig.map(config => {
@@ -63,27 +86,9 @@ function project({
         return cleanTask
     }
 
-    function copyStaticSourcesToDestination(done) {
-        if (static && static.length > 1) {
-            return gulp.src(static, { "root": src })
-                .pipe(debug({ title: "copying static to distributable" }))
-                .pipe(newer(dist))
-                .pipe(gulp.dest(dist))
-        } else {
-            done()
-        }
-    }
+    const copyStaticSourcesToDestination = gulp.series(copyStatic(dist), copyVendor(dist))
 
-    function copyStaticSourcesToCompressed(done) {
-        if (static && static.length > 1) {
-            return gulp.src(static, { "root": src })
-                .pipe(debug({ title: "copying static to compressed" }))
-                .pipe(newer(out))
-                .pipe(gulp.dest(out))
-        } else {
-            done()
-        }
-    }
+    const copyStaticSourcesToCompressed = gulp.series(copyStatic(out), copyVendor(out))
 
     const clean = gulp.parallel(cleanFolder(dist), cleanFolder(out))
 

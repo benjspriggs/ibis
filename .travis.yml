@@ -4,6 +4,7 @@ node_js:
 cache: npm
 before_script:
   - npm run build
+  - npm run build:semantic
   - npm run pkg
 script:
   - npm test

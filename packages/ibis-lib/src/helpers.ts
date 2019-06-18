@@ -20,6 +20,8 @@ function spawnProcessOnInitializationMessage(options: Options, log: (...args: an
         log(`${prefix}: ${d.toString()}`)
     }
 
+    const adjustedTimeout = process.env["CI"] && process.env.CI === "true" ? timeout + 5000 : timeout
+
     return new Promise<ChildProcess>((resolve, reject) => {
         const appUnderTest = spawn(command, args, {
             stdio: ['pipe', 'pipe', 'pipe', 'ipc']
@@ -34,7 +36,7 @@ function spawnProcessOnInitializationMessage(options: Options, log: (...args: an
             reject(`setup for ${prefix} unexpectedly closed with exit code ${code}`)
         })
 
-        setTimeout(() => reject(`setup for '${prefix}' timed out (took more than ${timeout} ms to send initialization message)`), timeout)
+        setTimeout(() => reject(`setup for '${prefix}' timed out (took more than ${adjustedTimeout} ms to send initialization message)`), adjustedTimeout)
     });
 }
 

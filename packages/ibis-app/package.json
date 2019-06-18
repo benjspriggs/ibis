@@ -43,12 +43,7 @@
     "tsconfig": "./tsconfig.json",
     "scripts": ["dist/**/*.js", "!dist/semantic/**/*.js"],
     "vendor": [
-      "semantic/dist/semantic.min.css",
-      "semantic/dist/semantic.min.js",
-      "semantic/dist/basic/assets/fonts/icons.eot",
-      "semantic/dist/basic/assets/fonts/icons.ttf",
-      "semantic/dist/basic/assets/fonts/icons.woff",
-      "semantic/dist/basic/assets/fonts/icons.svg"
+      "semantic/dist/**/*"
     ],
     "static": [
       "src/**/*.hbs",

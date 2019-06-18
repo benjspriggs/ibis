@@ -1,4 +1,5 @@
 import { spawn, ChildProcess } from "child_process";
+import { randomBytes } from "crypto";
 
 export interface Options {
     command: string,
@@ -8,26 +9,37 @@ export interface Options {
     port_env: string
 }
 
+function isRunningInContinuousIntegrationEnvironment() {
+    return process.env["CI"] && process.env.CI === "true"
+}
+
 function spawnProcessOnInitializationMessage(options: Options, log: (...args: any[]) => void) {
     const {
         command,
         args,
         prefix,
-        timeout = 5000
+        timeout = 5000,
+        port_env
     } = options;
 
     function logPrefixed(d: any) {
         log(`${prefix}: ${d.toString()}`)
     }
 
-    const adjustedTimeout = process.env["CI"] && process.env.CI === "true" ? timeout + 5000 : timeout
+    log(`running in CI environment? ${isRunningInContinuousIntegrationEnvironment()}`)
+    const adjustedTimeout = isRunningInContinuousIntegrationEnvironment() ? timeout + 5000 : timeout
 
-    return new Promise<ChildProcess>((resolve, reject) => {
+    const port = 8000 + Math.floor(Math.random() * 1000)
+
+    const env = { ...process.env, [port_env]: port.toString() }
+
+    return new Promise<{ app: ChildProcess, port: number}>((resolve, reject) => {
         const appUnderTest = spawn(command, args, {
+            env: env,
             stdio: ['pipe', 'pipe', 'pipe', 'ipc']
         })
 
-        appUnderTest.on('message', () => resolve(appUnderTest))
+        appUnderTest.on('message', () => resolve({ app: appUnderTest, port: port }))
 
         appUnderTest.stdout.on('data', logPrefixed)
         appUnderTest.stderr.on('data', logPrefixed)
@@ -46,23 +58,18 @@ function spawnProcessOnInitializationMessage(options: Options, log: (...args: an
  */
 export function withEntrypoint(options: Options) {
     const {
-        port_env,
         prefix = "app",
     } = options;
 
-    const id = Math.random().toString(36).substr(2, 9)
-
-    const log = (...args: any[]) => process.stdout.write([`[${id}]`].concat(args).join(' '))
-
     return function helper(t: any, run: any) {
+        const id = randomBytes(10).toString('base64')
+
+        const log = (...args: any[]) => process.stdout.write([`[${id}]`].concat(args).join(' '))
+
         log(`starting e2e test for ${prefix}`, JSON.stringify(options), '\n')
 
-        const port = 8000 + Math.floor(Math.random() * 1000)
-
-        process.env[port_env] = port.toString();
-
         return spawnProcessOnInitializationMessage(options, log)
-            .then(async (app) => {
+            .then(async ({ app, port }) => {
                 try {
                     log(`starting ${prefix} test\n`)
                     await run(t, port, app);

@@ -32,9 +32,9 @@ module.exports = function(options) {
 
     test("It should serve CSS from the static path", withApp, fetchAndOk("/assets/semantic/semantic.min.css"))
 
-    test("It should serve TTF fonts from the static path", withApp, fetchAndOk("/assets/fonts/icons.ttf"))
+    test("It should serve TTF fonts from the static path", withApp, fetchAndOk("/assets/semantic/default/assets/fonts/icons.ttf"))
 
-    test("It should serve WOFF fonts from the static path", withApp, fetchAndOk("/assets/fonts/icons.wof"))
+    test("It should serve WOFF fonts from the static path", withApp, fetchAndOk("/assets/semantic/default/assets/fonts/icons.woff"))
 
     test("It should serve HTML", withApp, fetchAndOk("/"))
 

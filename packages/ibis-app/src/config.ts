@@ -3,7 +3,7 @@ import { join } from "path"
 
 const root = __dirname
 const views = join(root, "views")
-const semantic = root
+const semantic = join(root, "semantic/dist")
 const _public = join(root, "public")
 
 export const paths = {

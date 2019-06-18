@@ -9,7 +9,7 @@ router.use("/semantic", express.static(paths.semantic, {
     immutable: true,
     maxAge: 1000000,
     lastModified: true,
-    fallthrough: false
+    fallthrough: true
 }))
 
 router.use("/", express.static(paths.public, {

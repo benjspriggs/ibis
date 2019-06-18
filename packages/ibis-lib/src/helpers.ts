@@ -22,18 +22,19 @@ function spawnProcessOnInitializationMessage(options: Options, log: (...args: an
         port_env
     } = options;
 
-    function logPrefixed(d: any) {
-        log(`${prefix}: ${d.toString()}`)
+    function logMessage(d: any) {
+        log(d.toString())
     }
 
-    log(`running in CI environment? ${isRunningInContinuousIntegrationEnvironment()}`)
+    log(`running in CI environment? ${isRunningInContinuousIntegrationEnvironment()}\n`)
+
     const adjustedTimeout = isRunningInContinuousIntegrationEnvironment() ? timeout + 5000 : timeout
 
-    const port = 8000 + Math.floor(Math.random() * 1000)
-
-    const env = { ...process.env, [port_env]: port.toString() }
-
     return new Promise<{ app: ChildProcess, port: number}>((resolve, reject) => {
+        const port = 8000 + Math.floor(Math.random() * 1000)
+
+        const env = { ...process.env, [port_env]: port.toString() }
+
         const appUnderTest = spawn(command, args, {
             env: env,
             stdio: ['pipe', 'pipe', 'pipe', 'ipc']
@@ -41,8 +42,8 @@ function spawnProcessOnInitializationMessage(options: Options, log: (...args: an
 
         appUnderTest.on('message', () => resolve({ app: appUnderTest, port: port }))
 
-        appUnderTest.stdout.on('data', logPrefixed)
-        appUnderTest.stderr.on('data', logPrefixed)
+        appUnderTest.stdout.on('data', logMessage)
+        appUnderTest.stderr.on('data', logMessage)
 
         appUnderTest.on('exit', (code, signal) => {
             reject(`setup for ${prefix} unexpectedly closed with exit code ${code}`)

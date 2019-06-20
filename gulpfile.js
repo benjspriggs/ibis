@@ -11,6 +11,37 @@ const json = require("rollup-plugin-json")
 const resolve = require("rollup-plugin-node-resolve")
 const babel = require("rollup-plugin-babel")
 
+function compress(scripts, out){
+    const executor = () => gulp.src(scripts)
+        .pipe(debug({ title: "compressing" }))
+        .pipe(rollup({
+            plugins: [
+                json(),
+                resolve({
+                    preferBuiltins: true
+                }),
+                babel({
+                    exclude: "node_modules/**",
+                    presets: ["@babel/preset-env"],
+                }),
+                terser()
+            ],
+        }, {
+            format: "cjs",
+            exports: "named",
+            browser: false
+        }))
+        .pipe(gulp.dest(out))
+    executor.taskName = `compressing sources in ${scripts} to ${out}`
+    return executor
+}
+
+function build(config, dist) {
+    const executor = (done) => buildTypescriptSources(config).pipe(gulp.dest(dist))
+    executor.taskName = `build typescript sources from ${config}`
+    return executor
+}
+
 function project({
     paths: {
         tsconfig: tsconfig = "./tsconfig.json",
@@ -45,39 +76,12 @@ function project({
     const copyVendor = copy("copying vendor assets", vendor, ".")
 
     function localBuild(done) {
-        if (Array.isArray(tsconfig)) {
-            const tasks = tsconfig.map(config => {
-                const nestedTask = () => build(config).pipe(gulp.dest(dist))
-                nestedTask.displayName = "Building Typescript sources from tsconfig: " + config
-                return nestedTask
-            })
-            return gulp.parallel(...tasks)(done)
-        } else {
-            return build(tsconfig).pipe(gulp.dest(dist))
-        }
-    }
-
-    function compress(){
-        return gulp.src(scripts)
-            .pipe(debug({ title: "compressing" }))
-            .pipe(rollup({
-                plugins: [
-                    json(),
-                    resolve({
-                        preferBuiltins: true
-                    }),
-                    babel({
-                        exclude: "node_modules/**",
-                        presets: ["@babel/preset-env"],
-                    }),
-                    terser()
-                ],
-            }, {
-                format: "cjs",
-                exports: "named",
-                browser: false
-            }))
-            .pipe(gulp.dest(out))
+        /**
+         * @type {string[]}
+         */
+        const configs = Array.isArray(tsconfig) ? tsconfig : [tsconfig];
+        const tasks = configs.map(config => build(config, dist))
+        return gulp.parallel(...tasks)(done)
     }
 
     function cleanFolder(folder){
@@ -111,7 +115,7 @@ function project({
         copy: copyStaticSourcesToDestination,
         build: gulp.series(copyStaticSourcesToDestination, localBuild),
         clean: clean,
-        compress: compress,
+        compress: compress(scripts, out),
         bundle: bundle,
         package: gulp.series(bundle, package)
     }
@@ -121,7 +125,7 @@ function project({
  * @param {string} config Path to a tsconfig.json.
  * @returns A stream that can be `gulp.pipe`'d to a destination.
  */
-function build(config) {
+function buildTypescriptSources(config) {
     const project = ts.createProject(config)
 
     return project.src()
@@ -130,5 +134,5 @@ function build(config) {
         .pipe(sourcemaps.write('.', { sourceRoot: "./", includeContent: false }))
 }
 
-exports.build = build;
+exports.build = buildTypescriptSources;
 exports.project = project;

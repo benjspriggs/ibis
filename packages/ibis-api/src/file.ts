@@ -126,12 +126,8 @@ const trimLeft = (condition: RegExp) => {
     }
 }
 
-export const router = (options: { endpoint: string, absoluteFilePath: string, trimLeftPattern?: RegExp }) => {
-    let router = express.Router()
-
-    const afterDefinition = options.trimLeftPattern ? trimLeft(options.trimLeftPattern) : (root: Node) => root
-
-    router.get("/:modality/:file", (req, res) => {
+function handleModalityFileRequest(options: { absoluteFilePath: string, endpoint: string }, afterDefinition: (root: Node) => Node) {
+    return (req: express.Request, res: express.Response) => {
         const {
             modality,
             file
@@ -158,23 +154,31 @@ export const router = (options: { endpoint: string, absoluteFilePath: string, tr
         res.send({
             modality: modality,
             filename: file,
-            filepath: filepath(req, modality, file),
+            filepath: filepath(options)(req, modality, file),
             version: version,
             tag: tag,
             name: name,
             category: category,
             content: formattedBoy.toString()
         })
-    });
+    };
+}
 
-    function resolved(req: express.Request, endpoint: string): ({ relative: string, absolute: string }) {
-        return {
-            relative: endpoint,
-            absolute: `${req.protocol}://${req.headers.host}/${endpoint}`
-        };
-    }
+function resolved(req: express.Request, endpoint: string): ({ relative: string, absolute: string }) {
+    return {
+        relative: endpoint,
+        absolute: `${req.protocol}://${req.headers.host}/${endpoint}`
+    };
+}
 
-    const filepath = (req: express.Request, modality: string, filename: string) => resolved(req, `${options.endpoint}/${modality}/${filename}`)
+const filepath = (options: { endpoint: string }) => (req: express.Request, modality: string, filename: string) => resolved(req, `${options.endpoint}/${modality}/${filename}`)
+
+export const router = (options: { endpoint: string, absoluteFilePath: string, trimLeftPattern?: RegExp }) => {
+    let router = express.Router()
+
+    const afterDefinition = options.trimLeftPattern ? trimLeft(options.trimLeftPattern) : (root: Node) => root
+
+    router.get('/:modality/:file', handleModalityFileRequest(options, afterDefinition))
 
     router.get("/:modality", addModalityListingToLocals(options.absoluteFilePath), async (req: express.Request, res: express.Response, next: express.NextFunction) => {
         const {
@@ -183,7 +187,7 @@ export const router = (options: { endpoint: string, absoluteFilePath: string, tr
 
         try {
             const meta = (await getFileInfo(options.absoluteFilePath, modality, res.locals.listing))
-                .map(x => ({ filepath: filepath(req, modality, x.filename), ...x}))
+                .map(x => ({ filepath: filepath(options)(req, modality, x.filename), ...x}))
 
             const empty = meta.filter((infoObject) => isEmpty(infoObject.header) || Object.values(infoObject.header).some(val => typeof val === "undefined"))
 

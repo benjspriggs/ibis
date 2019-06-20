@@ -106,7 +106,10 @@ function spawnProcessOnInitializationMessage(options: Options, log: (...args: an
                     stdio: ['pipe', 'pipe', 'pipe', 'ipc']
                 })
 
-                appUnderTest.on('message', () => resolve({ app: appUnderTest, port: port }))
+                appUnderTest.on('message', (...args: any[]) =>{
+                    log(`recieved message, assuming that app has initialized: ${JSON.stringify(args)}`)
+                    resolve({ app: appUnderTest, port: port })
+                })
 
                 appUnderTest.stdout.on('data', logMessage)
                 appUnderTest.stderr.on('data', logMessage)

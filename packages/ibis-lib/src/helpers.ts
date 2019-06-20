@@ -1,24 +1,78 @@
 import { spawn, ChildProcess } from "child_process";
 import { randomBytes } from "crypto";
+import { Socket } from "net"
 
 export interface Options {
     command: string,
     args: string[],
     prefix?: string,
     timeout?: number,
-    port_env: string
+    host?: string,
+    port_env: string,
+    host_env: string
 }
 
 function isRunningInContinuousIntegrationEnvironment() {
-    return process.env["CI"] && process.env.CI === "true"
+    return (process.env.CI && process.env.CI === "true") || false
+}
+
+/**
+ * @returns {Promise<boolean>} A resolved promise with whether that port is open.
+ */
+function isOpenPort(host: string, port: number, timeout: number = 5000) {
+    return new Promise((resolve, reject) => {
+        var socket = new Socket()
+
+        socket.setTimeout(timeout)
+        socket.once('error', (e) => {
+            socket.destroy()
+            if ((e as any).code === "ECONNREFUSED") {
+                resolve(true)
+            } else {
+                reject(e)
+            }
+        })
+
+        socket.once('timeout', () => {
+            socket.destroy()
+            resolve(true)
+        })
+
+        socket.connect({
+            port: port,
+            host: host
+        }, () => {
+            socket.end()
+            resolve(false)
+        })
+    })
+}
+
+async function getOpenPort(host: string, start: number, range: number, timeout: number = 5000, maxTries: number = 3): Promise<number> {
+    let tries = 0;
+    const getPort = () => start + Math.floor(Math.random() * range)
+
+    do {
+        tries += 1;
+
+        let port = getPort()
+
+        if (await isOpenPort(host, port, timeout)) {
+            return port;
+        }
+    } while (tries < maxTries);
+
+    throw new Error(`max number of tries used attempting to get an open port: ${maxTries}`)
 }
 
 function spawnProcessOnInitializationMessage(options: Options, log: (...args: any[]) => void) {
     const {
         command,
+        host = "localhost",
         args,
         prefix,
         timeout = 5000,
+        host_env,
         port_env
     } = options;
 
@@ -30,26 +84,27 @@ function spawnProcessOnInitializationMessage(options: Options, log: (...args: an
 
     const adjustedTimeout = isRunningInContinuousIntegrationEnvironment() ? timeout + 5000 : timeout
 
-    return new Promise<{ app: ChildProcess, port: number}>((resolve, reject) => {
-        const port = 8000 + Math.floor(Math.random() * 1000)
+    return new Promise<{ app: ChildProcess, port: number }>((resolve, reject) => {
+        return getOpenPort(host, 8000, 100)
+            .then((port) => {
+                const env = { ...process.env, [host_env]: host, [port_env]: port.toString() }
 
-        const env = { ...process.env, [port_env]: port.toString() }
+                const appUnderTest = spawn(command, args, {
+                    env: env,
+                    stdio: ['pipe', 'pipe', 'pipe', 'ipc']
+                })
 
-        const appUnderTest = spawn(command, args, {
-            env: env,
-            stdio: ['pipe', 'pipe', 'pipe', 'ipc']
-        })
+                appUnderTest.on('message', () => resolve({ app: appUnderTest, port: port }))
 
-        appUnderTest.on('message', () => resolve({ app: appUnderTest, port: port }))
+                appUnderTest.stdout.on('data', logMessage)
+                appUnderTest.stderr.on('data', logMessage)
 
-        appUnderTest.stdout.on('data', logMessage)
-        appUnderTest.stderr.on('data', logMessage)
+                appUnderTest.on('exit', (code, signal) => {
+                    reject(`setup for ${prefix} unexpectedly closed with exit code ${code}`)
+                })
 
-        appUnderTest.on('exit', (code, signal) => {
-            reject(`setup for ${prefix} unexpectedly closed with exit code ${code}`)
-        })
-
-        setTimeout(() => reject(`setup for '${prefix}' timed out (took more than ${adjustedTimeout} ms to send initialization message)`), adjustedTimeout)
+                setTimeout(() => reject(`setup for '${prefix}' timed out (took more than ${adjustedTimeout} ms to send initialization message)`), adjustedTimeout)
+            })
     });
 }
 

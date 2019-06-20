@@ -16,47 +16,45 @@ function isRunningInContinuousIntegrationEnvironment() {
     return (process.env.CI && process.env.CI === "true") || false
 }
 
+function handleSocketErrorCodes(resolve: (_: boolean) => void, reject: (_: any) => void) {
+    return (e: any) => {
+        switch ((e as any).code) {
+            case "ECONNREFUSED":
+                resolve(true);
+                break;
+            case "EADDRINUSE":
+                resolve(false);
+                break;
+            default:
+                reject(e);
+                break;
+        }
+    }
+}
+
 /**
  * @returns {Promise<boolean>} A resolved promise with whether that port is open.
  */
 function isOpenPort({ host, port, timeout = 5000 }: { host: string, port: number, timeout?: number }) {
-    return new Promise((resolve, reject) => {
-        var socket = new Socket()
+    var socket = new Socket()
 
-        socket.setTimeout(timeout)
-        socket.once('error', (e) => {
-            socket.destroy()
-            switch ((e as any).code) {
-                case "ECONNREFUSED":
-                    resolve(true);
-                    break;
-                case "EADDRINUSE":
-                    resolve(false);
-                    break;
-                default:
-                    console.error(`unknown error code '${(e as any).code}' connecting to '${host}' on port '${port}'`)
-                    reject(e);
-                    break;
-            }
-        })
+    socket.setTimeout(timeout)
+
+    return new Promise<boolean>((resolve, reject) => {
+        socket.once('error', handleSocketErrorCodes(resolve, reject))
 
         socket.once('timeout', () => {
             socket.destroy()
             resolve(true)
         })
 
-        try {
-            socket.connect({
-                port: port,
-                host: host
-            }, () => {
-                socket.end()
-                resolve(false)
-            })
-        } catch (e) {
-            socket.destroy()
-            reject(e)
-        }
+        socket.connect({
+            port: port,
+            host: host
+        }, () => {
+            socket.end()
+            resolve(false)
+        })
     })
 }
 
@@ -79,13 +77,8 @@ async function getOpenPort({ host, start, range, timeout = 5000, maxTries = 3 }:
 
 function spawnProcessOnInitializationMessage(options: Options, log: (...args: any[]) => void) {
     const {
-        command,
         host = "0.0.0.0",
-        args,
-        prefix,
         timeout = 5000,
-        host_env,
-        port_env
     } = options;
 
     function logMessage(d: any) {
@@ -99,29 +92,27 @@ function spawnProcessOnInitializationMessage(options: Options, log: (...args: an
     return new Promise<{ app: ChildProcess, port: number }>((resolve, reject) => {
         return getOpenPort({ host: host, start: 8000, range: 100 })
             .then((port) => {
-                const env = { ...process.env, [host_env]: host, [port_env]: port.toString() }
+                const env = { ...process.env, [options.host_env]: host, [options.port_env]: port.toString() }
 
-                const appUnderTest = spawn(command, args, {
+                const appUnderTest = spawn(options.command, options.args, {
                     env: env,
                     stdio: ['pipe', 'pipe', 'pipe', 'ipc']
                 })
 
+                setTimeout(() => reject(`setup for '${options.prefix}' timed out (took more than ${adjustedTimeout} ms to send initialization message)`), adjustedTimeout)
+
                 appUnderTest.on('message', (...args: any[]) => {
                     log(`recieved message, assuming that app has initialized: ${JSON.stringify(args)}\n`)
 
-                    isOpenPort({ host, port })
-                        .then(() => resolve({ app: appUnderTest, port: port }))
-                        .catch(reject)
+                    resolve({ app: appUnderTest, port: port })
                 })
 
                 appUnderTest.stdout.on('data', logMessage)
                 appUnderTest.stderr.on('data', logMessage)
 
                 appUnderTest.on('exit', (code, signal) => {
-                    reject(`setup for ${prefix} unexpectedly closed with exit code ${code}`)
+                    reject(`setup for ${options.prefix} unexpectedly closed with exit code ${code}`)
                 })
-
-                setTimeout(() => reject(`setup for '${prefix}' timed out (took more than ${adjustedTimeout} ms to send initialization message)`), adjustedTimeout)
             })
     });
 }

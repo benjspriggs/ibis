@@ -34,6 +34,7 @@ function isOpenPort(host: string, port: number, timeout: number = 5000) {
                     resolve(false);
                     break;
                 default:
+                    console.error(`unknown error code '${(e as any).code}' connecting to '${host}' on port '${port}'`)
                     reject(e);
                     break;
             }

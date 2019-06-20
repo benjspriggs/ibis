@@ -19,7 +19,7 @@ function isRunningInContinuousIntegrationEnvironment() {
 /**
  * @returns {Promise<boolean>} A resolved promise with whether that port is open.
  */
-function isOpenPort(host: string, port: number, timeout: number = 5000) {
+function isOpenPort({ host, port, timeout = 5000 }: { host: string, port: number, timeout?: number }) {
     return new Promise((resolve, reject) => {
         var socket = new Socket()
 
@@ -53,14 +53,14 @@ function isOpenPort(host: string, port: number, timeout: number = 5000) {
                 socket.end()
                 resolve(false)
             })
-        } catch(e) {
+        } catch (e) {
             socket.destroy()
             reject(e)
         }
     })
 }
 
-async function getOpenPort(host: string, start: number, range: number, timeout: number = 5000, maxTries: number = 3): Promise<number> {
+async function getOpenPort({ host, start, range, timeout = 5000, maxTries = 3 }: { host: string, start: number, range: number, timeout?: number, maxTries?: number }): Promise<number> {
     let tries = 0;
     const getPort = () => start + Math.floor(Math.random() * range)
 
@@ -69,7 +69,7 @@ async function getOpenPort(host: string, start: number, range: number, timeout: 
 
         let port = getPort()
 
-        if (await isOpenPort(host, port, timeout)) {
+        if (await isOpenPort({ host, port, timeout })) {
             return port;
         }
     } while (tries < maxTries);
@@ -97,7 +97,7 @@ function spawnProcessOnInitializationMessage(options: Options, log: (...args: an
     const adjustedTimeout = isRunningInContinuousIntegrationEnvironment() ? timeout + 5000 : timeout
 
     return new Promise<{ app: ChildProcess, port: number }>((resolve, reject) => {
-        return getOpenPort(host, 8000, 100)
+        return getOpenPort({ host: host, start: 8000, range: 100 })
             .then((port) => {
                 const env = { ...process.env, [host_env]: host, [port_env]: port.toString() }
 
@@ -106,10 +106,10 @@ function spawnProcessOnInitializationMessage(options: Options, log: (...args: an
                     stdio: ['pipe', 'pipe', 'pipe', 'ipc']
                 })
 
-                appUnderTest.on('message', (...args: any[]) =>{
+                appUnderTest.on('message', (...args: any[]) => {
                     log(`recieved message, assuming that app has initialized: ${JSON.stringify(args)}\n`)
 
-                    isOpenPort(host, port)
+                    isOpenPort({ host, port })
                         .then(() => resolve({ app: appUnderTest, port: port }))
                         .catch(reject)
                 })

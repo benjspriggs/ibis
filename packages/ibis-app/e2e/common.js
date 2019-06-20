@@ -4,7 +4,7 @@ const test = require("ava");
 const { get } = require("request");
 
 const fetchAndOk = (endpoint) => (t, port) => new Promise((resolve, reject) => {
-            get(`http://localhost:${port}${endpoint}`)
+            get(`http://0.0.0.0:${port}${endpoint}`)
                 .on('response', (response) => {
                     t.is(200, response.statusCode)
                     t.truthy(response.headers)
@@ -14,7 +14,7 @@ const fetchAndOk = (endpoint) => (t, port) => new Promise((resolve, reject) => {
         });
 
 const fetchAndNotOk = (endpoint) => (t, port) => new Promise((resolve, reject) => {
-            get(`http://localhost:${port}/${endpoint}`)
+            get(`http://0.0.0.0:${port}/${endpoint}`)
                 .on('response', (response) => {
                     t.not(200, response.statusCode)
                     t.truthy(response.headers)

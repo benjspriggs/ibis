@@ -8,7 +8,7 @@ module.exports = function(options) {
 
     test("It should serve a 200 for root", withApi, async (t, port) => {
         await new Promise((resolve, reject) => {
-            get(`http://localhost:${port}`)
+            get(`http://0.0.0.0:${port}`)
                 .on('response', (response) => {
                     t.is(200, response.statusCode)
                     t.truthy(response.headers)

@@ -10,7 +10,7 @@
     "build:browser": "rollup --config ./src/public/rollup.config.js",
     "build:semantic": "gulp build --gulpfile ./semantic/gulpfile.js",
     "test": "ava",
-    "e2e": "ava --tap e2e/index.test.js e2e/pkg.test.js",
+    "e2e": "ava --tap --serial e2e/index.test.js e2e/pkg.test.js",
     "pkg": "gulp package",
     "lint": "tslint --project . -t verbose",
     "clean": "gulp clean"

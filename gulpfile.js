@@ -96,7 +96,7 @@ function project({
 
     const clean = gulp.parallel(cleanFolder(dist), cleanFolder(out))
 
-    const bundle = gulp.series(copyStaticSourcesToCompressed, compress)
+    const bundle = gulp.series(copyStaticSourcesToCompressed, compress(scripts, out))
 
     function package(done) {
         try {

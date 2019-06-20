@@ -144,21 +144,12 @@ function handleModalityFileRequest(options: { absoluteFilePath: string, endpoint
         const formattedBoy = afterDefinition(body)
         formattedBoy.childNodes = trimConsecutive(formattedBoy.childNodes)
 
-        const {
-            version,
-            tag,
-            name,
-            category
-        } = parseHeaderFromFile(filePath)
-
         res.send({
+            ...parseHeaderFromFile(filePath),
             modality: modality,
             filename: file,
             filepath: filepath(options)(req, modality, file),
-            version: version,
-            tag: tag,
             name: name,
-            category: category,
             content: formattedBoy.toString()
         })
     };

@@ -108,7 +108,10 @@ function spawnProcessOnInitializationMessage(options: Options, log: (...args: an
 
                 appUnderTest.on('message', (...args: any[]) =>{
                     log(`recieved message, assuming that app has initialized: ${JSON.stringify(args)}`)
-                    resolve({ app: appUnderTest, port: port })
+
+                    isOpenPort(host, port)
+                        .then(() => resolve({ app: appUnderTest, port: port }))
+                        .catch(reject)
                 })
 
                 appUnderTest.stdout.on('data', logMessage)

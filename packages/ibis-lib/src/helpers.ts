@@ -80,7 +80,7 @@ async function getOpenPort(host: string, start: number, range: number, timeout: 
 function spawnProcessOnInitializationMessage(options: Options, log: (...args: any[]) => void) {
     const {
         command,
-        host = "localhost",
+        host = "0.0.0.0",
         args,
         prefix,
         timeout = 5000,

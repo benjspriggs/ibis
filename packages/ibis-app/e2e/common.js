@@ -24,7 +24,7 @@ const fetchAndNotOk = (endpoint) => (t, port) => new Promise((resolve, reject) =
         });
 
 module.exports = function(options) {
-    const withApp = withEntrypoint({ ...options, port_env: "APP_PORT" })
+    const withApp = withEntrypoint({ ...options, host_env: "APP_HOSTNAME", port_env: "APP_PORT" })
 
     test("It should serve a 200 for root", withApp, fetchAndOk('/'))
 

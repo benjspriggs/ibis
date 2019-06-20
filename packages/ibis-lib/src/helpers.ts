@@ -90,7 +90,7 @@ function spawnProcessOnInitializationMessage(options: Options, log: (...args: an
     const adjustedTimeout = isRunningInContinuousIntegrationEnvironment() ? timeout + 5000 : timeout
 
     return new Promise<{ app: ChildProcess, port: number }>(async (resolve, reject) => {
-        const port = await getOpenPort({ host: host, start: 8000, range: 100 });
+        const port = await getOpenPort({ host: host, start: 8000, range: 1500 });
 
         const appUnderTest = spawn(options.command, options.args, {
             env: { ...process.env, [options.host_env]: host, [options.port_env]: port.toString() },

@@ -26,10 +26,16 @@ function isOpenPort(host: string, port: number, timeout: number = 5000) {
         socket.setTimeout(timeout)
         socket.once('error', (e) => {
             socket.destroy()
-            if ((e as any).code === "ECONNREFUSED") {
-                resolve(true)
-            } else {
-                reject(e)
+            switch ((e as any).code) {
+                case "ECONNREFUSED":
+                    resolve(true);
+                    break;
+                case "EADDRINUSE":
+                    resolve(false);
+                    break;
+                default:
+                    reject(e);
+                    break;
             }
         })
 
@@ -38,13 +44,18 @@ function isOpenPort(host: string, port: number, timeout: number = 5000) {
             resolve(true)
         })
 
-        socket.connect({
-            port: port,
-            host: host
-        }, () => {
-            socket.end()
-            resolve(false)
-        })
+        try {
+            socket.connect({
+                port: port,
+                host: host
+            }, () => {
+                socket.end()
+                resolve(false)
+            })
+        } catch(e) {
+            socket.destroy()
+            reject(e)
+        }
     })
 }
 
@@ -122,7 +133,7 @@ export function withEntrypoint(options: Options) {
 
         const log = (...args: any[]) => process.stdout.write([`[${id}]`].concat(args).join(' '))
 
-        log(`starting e2e test for ${prefix}`, JSON.stringify(options), '\n')
+        log(`starting e2e test for ${prefix} - '${t.title}'`, JSON.stringify(options), '\n')
 
         return spawnProcessOnInitializationMessage(options, log)
             .then(async ({ app, port }) => {

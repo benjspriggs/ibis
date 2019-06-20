@@ -9,8 +9,9 @@ export const start = () => {
     h2(app)
         .then(async server => {
             await initialize()
-            server.listen(port, hostname)
-            console.log(`Listening on ${apiHostname}`)
-            process.send && process.send("initialized")
+            server.listen(port, hostname, () => {
+                console.log(`Listening on ${apiHostname}`)
+                process.send && process.send("initialized")
+            })
         })
 }

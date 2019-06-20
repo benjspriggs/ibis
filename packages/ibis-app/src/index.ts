@@ -6,6 +6,7 @@ import { app } from "./app"
 export const start = () => h2(app)
         .then(server => {
                 console.log(`Listening on ${appHostname}`)
-                server.listen(port, hostname)
-                process.send && process.send("initialized")
+                server.listen(port, hostname, () => {
+                        process.send && process.send("initialized")
+                })
         })

@@ -89,31 +89,27 @@ function spawnProcessOnInitializationMessage(options: Options, log: (...args: an
 
     const adjustedTimeout = isRunningInContinuousIntegrationEnvironment() ? timeout + 5000 : timeout
 
-    return new Promise<{ app: ChildProcess, port: number }>((resolve, reject) => {
-        return getOpenPort({ host: host, start: 8000, range: 100 })
-            .then((port) => {
-                const env = { ...process.env, [options.host_env]: host, [options.port_env]: port.toString() }
+    return new Promise<{ app: ChildProcess, port: number }>(async (resolve, reject) => {
+        const port = await getOpenPort({ host: host, start: 8000, range: 100 });
 
-                const appUnderTest = spawn(options.command, options.args, {
-                    env: env,
-                    stdio: ['pipe', 'pipe', 'pipe', 'ipc']
-                })
+        const env = { ...process.env, [options.host_env]: host, [options.port_env]: port.toString() };
 
-                setTimeout(() => reject(`setup for '${options.prefix}' timed out (took more than ${adjustedTimeout} ms to send initialization message)`), adjustedTimeout)
+        const appUnderTest = spawn(options.command, options.args, {
+            env: env,
+            stdio: ['pipe', 'pipe', 'pipe', 'ipc']
+        });
 
-                appUnderTest.on('message', (...args: any[]) => {
-                    log(`recieved message, assuming that app has initialized: ${JSON.stringify(args)}\n`)
+        setTimeout(() => reject(`setup for '${options.prefix}' timed out (took more than ${adjustedTimeout} ms to send initialization message)`), adjustedTimeout);
 
-                    resolve({ app: appUnderTest, port: port })
-                })
-
-                appUnderTest.stdout.on('data', logMessage)
-                appUnderTest.stderr.on('data', logMessage)
-
-                appUnderTest.on('exit', (code, signal) => {
-                    reject(`setup for ${options.prefix} unexpectedly closed with exit code ${code}`)
-                })
-            })
+        appUnderTest.on('message', (...args: any[]) => {
+            log(`recieved message, assuming that app has initialized: ${JSON.stringify(args)}\n`);
+            resolve({ app: appUnderTest, port: port });
+        });
+        appUnderTest.stdout.on('data', logMessage);
+        appUnderTest.stderr.on('data', logMessage);
+        appUnderTest.on('exit', (code, signal) => {
+            reject(`setup for ${options.prefix} unexpectedly closed with exit code ${code}`);
+        });
     });
 }
 

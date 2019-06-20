@@ -75,15 +75,15 @@ async function getOpenPort({ host, start, range, timeout = 5000, maxTries = 3 }:
     throw new Error(`max number of tries used attempting to get an open port: ${maxTries}`)
 }
 
+function logMessage(log: (args: any[]) => void) {
+    return (d: any) => log(d.toString())
+}
+
 function spawnProcessOnInitializationMessage(options: Options, log: (...args: any[]) => void) {
     const {
         host = "0.0.0.0",
         timeout = 5000,
     } = options;
-
-    function logMessage(d: any) {
-        log(d.toString())
-    }
 
     log(`running in CI environment? ${isRunningInContinuousIntegrationEnvironment()}\n`)
 
@@ -92,10 +92,8 @@ function spawnProcessOnInitializationMessage(options: Options, log: (...args: an
     return new Promise<{ app: ChildProcess, port: number }>(async (resolve, reject) => {
         const port = await getOpenPort({ host: host, start: 8000, range: 100 });
 
-        const env = { ...process.env, [options.host_env]: host, [options.port_env]: port.toString() };
-
         const appUnderTest = spawn(options.command, options.args, {
-            env: env,
+            env: { ...process.env, [options.host_env]: host, [options.port_env]: port.toString() },
             stdio: ['pipe', 'pipe', 'pipe', 'ipc']
         });
 
@@ -105,8 +103,8 @@ function spawnProcessOnInitializationMessage(options: Options, log: (...args: an
             log(`recieved message, assuming that app has initialized: ${JSON.stringify(args)}\n`);
             resolve({ app: appUnderTest, port: port });
         });
-        appUnderTest.stdout.on('data', logMessage);
-        appUnderTest.stderr.on('data', logMessage);
+        appUnderTest.stdout.on('data', logMessage(log));
+        appUnderTest.stderr.on('data', logMessage(log));
         appUnderTest.on('exit', (code, signal) => {
             reject(`setup for ${options.prefix} unexpectedly closed with exit code ${code}`);
         });

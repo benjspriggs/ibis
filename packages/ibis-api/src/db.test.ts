@@ -1,4 +1,4 @@
-import db, { SearchResult, query, directoryFilter } from "./db"
+import { router as db, SearchResult, query, directoryFilter } from "./db"
 import { getModality } from "ibis-lib"
 
 import bodyparser from "body-parser"

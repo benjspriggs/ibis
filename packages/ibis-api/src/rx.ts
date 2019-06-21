@@ -1,6 +1,6 @@
-import config from "./config"
+import { config } from "./config"
 import { default as express, Router } from "express"
-import file from "./file"
+import { router as file } from "./file"
 
 const router: Router = express.Router()
 
@@ -10,4 +10,6 @@ router.use("/", file({
     // trimLeftPattern: /[Dd]efinition/
 }))
 
-export default router
+export { 
+    router
+}

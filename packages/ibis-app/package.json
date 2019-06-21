@@ -8,7 +8,10 @@
     "start": "node start.js",
     "build": "gulp && npm run build:browser",
     "build:browser": "rollup --config ./src/public/rollup.config.js",
-    "pkg": "pkg dist/index.js --out-path dist",
+    "build:semantic": "gulp build --gulpfile ./semantic/gulpfile.js",
+    "test": "ava",
+    "e2e": "ava --tap --serial e2e/index.test.js e2e/pkg.test.js",
+    "pkg": "gulp package",
     "lint": "tslint --project . -t verbose",
     "clean": "gulp clean"
   },
@@ -18,25 +21,42 @@
     "cors": "^2.8.5",
     "express": "^4.16.4",
     "express-hbs": "^2.1.2",
-    "fomantic-ui": "^2.7.5",
     "got": "^9.6.0",
     "handlebars": "^4.1.2",
     "ibis-api": "file:../ibis-api",
     "ibis-lib": "file:../ibis-lib",
     "node-html-parser": "^1.1.15"
   },
+  "optionalDependencies": {
+    "fomantic-ui": "^2.7.5"
+  },
   "pkg": {
     "assets": [
-      "dist/views/**/*",
-      "dist/public/**/*",
-      "dist/semantic/**/*"
+      "out/**/*"
     ],
     "scripts": [
-      "dist/*.js"
+      "out/**/*.js"
     ]
   },
   "paths": {
     "dist": "./dist",
-    "tsconfig": "./tsconfig.json"
+    "tsconfig": "./tsconfig.json",
+    "scripts": ["dist/**/*.js", "!dist/semantic/**/*.js"],
+    "vendor": [
+      "semantic/dist/**/*"
+    ],
+    "static": [
+      "src/**/*.hbs",
+      "src/**/*.css"
+    ]
+  },
+  "ava": {
+    "babel": false,
+    "compileEnhancements": false,
+    "tap": true,
+    "files": [
+      "dist/**/*.test.js",
+      "e2e/**/*.test.js"
+    ]
   }
 }

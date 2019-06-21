@@ -8,7 +8,10 @@
         "**/spec/",
         "**/test/",
         "**/tests/",
+        "**/e2e/",
         "**/*.test.ts",
-        "**/*.d.ts"
+        "**/*.test.js",
+        "**/*.d.ts",
+        "**/gulpfile.js"
     ]
 }

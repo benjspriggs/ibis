@@ -1,10 +1,10 @@
 import { HTMLElement, Node, TextNode, parse } from "node-html-parser"
 import { Header, getModality, parseHeaderFromFile } from "ibis-lib"
 
-import express from "express"
-import fs from "fs"
+import { default as express } from "express"
+import { default as fs } from "fs"
 import { isEmpty } from "lodash"
-import path from "path"
+import { default as path } from "path"
 
 const nodeMatches = (condition: RegExp) => (node: Node) => condition.test(node.rawText)
 const childrenContainsDefinitionText = (condition: RegExp) => (node: Node): boolean => node.childNodes.some(nodeMatches(condition))
@@ -126,12 +126,8 @@ const trimLeft = (condition: RegExp) => {
     }
 }
 
-export default (options: { endpoint: string, absoluteFilePath: string, trimLeftPattern?: RegExp }) => {
-    let router = express.Router()
-
-    const afterDefinition = options.trimLeftPattern ? trimLeft(options.trimLeftPattern) : (root: Node) => root
-
-    router.get("/:modality/:file", (req, res) => {
+function handleModalityFileRequest(options: { absoluteFilePath: string, endpoint: string }, afterDefinition: (root: Node) => Node) {
+    return (req: express.Request, res: express.Response) => {
         const {
             modality,
             file
@@ -148,33 +144,32 @@ export default (options: { endpoint: string, absoluteFilePath: string, trimLeftP
         const formattedBoy = afterDefinition(body)
         formattedBoy.childNodes = trimConsecutive(formattedBoy.childNodes)
 
-        const {
-            version,
-            tag,
-            name,
-            category
-        } = parseHeaderFromFile(filePath)
-
         res.send({
+            ...parseHeaderFromFile(filePath),
             modality: modality,
             filename: file,
-            filepath: filepath(req, modality, file),
-            version: version,
-            tag: tag,
+            filepath: filepath(options)(req, modality, file),
             name: name,
-            category: category,
             content: formattedBoy.toString()
         })
-    });
+    };
+}
 
-    function resolved(req: express.Request, endpoint: string): ({ relative: string, absolute: string }) {
-        return {
-            relative: endpoint,
-            absolute: `${req.protocol}://${req.headers.host}/${endpoint}`
-        };
-    }
+function resolved(req: express.Request, endpoint: string): ({ relative: string, absolute: string }) {
+    return {
+        relative: endpoint,
+        absolute: `${req.protocol}://${req.headers.host}/${endpoint}`
+    };
+}
 
-    const filepath = (req: express.Request, modality: string, filename: string) => resolved(req, `${options.endpoint}/${modality}/${filename}`)
+const filepath = (options: { endpoint: string }) => (req: express.Request, modality: string, filename: string) => resolved(req, `${options.endpoint}/${modality}/${filename}`)
+
+export const router = (options: { endpoint: string, absoluteFilePath: string, trimLeftPattern?: RegExp }) => {
+    let router = express.Router()
+
+    const afterDefinition = options.trimLeftPattern ? trimLeft(options.trimLeftPattern) : (root: Node) => root
+
+    router.get('/:modality/:file', handleModalityFileRequest(options, afterDefinition))
 
     router.get("/:modality", addModalityListingToLocals(options.absoluteFilePath), async (req: express.Request, res: express.Response, next: express.NextFunction) => {
         const {
@@ -183,7 +178,7 @@ export default (options: { endpoint: string, absoluteFilePath: string, trimLeftP
 
         try {
             const meta = (await getFileInfo(options.absoluteFilePath, modality, res.locals.listing))
-                .map(x => ({ filepath: filepath(req, modality, x.filename), ...x}))
+                .map(x => ({ filepath: filepath(options)(req, modality, x.filename), ...x}))
 
             const empty = meta.filter((infoObject) => isEmpty(infoObject.header) || Object.values(infoObject.header).some(val => typeof val === "undefined"))
 

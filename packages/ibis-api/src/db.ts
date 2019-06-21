@@ -1,6 +1,6 @@
 import { Header, Modality, getModality, modalities } from "ibis-lib"
 import { join } from "path"
-import config, { apiHostname } from "./config"
+import { config, apiHostname } from "./config"
 import { getFileInfo, getListing } from "./file";
 
 import BetterFileAsync from "./BetterFileAsync"
@@ -236,15 +236,20 @@ export async function initialize() {
         return
     }
 
-    const txs = await getAllListings(`${apiHostname}/tx`, config.relative.ibisRoot("system", "tx"))
-    const rxs = await getAllListings(`${apiHostname}/rx`, config.relative.ibisRoot("system", "rx"))
-    console.debug("got all the magic")
+    try {
+        const txs = await getAllListings(`${apiHostname}/tx`, config.relative.ibisRoot("system", "tx"))
+        const rxs = await getAllListings(`${apiHostname}/rx`, config.relative.ibisRoot("system", "rx"))
+        console.debug(`fetched all listings from legacy IBIS directory: '${config.relative.ibisRoot(".")}'`)
 
-    db.get("diseases").splice(0, 0, ...txs).write()
-    db.get("treatments").splice(0, 0, ...rxs).write()
-    console.debug("initialized")
-    // get ALL the files everywhere
-    // put them in the diseases/ tx/ rx
+        console.debug("writing all legacy listings to db")
+        db.get("diseases").splice(0, 0, ...txs).write()
+        db.get("treatments").splice(0, 0, ...rxs).write()
+        console.debug("initialized")
+    } catch (e) {
+        console.error(`unable to initialize: ${e}`)
+    }
 }
 
-export default router
+export {
+    router
+}

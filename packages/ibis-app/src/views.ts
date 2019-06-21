@@ -2,12 +2,13 @@ import { exhbs } from "./helpers"
 import { default as express, Application } from "express"
 import { Options } from "express-hbs"
 import { fetchFromAPI } from "./helpers"
-import { modalities, requestLogger } from "ibis-lib"
-import cors from "cors"
-import assets from "./assets"
+import { requestLogger } from "ibis-lib"
+import { default as cors } from "cors"
+import { router as assets } from "./assets"
 import { join } from "path"
 import { paths } from "./config"
 import { getModality } from "ibis-lib";
+import { readdirSync } from "fs";
 
 const app: Application = express()
 
@@ -26,7 +27,24 @@ const hbsConfig: Options = {
     "partialsDir": join(paths.root, "views/partials")
 }
 
-console.log("using", hbsConfig);
+/*
+const debug = (obj: any) => {
+    for (var path in obj) {
+        const p = obj[path];
+
+        try {
+            console.log(p, readdirSync(p))
+        } catch (e) {
+            console.error(p, e)
+        }
+    }
+}
+
+console.log("using", {
+    hbsConfig,
+    paths
+}, debug(hbsConfig), debug(paths));
+*/
 
 app.engine(".hbs", exhbs.express4(hbsConfig))
 
@@ -174,4 +192,6 @@ app.get("/:route/:modality_code/:resource", (req, res, next) => {
     })
 })
 
-export default app
+export {
+    app
+}

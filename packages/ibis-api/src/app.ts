@@ -1,10 +1,10 @@
-import db, { initialize as dbInitialize } from "./db"
+import { router as db, initialize as dbInitialize } from "./db"
 import { modalities, requestLogger } from "ibis-lib"
 
-import cors from "cors"
+import { default as cors } from "cors"
 import { default as express, Application }  from "express"
-import rx from "./rx"
-import tx from "./tx"
+import { router as rx } from "./rx"
+import { router as tx } from "./tx"
 
 const app: Application = express()
 
@@ -27,4 +27,6 @@ app.use("/tx", tx)
 
 app.use("/data", db)
 
-export default app
+export {
+    app
+}

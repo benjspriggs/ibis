@@ -6,9 +6,10 @@
   "bin": "start.js",
   "scripts": {
     "start": "node start.js",
-    "test": "ava --tap",
+    "test": "ava",
+    "e2e": "ava --tap --serial e2e/index.test.js e2e/pkg.test.js",
     "build": "gulp build",
-    "pkg": "pkg dist/start.js --out-path dist",
+    "pkg": "gulp package",
     "lint": "tslint --project . -t verbose",
     "clean": "gulp clean"
   },
@@ -26,12 +27,20 @@
   },
   "pkg": {
     "scripts": [
-      "dist/*.js",
-      "!dist/*.test.js"
+      "out/*.js",
+      "!out/*.test.js"
     ]
   },
   "paths": {
     "dist": "./dist",
     "tsconfig": ["./tsconfig.json", "./tsconfig.js.json"]
+  },
+  "ava": {
+    "babel": false,
+    "compileEnhancements": false,
+    "tap": true,
+    "files": [
+      "dist/**/*.test.js"
+    ]
   }
 }

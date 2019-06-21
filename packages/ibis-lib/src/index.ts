@@ -10,6 +10,15 @@ export {
     isHttpsEnabled
 } from "./server"
 
+export {
+    withEntrypoint,
+    Options
+} from "./helpers"
+
+export {
+    applicationRoot
+} from "./pkg"
+
 export interface Modality {
     code: string,
     data: ModalityData
@@ -166,42 +175,4 @@ export const requestLogger: RequestHandler = (req: Request, _, next: NextFunctio
             "user-agent": req.headers["user-agent"],
         }))
     next()
-}
-
-interface pkgOptions {
-    entrypoint?: string;
-    defaultEntrypoint?: string;
-}
-
-function getLiveApplicationRoot() {
-    if (isPackaged()) {
-        return dirname(process.execPath)
-    } else {
-        return join(__dirname, '../..')
-    }
-}
-
-function detectApplicationRoot() {
-    if (isPackaged()) {
-        // https://www.npmjs.com/package/pkg#snapshot-filesystem
-        const pkg: pkgOptions = (process as any).pkg
-        return dirname(pkg.entrypoint);
-    } else {
-        const path = getLiveApplicationRoot()
-        return path
-    }
-}
-
-/**
- * See https://www.npmjs.com/package/pkg#snapshot-filesystem
- */
-export function isPackaged(): boolean {
-    const pkg: pkgOptions = (process as any).pkg
-
-    return !!pkg
-}
-
-export const applicationRoot = {
-    packaged: detectApplicationRoot(),
-    live: getLiveApplicationRoot()
 }

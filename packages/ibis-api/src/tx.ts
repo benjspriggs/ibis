@@ -1,8 +1,8 @@
 import { Header, parseHeaderFromFile } from "ibis-lib"
 
-import config from "./config"
+import { config } from "./config"
 import { default as express, Router } from "express"
-import file from "./file"
+import { router as file } from "./file"
 import fs from "fs"
 import { join } from "path"
 
@@ -48,4 +48,6 @@ router.use("/", file({
     absoluteFilePath: config.relative.ibisRoot("system", "tx")
 }))
 
-export default router
+export { 
+    router
+}

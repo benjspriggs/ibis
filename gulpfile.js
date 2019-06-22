@@ -6,6 +6,7 @@ const gulp = require("gulp")
 const debug = require("gulp-debug")
 const rollup = require("gulp-better-rollup")
 const newer = require("gulp-newer")
+const changed = require("gulp-changed")
 const { terser } = require("rollup-plugin-terser")
 const json = require("rollup-plugin-json")
 const resolve = require("rollup-plugin-node-resolve")
@@ -65,7 +66,8 @@ function project({
                 if (a && a.length <= 0) {
                     done()
                 } else {
-                    return gulp.src(a, { base: base, since: gulp.lastRun(copyTask) })
+                    return gulp.src(a, { base: base })
+                        .pipe(changed(destination))
                         .pipe(debug({ title: `${title} -> ${destination}` }))
                         .pipe(gulp.dest(destination))
                 }

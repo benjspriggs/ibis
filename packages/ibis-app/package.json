@@ -6,8 +6,7 @@
   "bin": "start.js",
   "scripts": {
     "start": "node start.js",
-    "build": "gulp && npm run build:browser",
-    "build:browser": "rollup --config ./src/public/rollup.config.js",
+    "build": "gulp build",
     "build:semantic": "gulp build --gulpfile ./semantic/gulpfile.js",
     "test": "ava",
     "e2e": "ava --tap --serial e2e/index.test.js e2e/pkg.test.js",

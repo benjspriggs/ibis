@@ -1,6 +1,5 @@
 import { HTMLElement, Node, TextNode, parse } from "node-html-parser"
 import { Header, getModality, parseHeaderFromFile } from "ibis-lib"
-import { database } from "./db"
 
 import { default as express } from "express"
 import { default as fs } from "fs"

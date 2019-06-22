@@ -5,7 +5,7 @@
   "main": "start.js",
   "bin": "start.js",
   "scripts": {
-    "start": "node start.js",
+    "start": "node start.js dist",
     "build": "gulp build",
     "build:semantic": "gulp build --gulpfile ./semantic/gulpfile.js",
     "build:fast": "gulp buildFast",

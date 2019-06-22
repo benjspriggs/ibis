@@ -32,13 +32,13 @@ function compress(scripts, out){
             browser: false
         }))
         .pipe(gulp.dest(out))
-    executor.taskName = `compressing sources in ${scripts} to ${out}`
+    executor.displayName = `compressing sources in ${scripts} to ${out}`
     return executor
 }
 
 function build(config, dist) {
     const executor = (done) => buildTypescriptSources(config).pipe(gulp.dest(dist))
-    executor.taskName = `build typescript sources from ${config}`
+    executor.displayName = `build typescript sources from ${config}`
     return executor
 }
 
@@ -59,16 +59,24 @@ function project({
         vendor: vendor = []
     }
 }) {
-    const stream = (a, base) => gulp.src(a, { base: base })
+    const stream = (a, base, task) => gulp.src(a, { base: base, since: gulp.lastRun(task) })
 
-    const copy = (title, a, base) => (destination) => (done) => {
-        if (a && a.length <= 0) {
-            done()
-        } else {
-            return stream(a, base)
-                .pipe(debug({ title: `${title} -> ${destination}` }))
-                .pipe(newer(destination))
-                .pipe(gulp.dest(destination))
+    function copy(title, a, base) {
+        return function (destination) {
+            function copyTask(done) {
+                if (a && a.length <= 0) {
+                    done()
+                } else {
+                    return stream(a, base, copyTask)
+                        .pipe(debug({ title: `${title} -> ${destination}` }))
+                        .pipe(newer(destination))
+                        .pipe(gulp.dest(destination))
+                }
+            }
+
+            copyTask.displayName = `copy sources from ${base} matching '${a}' to ${destination}`
+
+            return copyTask
         }
     }
 
@@ -129,6 +137,10 @@ function buildTypescriptSources(config) {
     const project = ts.createProject(config)
 
     return project.src()
+        .pipe(newer({
+            dest: project.projectDirectory,
+            ext: ".js"
+        }))
         .pipe(sourcemaps.init())
         .pipe(project())
         .pipe(sourcemaps.write('.', { sourceRoot: "./", includeContent: false }))

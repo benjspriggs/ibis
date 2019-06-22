@@ -59,17 +59,14 @@ function project({
         vendor: vendor = []
     }
 }) {
-    const stream = (a, base, task) => gulp.src(a, { base: base, since: gulp.lastRun(task) })
-
     function copy(title, a, base) {
         return function (destination) {
             function copyTask(done) {
                 if (a && a.length <= 0) {
                     done()
                 } else {
-                    return stream(a, base, copyTask)
+                    return gulp.src(a, { base: base, since: gulp.lastRun(copyTask) })
                         .pipe(debug({ title: `${title} -> ${destination}` }))
-                        .pipe(newer(destination))
                         .pipe(gulp.dest(destination))
                 }
             }

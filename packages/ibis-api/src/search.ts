@@ -3,7 +3,7 @@ import { getModality } from "ibis-lib"
 import { default as express, Router } from "express"
 import fuse from "fuse.js"
 
-import { database, Directory } from "./db"
+import { getTherapeutics, getMateriaMedica, Directory } from "./db"
 
 const router: Router = express.Router()
 
@@ -22,14 +22,11 @@ const defaultFuseOptions = {
 const modalityPattern = /m(?:odality)?:(\w+|".*?"|".*?")/g
 
 router.get("/", async (req, res) => {
-    const db = await database();
-
     if (!req.query.q) {
-        res.send(db.value())
-        return
+        res.send({})
     } else {
-        const t = db.get("treatments").value()
-        const d = db.get("diseases").value()
+        const t = await getMateriaMedica()
+        const d = await getTherapeutics()
 
         res.send(searchDirectory(req.query.q, [].concat(t, d)))
     }
@@ -88,11 +85,18 @@ router.get("/:sub", async (req, res) => {
         sub
     } = req.params
 
-    const db = await database()
+    let entries;
 
-    if (!Object.keys(db.value()).includes(sub)) {
-        res.sendStatus(404)
-        return
+    switch (sub) {
+        case "diseases":
+            entries = await getTherapeutics()
+            break;
+        case "therapeutics":
+            entries = await getMateriaMedica()
+            break;
+        default:
+            res.sendStatus(404)
+            return
     }
 
     const {
@@ -103,10 +107,9 @@ router.get("/:sub", async (req, res) => {
     const _categorize = typeof categorize === "undefined" ? false : categorize === "true";
 
     if (!q) {
-        res.send(formatSearchResponse(q, sub, db.get(sub).value(), _categorize));
+        res.send(formatSearchResponse(q, sub, entries, _categorize));
     } else {
-        const values: Directory[] = db.get(sub).value()
-        const results = searchDirectory(req.query.q, values)
+        const results = searchDirectory(req.query.q, entries)
         res.send(formatSearchResponse(q, sub, results, _categorize))
     }
 })

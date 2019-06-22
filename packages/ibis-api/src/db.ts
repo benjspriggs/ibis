@@ -26,8 +26,40 @@ const adapter = new BetterFileAsync<Database>(join(process.cwd(), "db.json"), {
     },
 })
 
-export function database(): Promise<lowdb.LowdbAsync<Database>> {
+function database(): Promise<lowdb.LowdbAsync<Database>> {
     return lowdb(adapter)
+}
+
+/**
+ * Returns all diease-related {@link Directory} that match the query.
+ * @param query A predicate for {@link Directory} entries.
+ */
+export async function getTherapeutics(query?: (d: Directory) => boolean): Promise<Directory[]> {
+    const db = await database()
+
+    const therapeutics = db.get("diseases")
+
+    if (!query) {
+        return therapeutics.value();
+    } else {
+        return therapeutics.filter(query).value();
+    }
+}
+
+/**
+ * Returns all technique-related {@link Directory} that match the query.
+ * @param query A predicate for {@link Directory} entries.
+ */
+export async function getMateriaMedica(query?: (d: Directory) => boolean): Promise<Directory[]> {
+    const db = await database()
+
+    const treatments = db.get("treatments")
+
+    if (!query) {
+        return treatments.value();
+    } else {
+        return treatments.filter(query).value();
+    }
 }
 
 async function getAllListings(resourcePrefix: string, abs: string): Promise<Directory[]> {

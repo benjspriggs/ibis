@@ -1,15 +1,15 @@
-import { router as db, SearchResult, query, directoryFilter } from "./db"
+import { router as search, SearchResult, query, directoryFilter } from "./search"
 import { getModality } from "ibis-lib"
 
 import bodyparser from "body-parser"
 import express from "express"
 import request from "supertest"
-import test, { ExecutionContext } from "ava"
+import test from "ava"
 
 const getApp = () => {
     const app = express()
     app.use(bodyparser.json())
-    app.use("/", db)
+    app.use("/", search)
     return app
 }
 
@@ -19,69 +19,69 @@ const getAppAndAssertResponse = (url: string, withResponse: (_: request.Response
             withResponse(r)
         })
 
-test("db:app:/", (t) => 
+test("search:app:/", (t) => 
     getAppAndAssertResponse("/", res => {
         t.is(res.status, 200)
         t.not(res.body, undefined)
     })
 )
 
-test("db:app:/:query", (t) =>
+test("search:app:/:query", (t) =>
     getAppAndAssertResponse("/?q=string", res => {
         t.is(res.status, 200)
         t.not(res.body, undefined)
     })
 )
 
-test("db:app:/diseases", (t) => 
+test("search:app:/diseases", (t) => 
     getAppAndAssertResponse("/diseases", res => {
         t.is(res.status, 200)
         t.is((res.body as SearchResult).directory, "diseases")
     })
 )
 
-test("db:app:/treatments", (t) => 
+test("search:app:/treatments", (t) => 
     getAppAndAssertResponse("/treatments", res => {
         t.is(res.status, 200)
         t.is((res.body as SearchResult).directory, "treatments")
     })
 )
 
-test("db:app:/treatments:categorized", (t) => 
+test("search:app:/treatments:categorized", (t) => 
     getAppAndAssertResponse("/treatments?categorize=true", res => {
         t.is(res.status, 200)
         t.false(Array.isArray(res.body.results))
     })
 )
 
-test("db:app:/diseases:categorized", (t) =>
+test("search:app:/diseases:categorized", (t) =>
     getAppAndAssertResponse("/diseases?categorize=true", res => {
         t.is(res.status, 200)
         t.false(Array.isArray(res.body.results))
     })
 )
 
-test("db:app:/treatments:not categorized", (t) =>
+test("search:app:/treatments:not categorized", (t) =>
     getAppAndAssertResponse("/treatments?categorize=false", res => {
         t.is(res.status, 200)
         t.true(Array.isArray(res.body.results))
     })
 )
 
-test("db:app:/diseases:not categorized", (t) =>
+test("search:app:/diseases:not categorized", (t) =>
     getAppAndAssertResponse("/diseases?categorize=false", res => {
         t.is(res.status, 200)
         t.true(Array.isArray(res.body.results))
     })
 )
 
-test("db:app:/foobar", (t) => 
+test("search:app:/foobar", (t) => 
     getAppAndAssertResponse("/foobar", res => {
         t.is(res.status, 404)
     })
 )
 
-test("db:query:modality", (t) => {
+test("search:query:modality", (t) => {
     t.deepEqual(query("foobar"), {
         text: "foobar",
     })
@@ -124,7 +124,7 @@ test("db:query:modality", (t) => {
     }, `it doesn"t capture words after quotes`)
 })
 
-test("db:directoryFilter:modality:false", (t) => {
+test("search:directoryFilter:modality:false", (t) => {
     var f = directoryFilter({
         text: 'anything',
         modality: 'bota'
@@ -142,7 +142,7 @@ test("db:directoryFilter:modality:false", (t) => {
     }))
 })
 
-test("db:directoryFilter:modality:true", (t) => {
+test("search:directoryFilter:modality:true", (t) => {
     var f = directoryFilter({
         text: 'anything',
         modality: 'bota'

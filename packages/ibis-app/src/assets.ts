@@ -12,6 +12,15 @@ router.use("/semantic", express.static(paths.semantic, {
     fallthrough: true
 }))
 
+router.use("/scripts/jquery.js", express.static(require.resolve("jquery"), {
+    index: false,
+    immutable: true,
+    maxAge: 10000,
+    lastModified: true,
+    fallthrough: false,
+    extensions: ["js"]
+}))
+
 router.use("/", express.static(paths.public, {
     index: false,
     immutable: true,

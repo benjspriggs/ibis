@@ -1,5 +1,6 @@
 import { HTMLElement, Node, TextNode, parse } from "node-html-parser"
 import { Header, getModality, parseHeaderFromFile } from "ibis-lib"
+import { database } from "./db"
 
 import { default as express } from "express"
 import { default as fs } from "fs"
@@ -149,7 +150,6 @@ function handleModalityFileRequest(options: { absoluteFilePath: string, endpoint
             modality: modality,
             filename: file,
             filepath: filepath(options)(req, modality, file),
-            name: name,
             content: formattedBoy.toString()
         })
     };

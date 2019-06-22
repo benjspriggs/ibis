@@ -9,6 +9,7 @@
     "test": "ava",
     "e2e": "ava --tap --serial e2e/index.test.js e2e/pkg.test.js",
     "build": "gulp build",
+    "build:fast": "gulp buildFast",
     "pkg": "gulp package",
     "lint": "tslint --project . -t verbose",
     "clean": "gulp clean"

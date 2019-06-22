@@ -37,8 +37,8 @@ function compress(scripts, out){
     return executor
 }
 
-function build(config, dist) {
-    const executor = (done) => buildTypescriptSources(config).pipe(gulp.dest(dist))
+function build(config, override, dist) {
+    const executor = (done) => buildTypescriptSources(config, override).pipe(gulp.dest(dist))
     executor.displayName = `build typescript sources from ${config}`
     return executor
 }
@@ -82,13 +82,13 @@ function project({
     const copyStatic = copy("copying static assets", static, src)
     const copyVendor = copy("copying vendor assets", vendor, ".")
 
-    function localBuild(done) {
+    function localBuild(override) {
         /**
          * @type {string[]}
          */
         const configs = Array.isArray(tsconfig) ? tsconfig : [tsconfig];
-        const tasks = configs.map(config => build(config, dist))
-        return gulp.parallel(...tasks)(done)
+        const tasks = configs.map(config => build(config, override, dist))
+        return (done) => gulp.parallel(...tasks)(done)
     }
 
     function cleanFolder(folder){
@@ -120,7 +120,8 @@ function project({
 
     return {
         copy: copyStaticSourcesToDestination,
-        build: gulp.parallel(copyStaticSourcesToDestination, localBuild),
+        build: gulp.parallel(copyStaticSourcesToDestination, localBuild({})),
+        buildFast: gulp.parallel(copyStaticSourcesToDestination, localBuild({ isolatedModules: true })),
         clean: clean,
         compress: compress(scripts, out),
         bundle: bundle,
@@ -130,10 +131,11 @@ function project({
 
 /**
  * @param {string} config Path to a tsconfig.json.
+ * @param {any} [settings]
  * @returns A stream that can be `gulp.pipe`'d to a destination.
  */
-function buildTypescriptSources(config) {
-    const project = ts.createProject(config)
+function buildTypescriptSources(config, settings) {
+    const project = ts.createProject(config, settings)
 
     return project.src()
         .pipe(debug({ title: `compiling typescript source (${config})` }))

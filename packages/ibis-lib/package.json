@@ -5,6 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "gulp build",
+    "build:fast": "gulp buildFast",
     "test": "ava",
     "clean": "gulp clean",
     "lint": "tslint --project . -t verbose"

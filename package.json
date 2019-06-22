@@ -6,6 +6,7 @@
     "start": "lerna run --stream start --parallel",
     "build": "lerna run --stream build",
     "build:semantic": "lerna run --stream build:semantic --scope ibis-app",
+    "build:fast": "lerna run --stream build:fast",
     "compress": "lerna run --stream compress",
     "test": "lerna run --stream test --parallel",
     "e2e": "lerna run --stream e2e",

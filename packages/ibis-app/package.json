@@ -8,6 +8,7 @@
     "start": "node start.js",
     "build": "gulp build",
     "build:semantic": "gulp build --gulpfile ./semantic/gulpfile.js",
+    "build:fast": "gulp buildFast",
     "test": "ava",
     "e2e": "ava --tap --serial e2e/index.test.js e2e/pkg.test.js",
     "pkg": "gulp package",

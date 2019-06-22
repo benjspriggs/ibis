@@ -1,7 +1,7 @@
 declare module "fomantic-ui" {
     import "jquery"
 
-    interface JQueryStatic {
+    interface FomanicJqueryStatic {
         // TODO: add api types from fomantic-ui
         api: any
     }

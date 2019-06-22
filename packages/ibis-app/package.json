@@ -39,6 +39,7 @@
   },
   "paths": {
     "dist": "./dist",
+    "publicDist": "./dist/public/scripts/",
     "tsconfig": "./tsconfig.json",
     "scripts": ["dist/**/*.js", "!dist/semantic/**/*.js"],
     "vendor": [

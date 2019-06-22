@@ -97,13 +97,13 @@ function project({
         return cleanTask
     }
 
-    const copyStaticSourcesToDestination = gulp.series(copyStatic(dist), copyVendor(dist))
+    const copyStaticSourcesToDestination = gulp.parallel(copyStatic(dist), copyVendor(dist))
 
-    const copyStaticSourcesToCompressed = gulp.series(copyStatic(out), copyVendor(out))
+    const copyStaticSourcesToCompressed = gulp.parallel(copyStatic(out), copyVendor(out))
 
     const clean = gulp.parallel(cleanFolder(dist), cleanFolder(out))
 
-    const bundle = gulp.series(copyStaticSourcesToCompressed, compress(scripts, out))
+    const bundle = gulp.parallel(copyStaticSourcesToCompressed, compress(scripts, out))
 
     function package(done) {
         try {
@@ -120,7 +120,7 @@ function project({
 
     return {
         copy: copyStaticSourcesToDestination,
-        build: gulp.series(copyStaticSourcesToDestination, localBuild),
+        build: gulp.parallel(copyStaticSourcesToDestination, localBuild),
         clean: clean,
         compress: compress(scripts, out),
         bundle: bundle,
@@ -136,6 +136,7 @@ function buildTypescriptSources(config) {
     const project = ts.createProject(config)
 
     return project.src()
+        .pipe(debug({ title: `compiling typescript source (${config})` }))
         .pipe(newer({
             dest: project.projectDirectory,
             ext: ".js"
@@ -143,6 +144,7 @@ function buildTypescriptSources(config) {
         .pipe(sourcemaps.init())
         .pipe(project())
         .pipe(sourcemaps.write('.', { sourceRoot: "./", includeContent: false }))
+        .pipe(debug({ title: `compiled typescript source (${config})` }))
 }
 
 exports.build = buildTypescriptSources;

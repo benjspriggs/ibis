@@ -1,9 +1,8 @@
 //@ts-check
 const package = require("./package.json")
-const { series, parallel, task } = require("gulp")
+const { parallel, task, dest } = require("gulp")
 const ts = require("gulp-typescript")
-const rollup = require("gulp-better-rollup")
-const { terser } = require("rollup-plugin-terser")
+const debug = require("gulp-debug")
 
 const { project } = require("./../../gulpfile")
 
@@ -17,18 +16,13 @@ function buildPublicScripts() {
     const publicScriptProjects = ts.createProject("./src/public/tsconfig.json")
 
     return publicScriptProjects.src()
+        .pipe(debug({ title: "compiling public script" }))
         .pipe(publicScriptProjects())
-        .pipe(rollup({
-            plugins: [
-                terser()
-            ]
-        }, {
-            format: 'iife',
-            browser: true
-        }))
+        .pipe(debug({ title: "compiled public script" }))
+        .pipe(dest(package.paths.publicDist))
 }
 
-task('build', series(build, buildPublicScripts))
+task('build', parallel(build, buildPublicScripts))
 
 task('compress', compress)
 task('bundle', bundle)

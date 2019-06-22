@@ -1,5 +1,7 @@
-//@ts-check
 export const apiHostname = `${location.protocol}//127.0.0.1:3000`
+import { FomanicJqueryStatic } from "fomantic-ui";
+
+declare var $: FomanicJqueryStatic;
 
 $.api.settings.verbose = true
 

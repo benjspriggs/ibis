@@ -24,6 +24,7 @@
     "handlebars": "^4.1.2",
     "ibis-api": "file:../ibis-api",
     "ibis-lib": "file:../ibis-lib",
+    "jquery": "^3.4.1",
     "node-html-parser": "^1.1.15"
   },
   "optionalDependencies": {
@@ -41,7 +42,10 @@
     "dist": "./dist",
     "publicDist": "./dist/public/scripts/",
     "tsconfig": "./tsconfig.json",
-    "scripts": ["dist/**/*.js", "!dist/semantic/**/*.js"],
+    "scripts": [
+      "dist/**/*.js",
+      "!dist/semantic/**/*.js"
+    ],
     "vendor": [
       "semantic/dist/**/*"
     ],

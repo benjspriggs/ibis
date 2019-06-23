@@ -96,15 +96,13 @@ const trimLeft = (condition: RegExp, root: Node): Node => {
         console.debug('root is text node')
         if (contains(root) || childrenContains(root)) {
             return root;
-        } else {
-            console.error("no contains condition")
         }
     } else {
-        console.debug('root is html node')
+        // console.debug('root is html node')
         const body = root as HTMLElement;
 
         if (body.childNodes.length === 0 && contains(body)) {
-            console.log("found text: ", body.text)
+            // console.log("found text: ", body.text)
             return body;
         }
 
@@ -117,7 +115,7 @@ const trimLeft = (condition: RegExp, root: Node): Node => {
 
         if (first !== -1) {
             // add the body text
-            console.debug("updating children and trimming empty nodes ")
+            // console.debug("updating children and trimming empty nodes ")
             const newChildren = body.childNodes.slice(first)
             body.childNodes = newChildren
             return trimEmptyNodes(body);

@@ -321,8 +321,8 @@ export async function initialize() {
             getAllListings(`${apiHostname}/rx`, config.relative.ibisRoot("system", "rx"))
                 .then(async rxs =>
                     Promise.all([
-                        db.get("diseases").splice(0, 0, ...rxs.map(stripContent)).write(),
-                        db.get("content").get("diseases").splice(0, 0, ...rxs).write()
+                        db.get("treatments").splice(0, 0, ...rxs.map(stripContent)).write(),
+                        db.get("content").get("treatments").splice(0, 0, ...rxs).write()
                     ])
                 )
         ])

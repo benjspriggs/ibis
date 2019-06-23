@@ -77,8 +77,12 @@ async function getEntryResponse(options: {
         default:
             throw new Error(`unknown category ${options.category}`)
     }
-
 }
+
+router.get("/", (req, res) => {
+    res.status(204)
+    res.send()
+})
 
 router.get('/:category/:modality', (req, res, next) => {
     getModalityResponse(req.params)

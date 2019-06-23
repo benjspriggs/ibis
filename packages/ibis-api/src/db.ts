@@ -303,28 +303,37 @@ export async function initialize() {
         console.error("no IBIS directory detected, skipping initialization")
     }
 
-    function stripContent(entry: Entry) {
+    function stripContent(entry: Entry): Directory {
         const { content, ...directory } = entry
 
         return directory;
     }
 
+    async function fetchEntries(prefix: string, path: string): Promise<Entry[]> {
+        return getAllListings(prefix, path)
+    }
+
+    async function writeEntries(location: "diseases" | "treatments", entries: Entry[]) {
+        return db.get("content").get(location).splice(0, 0, ...entries).write()
+    }
+
+    async function writeDirectories(location: "diseases" | "treatments", entries: Entry[]) {
+        return db.get(location).splice(0, 0, ...entries.map(stripContent)).write()
+    }
+
+    async function write(location: "diseases" | "treatments", entries: Entry[]) {
+        return await Promise.all([
+            writeEntries(location, entries),
+            writeDirectories(location, entries)
+        ])
+    }
+
     try {
         await Promise.all([
-            getAllListings(`${apiHostname}/tx`, config.relative.ibisRoot("system", "tx"))
-                .then(async txs =>
-                    Promise.all([
-                        db.get("diseases").splice(0, 0, ...txs.map(stripContent)).write(),
-                        db.get("content").get("diseases").splice(0, 0, ...txs).write()
-                    ])
-                ),
-            getAllListings(`${apiHostname}/rx`, config.relative.ibisRoot("system", "rx"))
-                .then(async rxs =>
-                    Promise.all([
-                        db.get("treatments").splice(0, 0, ...rxs.map(stripContent)).write(),
-                        db.get("content").get("treatments").splice(0, 0, ...rxs).write()
-                    ])
-                )
+            fetchEntries(`${apiHostname}/tx`, config.relative.ibisRoot("system", "tx"))
+            .then((entries) => write("diseases", entries)),
+            fetchEntries(`${apiHostname}/rx`, config.relative.ibisRoot("system", "rx"))
+            .then((entries) => write("treatments", entries))
         ])
 
         console.debug("initialized")

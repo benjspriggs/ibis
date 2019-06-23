@@ -125,8 +125,8 @@ const trimLeft = (condition: RegExp, root: Node): Node => {
     }
 }
 
-function getFileInfo(absoluteFilePath: string, modality: string, listing: string[]): Promise<{ id: string, header: Header, content: string }[]> {
-    const promises = listing.map(async (filename: string) => {
+async function getFileInfo(absoluteFilePath: string, modality: string, listing: string[]): Promise<{ id: string, header: Header, content: string }[]> {
+    const allContentParsed = await Promise.all(listing.map(async (filename: string) => {
         const filepather = path.join(absoluteFilePath, modality, filename)
 
         const content = fs.readFileSync(filepather, { encoding: 'utf-8' })
@@ -137,6 +137,14 @@ function getFileInfo(absoluteFilePath: string, modality: string, listing: string
             throw new Error(`failed to parse content for file at ${filepather}`)
         }
 
+        return {
+            filename,
+            filepather,
+            parsed
+        }
+    }))
+
+    const modifiedBodies = await Promise.all(allContentParsed.map(async ({ filename, parsed, filepather }) => {
         const body = parsed.childNodes.find(node => node instanceof HTMLElement) as HTMLElement
 
         if (!body) {
@@ -158,14 +166,20 @@ function getFileInfo(absoluteFilePath: string, modality: string, listing: string
             process.exit(1)
         }
 
-        return {
-            modality: modality,
-            id: filename.slice(),
-            header: header,
-            content: trimmed.toString() as string
-        }
-    })
-    return Promise.all(promises)
+        return ({
+            header,
+            filename,
+            filepather,
+            trimmed
+        })
+    }))
+
+    return modifiedBodies.map(({ filename, trimmed, header }) => ({
+        modality: modality,
+        id: filename.slice(),
+        header: header,
+        content: trimmed.toString() as string
+    }))
 }
 
 const getListing = (absoluteFilePath: string, modality: string) => new Promise<string[]>((resolve, reject) => {

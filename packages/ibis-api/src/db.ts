@@ -22,14 +22,22 @@ export interface Entry extends Directory {
 }
 
 export interface Database {
-    diseases: Entry[]
-    treatments: Entry[]
+    diseases: Directory[]
+    treatments: Directory[],
+    content: {
+        diseases: Entry[],
+        treatments: Entry[]
+    }
 }
 
 const adapter = new BetterFileAsync<Database>(join(process.cwd(), "db.json"), {
     defaultValue: {
         diseases: [],
         treatments: [],
+        content: {
+            diseases: [],
+            treatments: []
+        }
     },
 })
 
@@ -111,7 +119,7 @@ const trimLeft = (condition: RegExp, root: Node): Node => {
 
         const first = answers.findIndex(v => v)
 
-        console.debug({ first })
+        // console.debug({ first })
 
         if (first !== -1) {
             // add the body text
@@ -195,10 +203,22 @@ const getListing = (absoluteFilePath: string, modality: string) => new Promise<s
  * Returns all diease-related {@link Directory} that match the query.
  * @param query A predicate for {@link Directory} entries.
  */
-export async function getTherapeutics(query?: (d: Directory) => boolean): Promise<Entry[]> {
+export async function getTherapeutics(query?: (d: Directory) => boolean): Promise<Directory[]> {
     const db = await database()
 
     const therapeutics = db.get("diseases")
+
+    if (!query) {
+        return therapeutics.value();
+    } else {
+        return therapeutics.filter(query).value();
+    }
+}
+
+export async function getTherapeuticContent(query?: (e: Entry) => boolean): Promise<Entry[]> {
+    const db = await database()
+
+    const therapeutics = db.get("content").get("diseases")
 
     if (!query) {
         return therapeutics.value();
@@ -211,10 +231,22 @@ export async function getTherapeutics(query?: (d: Directory) => boolean): Promis
  * Returns all technique-related {@link Directory} that match the query.
  * @param query A predicate for {@link Directory} entries.
  */
-export async function getMateriaMedica(query?: (d: Directory) => boolean): Promise<Entry[]> {
+export async function getMateriaMedica(query?: (d: Directory) => boolean): Promise<Directory[]> {
     const db = await database()
 
     const treatments = db.get("treatments")
+
+    if (!query) {
+        return treatments.value();
+    } else {
+        return treatments.filter(query).value();
+    }
+}
+
+export async function getMateriaMedicaContent(query?: (e: Entry) => boolean): Promise<Entry[]> {
+    const db = await database()
+
+    const treatments = db.get("content").get("treatments")
 
     if (!query) {
         return treatments.value();
@@ -260,16 +292,28 @@ export async function initialize() {
         console.error("no IBIS directory detected, skipping initialization")
     }
 
+    function stripContent(entry: Entry) {
+        const { content, ...directory } = entry
+
+        return directory;
+    }
+
     try {
         await Promise.all([
             getAllListings(`${apiHostname}/tx`, config.relative.ibisRoot("system", "tx"))
-                .then(txs => {
-                    return db.get("diseases").splice(0, 0, ...txs).write()
-                }),
+                .then(async txs => 
+                    Promise.all([
+                        db.get("diseases").splice(0, 0, ...txs.map(stripContent)).write(),
+                        db.get("content").get("diseases").splice(0, 0, ...txs).write()
+                    ])
+                ),
             getAllListings(`${apiHostname}/rx`, config.relative.ibisRoot("system", "rx"))
-                .then(rxs => {
-                    return db.get("treatments").splice(0, 0, ...rxs).write()
-                })
+                .then(async rxs =>
+                    Promise.all([
+                        db.get("diseases").splice(0, 0, ...rxs.map(stripContent)).write(),
+                        db.get("content").get("diseases").splice(0, 0, ...rxs).write()
+                    ])
+                )
         ])
 
         console.debug("initialized")

@@ -1,6 +1,6 @@
 import { default as express } from "express"
 import { Modality, Header, getModality } from "ibis-lib";
-import { Entry, getMateriaMedica, getTherapeutics } from "./db"
+import { Entry, getMateriaMedica, getTherapeutics, getMateriaMedicaContent, getTherapeuticContent } from "./db"
 import isEmpty from "lodash/isEmpty"
 
 const router = express.Router()
@@ -17,8 +17,7 @@ async function getModalityResponse(options: {
             absolute: string
         },
         id: string,
-        header: Header,
-        content: string
+        header: Header
     }[],
 }> {
     if (!options) {
@@ -66,15 +65,15 @@ async function getEntryResponse(options: {
         throw new Error("options required for `getModalityResponse`")
     }
 
-    const predicate = (entry: Entry) => entry.id === options.id
+    const predicate = (entry: Entry) => entry.id === options.id && entry.modality === getModality(options.modality)
 
     switch (options.category) {
         case "rx":
         case "materia-medica":
-            return (await getMateriaMedica(predicate))[0]
+            return (await getMateriaMedicaContent(predicate))[0]
         case "tx":
         case "therapeutics":
-            return (await getTherapeutics(predicate))[0]
+            return (await getTherapeuticContent(predicate))[0]
         default:
             throw new Error(`unknown category ${options.category}`)
     }

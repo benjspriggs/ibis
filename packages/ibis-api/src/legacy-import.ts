@@ -1,9 +1,8 @@
-import { HTMLElement, Node, TextNode, parse } from "node-html-parser"
+import { HTMLElement, Node, TextNode } from "node-html-parser"
 
 import { Header } from "ibis-lib"
 
-import { flatten } from "lodash"
-import { readFileSync } from "fs"
+import flatten from "lodash/flatten"
 
 const flattenNode = (node: Node) => {
     if (node instanceof TextNode) {

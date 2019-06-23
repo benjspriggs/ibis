@@ -49,7 +49,7 @@ const nodeMatches = (condition: RegExp) => (node: Node) => condition.test(node.r
 const childrenContainsDefinitionText = (condition: RegExp) => (node: Node): boolean => node.childNodes.some(nodeMatches(condition))
 const emptyNode = (node: Node) => node.rawText.trim() === ""
 
-const trimEmptyNodes = (root: Node): Node | undefined => {
+function trimEmptyNodes(root: Node): Node | undefined {
     if (root.childNodes.length === 0) {
         if (!emptyNode(root)) {
             return root
@@ -68,7 +68,7 @@ const trimEmptyNodes = (root: Node): Node | undefined => {
     return root
 }
 
-const trimConsecutive = (childNodes: Node[], tag: string = "BR", maxConsecutive: number = 3): Node[] => {
+function trimConsecutive(childNodes: Node[], tag: string = "BR", maxConsecutive: number = 3): Node[] {
     if (childNodes.length === 0) {
         return childNodes
     }
@@ -101,34 +101,35 @@ const trimLeft = (condition: RegExp, root: Node): Node => {
     const childrenContains = childrenContainsDefinitionText(condition)
 
     if (root instanceof TextNode) {
-        console.debug('root is text node')
         if (contains(root) || childrenContains(root)) {
             return root;
+        } else {
+            return;
         }
+    }
+
+    // console.debug('root is html node')
+    const body = root as HTMLElement;
+
+    if (body.childNodes.length === 0 && contains(body)) {
+        // console.log("found text: ", body.text)
+        return body;
+    }
+
+    // prune children
+    const answers: boolean[] = body.childNodes.map(n => contains(n) || childrenContains(n))
+
+    const indexOfFirstChildContainingPattern = answers.findIndex(v => v)
+
+    // console.debug({ first })
+
+    if (indexOfFirstChildContainingPattern !== -1) {
+        // add the body text
+        // console.debug("updating children and trimming empty nodes ")
+        const newChildren = body.childNodes.slice(indexOfFirstChildContainingPattern)
+        body.childNodes = newChildren
+        return trimEmptyNodes(body);
     } else {
-        // console.debug('root is html node')
-        const body = root as HTMLElement;
-
-        if (body.childNodes.length === 0 && contains(body)) {
-            // console.log("found text: ", body.text)
-            return body;
-        }
-
-        // prune children
-        const answers: boolean[] = body.childNodes.map(n => contains(n) || childrenContains(n))
-
-        const first = answers.findIndex(v => v)
-
-        // console.debug({ first })
-
-        if (first !== -1) {
-            // add the body text
-            // console.debug("updating children and trimming empty nodes ")
-            const newChildren = body.childNodes.slice(first)
-            body.childNodes = newChildren
-            return trimEmptyNodes(body);
-        }
-
         return body;
     }
 }

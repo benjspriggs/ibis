@@ -5,7 +5,7 @@ import { importEntriesFromDisk } from "./legacy-import"
 import BetterFileAsync from "./BetterFileAsync"
 import lowdb from "lowdb"
 
-export type Category = "diseases" | "treatments"
+export type Category = "monographs" | "treatments"
 
 export interface Directory {
     id: string,
@@ -19,20 +19,26 @@ export interface Entry extends Directory {
 }
 
 export interface Database {
-    diseases: Directory[]
+    /**
+     * The description of a specific herb or strategy.
+     */
+    monographs: Directory[]
+    /**
+     * The treatments for specific diseases, using components from a modality.
+     */
     treatments: Directory[],
     content: {
-        diseases: Entry[],
+        monographs: Entry[],
         treatments: Entry[]
     }
 }
 
 const adapter = new BetterFileAsync<Database>(join(process.cwd(), "db.json"), {
     defaultValue: {
-        diseases: [],
+        monographs: [],
         treatments: [],
         content: {
-            diseases: [],
+            monographs: [],
             treatments: []
         }
     },
@@ -42,39 +48,7 @@ function database(): Promise<lowdb.LowdbAsync<Database>> {
     return lowdb(adapter)
 }
 
-/**
- * Returns all diease-related {@link Directory} that match the query.
- * @param query A predicate for {@link Directory} entries.
- */
-export async function getTherapeutics(query?: (d: Directory) => boolean): Promise<Directory[]> {
-    const db = await database()
-
-    const therapeutics = db.get("diseases")
-
-    if (!query) {
-        return therapeutics.value();
-    } else {
-        return therapeutics.filter(query).value();
-    }
-}
-
-export async function getTherapeuticContent(query?: (e: Entry) => boolean): Promise<Entry[]> {
-    const db = await database()
-
-    const therapeutics = db.get("content").get("diseases")
-
-    if (!query) {
-        return therapeutics.value();
-    } else {
-        return therapeutics.filter(query).value();
-    }
-}
-
-/**
- * Returns all technique-related {@link Directory} that match the query.
- * @param query A predicate for {@link Directory} entries.
- */
-export async function getMateriaMedica(query?: (d: Directory) => boolean): Promise<Directory[]> {
+export async function getTreatmentMetaContent(query?: (d: Directory) => boolean): Promise<Directory[]> {
     const db = await database()
 
     const treatments = db.get("treatments")
@@ -86,7 +60,7 @@ export async function getMateriaMedica(query?: (d: Directory) => boolean): Promi
     }
 }
 
-export async function getMateriaMedicaContent(query?: (e: Entry) => boolean): Promise<Entry[]> {
+export async function getTreatmentContent(query?: (e: Entry) => boolean): Promise<Entry[]> {
     const db = await database()
 
     const treatments = db.get("content").get("treatments")
@@ -95,6 +69,30 @@ export async function getMateriaMedicaContent(query?: (e: Entry) => boolean): Pr
         return treatments.value();
     } else {
         return treatments.filter(query).value();
+    }
+}
+
+export async function getMonographMetaContent(query?: (d: Directory) => boolean): Promise<Directory[]> {
+    const db = await database()
+
+    const monographs = db.get("monographs")
+
+    if (!query) {
+        return monographs.value();
+    } else {
+        return monographs.filter(query).value();
+    }
+}
+
+export async function getMonographContent(query?: (e: Entry) => boolean): Promise<Entry[]> {
+    const db = await database()
+
+    const monographs = db.get("content").get("monographs")
+
+    if (!query) {
+        return monographs.value();
+    } else {
+        return monographs.filter(query).value();
     }
 }
 

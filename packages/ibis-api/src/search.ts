@@ -3,7 +3,7 @@ import { getModality } from "ibis-lib"
 import { default as express, Router } from "express"
 import fuse from "fuse.js"
 
-import { getTherapeutics, getMateriaMedica, Directory } from "./db"
+import { getTreatmentMetaContent, getMonographMetaContent, Directory } from "./db"
 
 const router: Router = express.Router()
 
@@ -25,8 +25,8 @@ router.get("/", async (req, res) => {
     if (!req.query.q) {
         res.send({})
     } else {
-        const t = await getMateriaMedica()
-        const d = await getTherapeutics()
+        const t = await getMonographMetaContent()
+        const d = await getTreatmentMetaContent()
 
         res.send(searchDirectory(req.query.q, [].concat(t, d)))
     }
@@ -107,10 +107,11 @@ router.get("/:sub", async (req, res) => {
 
     switch (sub) {
         case "diseases":
-            entries = await getTherapeutics()
-            break;
         case "treatments":
-            entries = await getMateriaMedica()
+            entries = await getTreatmentMetaContent()
+            break;
+        case "monographs":
+            entries = await getMonographMetaContent()
             break;
         default:
             res.sendStatus(404)

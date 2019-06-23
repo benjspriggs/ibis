@@ -119,15 +119,15 @@ export async function importEntriesFromDisk(): Promise<Database> {
         return directory;
     }
 
-    const diseases = getAllListings("diseases", config.relative.ibisRoot("system", "tx"))
-    const treatments = getAllListings("treatments", config.relative.ibisRoot("system", "rx"))
+    const diseases = getAllListings("treatments", config.relative.ibisRoot("system", "tx"))
+    const monographs = getAllListings("monographs", config.relative.ibisRoot("system", "rx"))
 
     return {
-        "diseases": (await diseases).map(stripContent),
-        "treatments": (await treatments).map(stripContent),
+        "monographs": (await monographs).map(stripContent),
+        "treatments": (await diseases).map(stripContent),
         "content": {
-            "diseases": await diseases,
-            "treatments": await treatments
+            "monographs": await monographs,
+            "treatments": await diseases
         }
     }
 }

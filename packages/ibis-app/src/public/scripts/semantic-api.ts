@@ -6,7 +6,8 @@ declare var $: FomanicJqueryStatic;
 $.api.settings.verbose = true
 
 $.api.settings.api = {
-    'search treatments': `${apiHostname}/data/treatments?q={query}`,
+    'search monographs': `${apiHostname}/data/monographs?q={query}`,
     'search diseases': `${apiHostname}/data/diseases?q={query}&categorize=true`,
+    'search treatments': `${apiHostname}/data/treatments?q={query}&categorize=true`,
     'search': `${apiHostname}/data?q={query}`
 }

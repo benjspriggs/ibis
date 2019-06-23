@@ -1,9 +1,4 @@
-import { HTMLElement, Node, TextNode, parse } from "node-html-parser"
 import { NextFunction, Request, RequestHandler } from "express"
-
-import { flatten } from "lodash"
-import { join, dirname } from "path"
-import { readFileSync } from "fs"
 
 export {
     h2,
@@ -81,86 +76,11 @@ export function getModality(codeOrDisplayName?: string): Modality {
     }
 }
 
-const flattenNode = (node: Node) => {
-    if (node instanceof TextNode) {
-        return [node.rawText.trim()]
-    } else if (node instanceof HTMLElement) {
-        if (node.childNodes[0] instanceof TextNode) {
-            return node.childNodes.slice(0, 10).map(n => n.rawText.trim())
-        }
-    }
-    return []
-}
-
-const possibleNodes = (node: Node) => {
-    if (!node) {
-        return []
-    }
-
-    return flatten(node.childNodes
-        .map(flattenNode)
-        .filter(nodeText => nodeText.every(text => text !== "")))
-}
-
 export interface Header {
     version: string,
     tag: string,
     name: string,
     category: string
-}
-
-export function parseHeaderFromFile(filepath: string): Header {
-    if (typeof filepath === "undefined") {
-        throw new Error("undefined filepath")
-    }
-
-    const buffer = readFileSync(filepath)
-
-    const data = buffer.toString()
-
-    const interestingNode = parseHeader(data);
-
-    const [
-        version,
-        _,
-        tag,
-        name,
-        category
-    ] = interestingNode;
-
-    return ({
-        version: version,
-        tag: tag,
-        name: name,
-        category: category
-    })
-}
-
-const versionPattern = /^-IBIS-(\d+)\.(\d+)\.(\d+)-$/
-
-// TODO: this doesn"t reliably parse the headers for most files
-// @bspriggs investigate
-export function parseHeader(source: string): string[] {
-    const root = parse(source, { noFix: false, lowerCaseTagName: false })
-
-    const htmlRoot = (root.childNodes
-        .find(node => node instanceof HTMLElement) as HTMLElement)
-
-    if (!htmlRoot) {
-        return []
-    }
-
-    const head = htmlRoot.querySelector("HEAD")
-    const body = htmlRoot.querySelector("BODY")
-
-    const interestingNodes: string[] = [].concat(
-        possibleNodes(htmlRoot),
-        possibleNodes(head),
-        possibleNodes(body))
-
-    const first = interestingNodes.findIndex(node => versionPattern.test(node))
-
-    return interestingNodes.slice(first, first + 5).map(s => s.slice())
 }
 
 export const requestLogger: RequestHandler = (req: Request, _, next: NextFunction) => {

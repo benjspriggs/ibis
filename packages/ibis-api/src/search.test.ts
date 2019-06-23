@@ -131,6 +131,7 @@ test("search:directoryFilter:modality:false", (t) => {
     })
 
     t.is(false, f({
+        id: '',
         url: '',
         modality: getModality('home'),
         header: {
@@ -149,6 +150,7 @@ test("search:directoryFilter:modality:true", (t) => {
     })
 
     t.is(true, f({
+        id: '',
         url: '',
         modality: getModality('bota'),
         header: {

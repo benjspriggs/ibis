@@ -1,199 +1,98 @@
-import { HTMLElement, Node, TextNode, parse } from "node-html-parser"
-import { Header, getModality, parseHeaderFromFile } from "ibis-lib"
-
 import { default as express } from "express"
-import { default as fs } from "fs"
-import { isEmpty } from "lodash"
-import { default as path } from "path"
+import { Modality, Header, getModality } from "ibis-lib";
+import { Entry, getMateriaMedica, getTherapeutics } from "./db"
+import isEmpty from "lodash/isEmpty"
 
-const nodeMatches = (condition: RegExp) => (node: Node) => condition.test(node.rawText)
-const childrenContainsDefinitionText = (condition: RegExp) => (node: Node): boolean => node.childNodes.some(nodeMatches(condition))
-const emptyNode = (node: Node) => node.rawText.trim() === ""
+const router = express.Router()
 
-export function getFileInfo(absoluteFilePath: string, modality: string, listing: string[]): Promise<{ filename: string, header: Header }[]> {
-    const promises = listing.map(async (filename: string) => ({
-        modality: modality,
-        filename: filename.slice(),
-        header: parseHeaderFromFile(path.join(absoluteFilePath, modality, filename)),
-    }))
-    return Promise.all(promises)
+async function getModalityResponse(options: {
+    category: string,
+    modality: string,
+}) : Promise<{
+    modality: Modality
+    empty: boolean,
+    meta: {
+        filepath: {
+            relative: string,
+            absolute: string
+        },
+        id: string,
+        header: Header,
+        content: string
+    }[],
+}> {
+    if (!options) {
+        throw new Error("options required for `getModalityResponse`")
+    }
+
+    let entries;
+
+    switch (options.category) {
+        case "rx":
+        case "materia-medica":
+            entries = await getMateriaMedica()
+            break;
+        case "tx":
+        case "therapeutics":
+            entries = await getTherapeutics()
+            break;
+        default:
+            throw new Error(`unknown category ${options.category}`)
+    }
+
+    const meta = entries
+
+    const empty = meta.filter((infoObject) => isEmpty(infoObject.header) || Object.values(infoObject.header).some(val => typeof val === "undefined"))
+
+    return {
+        modality: getModality(options.modality),
+        empty: !isEmpty(empty),
+        meta: meta.map(entry => ({
+            ...entry,
+            filepath: {
+                relative: "",
+                absolute: ""
+            }
+        }))
+    }
 }
 
-export const getListing = (absoluteFilePath: string, modality: string) => new Promise<string[]>((resolve, reject) => {
-    fs.readdir(path.join(absoluteFilePath, modality), (err, items) => {
-        if (err) {
-            return reject(err)
-        }
-        resolve(items.filter(item => !item.startsWith(".")))
-    })
+async function getEntryResponse(options: {
+    category: string,
+    id: string,
+    modality: string
+}): Promise<Entry> {
+    if (!options) {
+        throw new Error("options required for `getModalityResponse`")
+    }
+
+    const predicate = (entry: Entry) => entry.id === options.id
+
+    switch (options.category) {
+        case "rx":
+        case "materia-medica":
+            return (await getMateriaMedica(predicate))[0]
+        case "tx":
+        case "therapeutics":
+            return (await getTherapeutics(predicate))[0]
+        default:
+            throw new Error(`unknown category ${options.category}`)
+    }
+
+}
+
+router.get('/:category/:modality', (req, res, next) => {
+    getModalityResponse(req.params)
+        .then(response => res.send(response))
+        .catch(() => next())
 })
 
-const addModalityListingToLocals: (absoluteFilePath: string) => express.RequestHandler = (absoluteFilePath: string) => async (req, res, next) => {
-    const {
-        modality
-    } = req.params;
+router.get('/:category/:modality/:id', (req, res, next) => {
+    getEntryResponse(req.params)
+        .then(response => res.send(response))
+        .catch(() => next())
+})
 
-    try {
-        const listing = await getListing(absoluteFilePath, modality)
-        res.locals.listing = listing
-        next()
-    } catch (e) {
-        next(e)
-        return
-    }
-}
-
-const trimEmptyNodes = (root: Node): Node | undefined => {
-    if (root.childNodes.length === 0) {
-        if (!emptyNode(root)) {
-            return root
-        } else {
-            return
-        }
-    }
-
-    if (root.childNodes.every(n => emptyNode(n))) {
-        root.childNodes = []
-    } else {
-        const trimmedNodes = root.childNodes.map(trimEmptyNodes)
-        root.childNodes = trimmedNodes.filter(n => typeof n !== "undefined")
-    }
-
-    return root
-}
-
-const trimConsecutive = (childNodes: Node[], tag: string = "BR", maxConsecutive: number = 3): Node[] => {
-    if (childNodes.length === 0) {
-        return childNodes
-    }
-
-    let i = 0;
-
-    return childNodes.reduce((newNodeList, curr) => {
-        if (curr instanceof HTMLElement) {
-            if (curr.tagName === tag) {
-                if (i >= maxConsecutive) {
-                    return newNodeList
-                } else {
-                    ++i
-                }
-            } else {
-                i = 0
-            }
-        } else {
-            i = 0
-        }
-
-        newNodeList.push(curr)
-
-        return newNodeList
-    }, []);
-}
-
-const trimLeft = (condition: RegExp) => {
-    const contains = nodeMatches(condition)
-    const childrenContains = childrenContainsDefinitionText(condition)
-
-    return (root: Node): Node | undefined => {
-        if (root instanceof TextNode) {
-            if (contains(root) || childrenContains(root)) {
-                return root;
-            }
-        } else {
-            const body = root as HTMLElement;
-
-            if (body.childNodes.length === 0 && contains(body)) {
-                console.log("found text: ", body.text)
-                return body;
-            }
-
-            // prune children
-            const answers: boolean[] = body.childNodes.map(n => contains(n) || childrenContains(n))
-
-            const first = answers.findIndex(v => v)
-
-            if (first) {
-                // add the body text
-                const newChildren = body.childNodes.slice(first)
-                body.childNodes = newChildren
-                return trimEmptyNodes(body);
-            }
-
-            console.dir(body.childNodes)
-
-            return body;
-        }
-    }
-}
-
-function handleModalityFileRequest(options: { absoluteFilePath: string, endpoint: string }, afterDefinition: (root: Node) => Node) {
-    return (req: express.Request, res: express.Response) => {
-        const {
-            modality,
-            file
-        } = req.params;
-
-        const filePath = path.join(options.absoluteFilePath, modality, file)
-
-        const data = fs.readFileSync(filePath);
-
-        const root = parse(data.toString(), { noFix: false })
-
-        const body = root.childNodes.find(node => node instanceof HTMLElement)
-
-        const formattedBoy = afterDefinition(body)
-        formattedBoy.childNodes = trimConsecutive(formattedBoy.childNodes)
-
-        res.send({
-            ...parseHeaderFromFile(filePath),
-            modality: modality,
-            filename: file,
-            filepath: filepath(options)(req, modality, file),
-            content: formattedBoy.toString()
-        })
-    };
-}
-
-function resolved(req: express.Request, endpoint: string): ({ relative: string, absolute: string }) {
-    return {
-        relative: endpoint,
-        absolute: `${req.protocol}://${req.headers.host}/${endpoint}`
-    };
-}
-
-const filepath = (options: { endpoint: string }) => (req: express.Request, modality: string, filename: string) => resolved(req, `${options.endpoint}/${modality}/${filename}`)
-
-export const router = (options: { endpoint: string, absoluteFilePath: string, trimLeftPattern?: RegExp }) => {
-    let router = express.Router()
-
-    const afterDefinition = options.trimLeftPattern ? trimLeft(options.trimLeftPattern) : (root: Node) => root
-
-    router.get('/:modality/:file', handleModalityFileRequest(options, afterDefinition))
-
-    router.get("/:modality", addModalityListingToLocals(options.absoluteFilePath), async (req: express.Request, res: express.Response, next: express.NextFunction) => {
-        const {
-            modality
-        } = req.params
-
-        try {
-            const meta = (await getFileInfo(options.absoluteFilePath, modality, res.locals.listing))
-                .map(x => ({ filepath: filepath(options)(req, modality, x.filename), ...x}))
-
-            const empty = meta.filter((infoObject) => isEmpty(infoObject.header) || Object.values(infoObject.header).some(val => typeof val === "undefined"))
-
-            res.send({
-                modality: {
-                    code: modality,
-                    ...getModality(modality)
-                },
-                meta: meta,
-                empty: empty
-            })
-
-        } catch (e) {
-            next(e)
-        }
-    })
-
-    return router
+export {
+    router
 }

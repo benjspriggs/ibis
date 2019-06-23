@@ -181,10 +181,9 @@ app.get("/:route/:modality_code/:resource", (req, res, next) => {
             return
         }
 
-        // TODO: add type safety to API routes
         res.render("single", {
             ...item,
-            title: `${modality.data.displayName} - ${data.name}`,
+            title: `${modality.data.displayName} - ${data.header.name}`,
             needs_modalities: true,
             route: route,
             data: data

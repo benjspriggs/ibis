@@ -91,7 +91,7 @@ router.get("/:sub", async (req, res) => {
         case "diseases":
             entries = await getTherapeutics()
             break;
-        case "therapeutics":
+        case "treatments":
             entries = await getMateriaMedica()
             break;
         default:

@@ -92,8 +92,6 @@ const trimLeft = (condition: RegExp, root: Node): Node => {
     const contains = nodeMatches(condition)
     const childrenContains = childrenContainsDefinitionText(condition)
 
-    console.debug({ contains, childrenContains })
-
     if (root instanceof TextNode) {
         console.debug('root is text node')
         if (contains(root) || childrenContains(root)) {

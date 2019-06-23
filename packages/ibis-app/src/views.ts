@@ -8,7 +8,6 @@ import { router as assets } from "./assets"
 import { join } from "path"
 import { paths } from "./config"
 import { getModality } from "ibis-lib";
-import { readdirSync } from "fs";
 
 const app: Application = express()
 

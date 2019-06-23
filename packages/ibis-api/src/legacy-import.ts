@@ -26,14 +26,6 @@ const possibleNodes = (node: Node) => {
         .filter(nodeText => nodeText.every(text => text !== "")))
 }
 
-export function parseHeaderFromFile(filepath: string): Header {
-    const buffer = readFileSync(filepath)
-
-    const root = parse(buffer.toString(), { lowerCaseTagName: false, noFix: false })
-
-    return parseHeader(root.childNodes.find(node => node instanceof HTMLElement) as HTMLElement);
-}
-
 const versionPattern = /^-IBIS-(\d+)\.(\d+)\.(\d+)-$/
 
 // TODO: this doesn"t reliably parse the headers for most files

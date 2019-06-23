@@ -3,12 +3,12 @@ import { Header, Modality, getModality, modalities } from "ibis-lib"
 import { join } from "path"
 import { config, apiHostname } from "./config"
 import { parseHeader } from "./legacy-import"
-import { default as fs } from "fs"
 import { default as path } from "path"
 
 import BetterFileAsync from "./BetterFileAsync"
 import lowdb from "lowdb"
 import isEmpty from "lodash/isEmpty";
+import { readFileSync, readdir, existsSync } from "fs";
 
 export interface Directory {
     id: string,
@@ -137,7 +137,7 @@ async function getFileInfo(absoluteFilePath: string, modality: string, listing: 
     const allContentParsed = await Promise.all(listing.map(async (filename: string) => {
         const filepather = path.join(absoluteFilePath, modality, filename)
 
-        const content = fs.readFileSync(filepather, { encoding: 'utf-8' })
+        const content = readFileSync(filepather, { encoding: 'utf-8' })
 
         const parsed = parse(content.toString(), { noFix: false, lowerCaseTagName: false })
 
@@ -191,7 +191,7 @@ async function getFileInfo(absoluteFilePath: string, modality: string, listing: 
 }
 
 const getListing = (absoluteFilePath: string, modality: string) => new Promise<string[]>((resolve, reject) => {
-    fs.readdir(path.join(absoluteFilePath, modality), (err, items) => {
+    readdir(path.join(absoluteFilePath, modality), (err, items) => {
         if (err) {
             return reject(err)
         }
@@ -288,7 +288,7 @@ export async function initialize() {
 
     console.debug(`fetching all listings from legacy IBIS directory: '${config.relative.ibisRoot(".")}'`)
 
-    if (!fs.existsSync(config.relative.ibisRoot('.'))) {
+    if (!existsSync(config.relative.ibisRoot('.'))) {
         console.error("no IBIS directory detected, skipping initialization")
     }
 

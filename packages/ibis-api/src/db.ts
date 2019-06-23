@@ -134,7 +134,15 @@ const trimLeft = (condition: RegExp, root: Node): Node => {
     }
 }
 
-async function getFileInfo(absoluteFilePath: string, modality: string, listing: string[]): Promise<{ id: string, header: Header, content: string }[]> {
+async function getFileInfo({ 
+        absoluteFilePath, 
+        modality,
+        listing 
+    }: { 
+        absoluteFilePath: string, 
+        modality: string, 
+        listing: string[]
+    }): Promise<{ id: string, header: Header, content: string }[]> {
     const allContentParsed = await Promise.all(listing.map(async (filename: string) => {
         const filepather = path.join(absoluteFilePath, modality, filename)
 
@@ -270,7 +278,7 @@ async function getAllListings(resourcePrefix: string, abs: string): Promise<Entr
                 listing = await getListing(abs, modality)
             }
 
-            const fileInfos = await getFileInfo(abs, modality, listing)
+            const fileInfos = await getFileInfo({ absoluteFilePath: abs, modality, listing })
             console.debug("done", abs, modality)
 
             return fileInfos.map(f => ({ ...f, url: `${resourcePrefix}/${modality}/${f.id}`, modality: getModality(modality) }))

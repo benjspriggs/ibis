@@ -87,13 +87,13 @@ router.get("/", (req, res) => {
 router.get('/:category/:modality/:id', (req, res, next) => {
     return getEntryResponse(req.params)
         .then(response => res.send(response))
-        .catch(() => res.send(404))
+        .catch(() => res.sendStatus(404))
 })
 
 router.get('/:category/:modality', (req, res, next) => {
     return getModalityResponse(req.params)
         .then(response => res.send(response))
-        .catch(() => res.send(404))
+        .catch(() => res.sendStatus(404))
 })
 
 export {

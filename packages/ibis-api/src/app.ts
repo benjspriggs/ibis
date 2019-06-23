@@ -14,13 +14,13 @@ app.use(cors())
 
 app.use(requestLogger)
 
-app.use("/", entry)
-
 app.get("/modalities", (_, res: express.Response) => {
     res.send(modalities)
 })
 
 app.use("/data", search)
+
+app.use("/", entry)
 
 export {
     app

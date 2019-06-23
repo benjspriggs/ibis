@@ -77,7 +77,7 @@ function formatSearchResponse(query: string, directory: string, results: Directo
         return {
             query,
             directory,
-            results: null
+            results: results
         }
     }
 }

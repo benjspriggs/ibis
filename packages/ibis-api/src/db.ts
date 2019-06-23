@@ -134,16 +134,16 @@ const trimLeft = (condition: RegExp, root: Node): Node => {
     }
 }
 
-async function getFileInfo({ 
-        absoluteFilePath, 
-        modality,
-        listing 
-    }: { 
-        absoluteFilePath: string, 
-        modality: string, 
-        listing: string[]
-    }): Promise<{ id: string, header: Header, content: string }[]> {
-    const allContentParsed = await Promise.all(listing.map(async (filename: string) => {
+async function getFileInfo({
+    absoluteFilePath,
+    modality,
+    listing
+}: {
+    absoluteFilePath: string,
+    modality: string,
+    listing: string[]
+}): Promise<{ id: string, header: Header, content: string }[]> {
+    async function getParsedContent(filename: string) {
         const filepather = path.join(absoluteFilePath, modality, filename)
 
         const content = readFileSync(filepather, { encoding: 'utf-8' })
@@ -159,9 +159,9 @@ async function getFileInfo({
             filepather,
             parsed
         }
-    }))
+    }
 
-    const modifiedBodies = await Promise.all(allContentParsed.map(async ({ filename, parsed, filepather }) => {
+    async function getModifiedEntryBody({ filename, parsed, filepather }: { filename: string, parsed: Node, filepather: string }) {
         const body = parsed.childNodes.find(node => node instanceof HTMLElement) as HTMLElement
 
         if (!body) {
@@ -189,7 +189,9 @@ async function getFileInfo({
             filepather,
             trimmed
         })
-    }))
+    }
+
+    const modifiedBodies = await Promise.all(listing.map(getParsedContent).map(p => p.then(getModifiedEntryBody)))
 
     return modifiedBodies.map(({ filename, trimmed, header }) => ({
         modality: modality,
@@ -310,7 +312,7 @@ export async function initialize() {
     try {
         await Promise.all([
             getAllListings(`${apiHostname}/tx`, config.relative.ibisRoot("system", "tx"))
-                .then(async txs => 
+                .then(async txs =>
                     Promise.all([
                         db.get("diseases").splice(0, 0, ...txs.map(stripContent)).write(),
                         db.get("content").get("diseases").splice(0, 0, ...txs).write()

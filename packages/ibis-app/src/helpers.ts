@@ -78,7 +78,7 @@ exhbs.registerHelper("hostname", (route: any) => {
 })
 
 exhbs.registerHelper("json", (data: any) => {
-    return JSON.stringify(data)
+    return JSON.stringify(data, null, 2)
 })
 
 exhbs.registerHelper("if_present", (value: any, defaultValue: any) => {

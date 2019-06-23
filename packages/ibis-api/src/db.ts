@@ -1,18 +1,12 @@
-import { HTMLElement, Node, TextNode, parse } from "node-html-parser"
-import { Header, Modality, getModality, modalities } from "ibis-lib"
+import { Header, Modality } from "ibis-lib"
 import { join } from "path"
-import { config, apiHostname } from "./config"
-import { parseHeader } from "./legacy-import"
-import { default as path } from "path"
+import { importEntriesFromDisk } from "./legacy-import"
 
 import BetterFileAsync from "./BetterFileAsync"
 import lowdb from "lowdb"
-import isEmpty from "lodash/isEmpty";
-import { readFileSync, readdir, existsSync } from "fs";
 
 export interface Directory {
     id: string,
-    url: string,
     modality: Modality,
     header: Header
 }
@@ -44,171 +38,6 @@ const adapter = new BetterFileAsync<Database>(join(process.cwd(), "db.json"), {
 function database(): Promise<lowdb.LowdbAsync<Database>> {
     return lowdb(adapter)
 }
-
-const nodeMatches = (condition: RegExp) => (node: Node) => condition.test(node.rawText)
-const childrenContainsDefinitionText = (condition: RegExp) => (node: Node): boolean => node.childNodes.some(nodeMatches(condition))
-const emptyNode = (node: Node) => node.rawText.trim() === ""
-
-function trimEmptyNodes(root: Node): Node | undefined {
-    if (root.childNodes.length === 0) {
-        if (!emptyNode(root)) {
-            return root
-        } else {
-            return
-        }
-    }
-
-    if (root.childNodes.every(n => emptyNode(n))) {
-        root.childNodes = []
-    } else {
-        const trimmedNodes = root.childNodes.map(trimEmptyNodes)
-        root.childNodes = trimmedNodes.filter(n => typeof n !== "undefined")
-    }
-
-    return root
-}
-
-function trimConsecutive(childNodes: Node[], tag: string = "BR", maxConsecutive: number = 3): Node[] {
-    if (childNodes.length === 0) {
-        return childNodes
-    }
-
-    let i = 0;
-
-    return childNodes.reduce((newNodeList, curr) => {
-        if (curr instanceof HTMLElement) {
-            if (curr.tagName === tag) {
-                if (i >= maxConsecutive) {
-                    return newNodeList
-                } else {
-                    ++i
-                }
-            } else {
-                i = 0
-            }
-        } else {
-            i = 0
-        }
-
-        newNodeList.push(curr)
-
-        return newNodeList
-    }, []);
-}
-
-const trimLeft = (condition: RegExp, root: Node): Node => {
-    const contains = nodeMatches(condition)
-    const childrenContains = childrenContainsDefinitionText(condition)
-
-    if (root instanceof TextNode) {
-        if (contains(root) || childrenContains(root)) {
-            return root;
-        } else {
-            return;
-        }
-    }
-
-    // console.debug('root is html node')
-    const body = root as HTMLElement;
-
-    if (body.childNodes.length === 0 && contains(body)) {
-        // console.log("found text: ", body.text)
-        return body;
-    }
-
-    // prune children
-    const answers: boolean[] = body.childNodes.map(n => contains(n) || childrenContains(n))
-
-    const indexOfFirstChildContainingPattern = answers.findIndex(v => v)
-
-    // console.debug({ first })
-
-    if (indexOfFirstChildContainingPattern !== -1) {
-        // add the body text
-        // console.debug("updating children and trimming empty nodes ")
-        const newChildren = body.childNodes.slice(indexOfFirstChildContainingPattern)
-        body.childNodes = newChildren
-        return trimEmptyNodes(body);
-    } else {
-        return body;
-    }
-}
-
-async function getFileInfo({
-    absoluteFilePath,
-    modality,
-    listing
-}: {
-    absoluteFilePath: string,
-    modality: string,
-    listing: string[]
-}): Promise<{ id: string, header: Header, content: string }[]> {
-    async function getParsedContent(filename: string) {
-        const filepather = path.join(absoluteFilePath, modality, filename)
-
-        const content = readFileSync(filepather, { encoding: 'utf-8' })
-
-        const parsed = parse(content.toString(), { noFix: false, lowerCaseTagName: false })
-
-        if (!parsed) {
-            throw new Error(`failed to parse content for file at ${filepather}`)
-        }
-
-        return {
-            filename,
-            filepather,
-            parsed
-        }
-    }
-
-    async function getModifiedEntryBody({ filename, parsed, filepather }: { filename: string, parsed: Node, filepather: string }) {
-        const body = parsed.childNodes.find(node => node instanceof HTMLElement) as HTMLElement
-
-        if (!body) {
-            throw new Error(`unable to find HTML element for file at ${filepather}: ${parsed}`)
-        }
-
-        body.childNodes = trimConsecutive(body.childNodes)
-
-        const header = parseHeader(body)
-
-        if (isEmpty(header)) {
-            console.warn("empty header for ", filepather)
-        }
-
-        let trimmed = trimLeft(/[Dd]efinition/, body) as HTMLElement
-
-        if (!trimmed || trimmed.childNodes.length === 0) {
-            console.error("failed trimming left with definition rule on", filepather)
-            process.exit(1)
-        }
-
-        return ({
-            header,
-            filename,
-            filepather,
-            trimmed
-        })
-    }
-
-    const modifiedBodies = await Promise.all(listing.map(getParsedContent).map(p => p.then(getModifiedEntryBody)))
-
-    return modifiedBodies.map(({ filename, trimmed, header }) => ({
-        modality: modality,
-        id: filename.slice(),
-        header: header,
-        content: trimmed.toString() as string
-    }))
-}
-
-const getListing = (absoluteFilePath: string, modality: string) => new Promise<string[]>((resolve, reject) => {
-    readdir(path.join(absoluteFilePath, modality), (err, items) => {
-        if (err) {
-            return reject(err)
-        }
-        resolve(items.filter(item => !item.startsWith(".")))
-    })
-})
 
 /**
  * Returns all diease-related {@link Directory} that match the query.
@@ -266,27 +95,6 @@ export async function getMateriaMedicaContent(query?: (e: Entry) => boolean): Pr
     }
 }
 
-async function getAllListings(resourcePrefix: string, abs: string): Promise<Entry[]> {
-    return ([] as Entry[]).concat(...await Promise.all(
-        Object.keys(modalities).map(async modality => {
-            console.debug("getting", abs, modality)
-
-            let listing: string[];
-
-            try {
-                listing = await getListing(abs, modality)
-            } catch (err) {
-                modality = modality.toUpperCase();
-                listing = await getListing(abs, modality)
-            }
-
-            const fileInfos = await getFileInfo({ absoluteFilePath: abs, modality, listing })
-            console.debug("done", abs, modality)
-
-            return fileInfos.map(f => ({ ...f, url: `${resourcePrefix}/${modality}/${f.id}`, modality: getModality(modality) }))
-        })))
-}
-
 export async function initialize() {
     const db = await database()
 
@@ -297,44 +105,12 @@ export async function initialize() {
         return
     }
 
-    console.debug(`fetching all listings from legacy IBIS directory: '${config.relative.ibisRoot(".")}'`)
-
-    if (!existsSync(config.relative.ibisRoot('.'))) {
-        console.error("no IBIS directory detected, skipping initialization")
-    }
-
-    function stripContent(entry: Entry): Directory {
-        const { content, ...directory } = entry
-
-        return directory;
-    }
-
-    async function fetchEntries(prefix: string, path: string): Promise<Entry[]> {
-        return getAllListings(prefix, path)
-    }
-
-    async function writeEntries(location: "diseases" | "treatments", entries: Entry[]) {
-        return db.get("content").get(location).splice(0, 0, ...entries).write()
-    }
-
-    async function writeDirectories(location: "diseases" | "treatments", entries: Entry[]) {
-        return db.get(location).splice(0, 0, ...entries.map(stripContent)).write()
-    }
-
-    async function write(location: "diseases" | "treatments", entries: Entry[]) {
-        return await Promise.all([
-            writeEntries(location, entries),
-            writeDirectories(location, entries)
-        ])
-    }
-
     try {
-        await Promise.all([
-            fetchEntries(`${apiHostname}/tx`, config.relative.ibisRoot("system", "tx"))
-            .then((entries) => write("diseases", entries)),
-            fetchEntries(`${apiHostname}/rx`, config.relative.ibisRoot("system", "rx"))
-            .then((entries) => write("treatments", entries))
-        ])
+        console.debug(`fetching all listings from legacy IBIS directory`)
+
+        const imported = await importEntriesFromDisk()
+
+        await db.setState(imported).write()
 
         console.debug("initialized")
     } catch (e) {

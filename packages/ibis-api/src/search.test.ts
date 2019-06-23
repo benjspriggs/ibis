@@ -1,4 +1,5 @@
-import { router as search, SearchResult, query, directoryFilter } from "./search"
+import { router as search, SearchResult, query, directoryFilter, formatSearchDirectory } from "./search"
+import { Category } from "./db"
 import { getModality } from "ibis-lib"
 
 import bodyparser from "body-parser"
@@ -132,7 +133,7 @@ test("search:directoryFilter:modality:false", (t) => {
 
     t.is(false, f({
         id: '',
-        url: '',
+        category: "treatments",
         modality: getModality('home'),
         header: {
             version: '',
@@ -151,7 +152,7 @@ test("search:directoryFilter:modality:true", (t) => {
 
     t.is(true, f({
         id: '',
-        url: '',
+        category: "treatments",
         modality: getModality('bota'),
         header: {
             version: '',
@@ -160,4 +161,23 @@ test("search:directoryFilter:modality:true", (t) => {
             category: ''
         }
     }))
+})
+
+test("search:formatSearchDirectory:based off id", (t) => {
+    t.is("/treatments/acup/entryID", formatSearchDirectory({
+        id: "entryID",
+        modality: {
+            code: "acup",
+            data: {
+                "displayName": ""
+            }
+        },
+        category: "treatments",
+        header: {
+            "version": "",
+            "name": "",
+            "tag": "",
+            "category": "acup"
+        }
+    }).url)
 })

@@ -7,7 +7,7 @@ import { trimConsecutive, trimLeft, parseHeader } from "./utils"
 import { Header, modalities, getModality } from "ibis-lib"
 
 import isEmpty from "lodash/isEmpty"
-import { Database, Directory, Entry } from "./../db";
+import { Database, Directory, Entry, Category } from "./../db";
 
 async function getFileInfo({
     absoluteFilePath,
@@ -85,7 +85,7 @@ const getListing = (absoluteFilePath: string, modality: string) => new Promise<s
     })
 })
 
-async function getAllListings(abs: string): Promise<Entry[]> {
+async function getAllListings(category: Category, abs: string): Promise<Entry[]> {
     return ([] as Entry[]).concat(...await Promise.all(
         Object.keys(modalities).map(async modality => {
             console.debug("getting", abs, modality)
@@ -102,7 +102,7 @@ async function getAllListings(abs: string): Promise<Entry[]> {
             const fileInfos = await getFileInfo({ absoluteFilePath: abs, modality, listing })
             console.debug("done", abs, modality)
 
-            return fileInfos.map(f => ({ ...f, modality: getModality(modality) }))
+            return fileInfos.map(f => ({ ...f, modality: getModality(modality), category: category }))
         })))
 }
 
@@ -119,8 +119,8 @@ export async function importEntriesFromDisk(): Promise<Database> {
         return directory;
     }
 
-    const diseases = getAllListings(config.relative.ibisRoot("system", "tx"))
-    const treatments = getAllListings(config.relative.ibisRoot("system", "rx"))
+    const diseases = getAllListings("diseases", config.relative.ibisRoot("system", "tx"))
+    const treatments = getAllListings("treatments", config.relative.ibisRoot("system", "rx"))
 
     return {
         "diseases": (await diseases).map(stripContent),

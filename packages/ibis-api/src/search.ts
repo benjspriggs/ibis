@@ -32,10 +32,24 @@ router.get("/", async (req, res) => {
     }
 })
 
+export interface SearchDirectory extends Directory {
+    /**
+     * The URL that identifies this {@link Directory} on the API.
+     */
+    url: string
+}
+
+export function formatSearchDirectory(directory: Directory): SearchDirectory {
+    return {
+        ...directory,
+        url: `/${directory.category}/${directory.modality.code}/${directory.id}`
+    }
+}
+
 export interface SearchResult {
     query: string,
     directory: string,
-    results: Directory[]
+    results: SearchDirectory[]
 }
 
 export interface CategorizedSearchResult {
@@ -47,13 +61,15 @@ export interface CategorizedSearchResult {
 export interface CategorizedSearchMap {
     [name: string]: {
         name: string,
-        results: Directory[]
+        results: SearchDirectory[]
     }
 }
 
 function formatSearchResponse(query: string, directory: string, results: Directory[], categorize: boolean = false): SearchResult | CategorizedSearchResult {
+    const formattedResults = results.map(formatSearchDirectory)
+
     if (categorize) {
-        const resultsMap = results.reduce<CategorizedSearchMap>((acc, cur) => {
+        const resultsMap = formattedResults.reduce<CategorizedSearchMap>((acc, cur) => {
             const name = cur.modality.data.displayName
 
             if (name in acc) {
@@ -77,7 +93,7 @@ function formatSearchResponse(query: string, directory: string, results: Directo
         return {
             query,
             directory,
-            results: results
+            results: formattedResults
         }
     }
 }

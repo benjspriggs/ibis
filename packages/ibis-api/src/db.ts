@@ -5,8 +5,11 @@ import { importEntriesFromDisk } from "./legacy-import"
 import BetterFileAsync from "./BetterFileAsync"
 import lowdb from "lowdb"
 
+export type Category = "diseases" | "treatments"
+
 export interface Directory {
     id: string,
+    category: Category,
     modality: Modality,
     header: Header
 }

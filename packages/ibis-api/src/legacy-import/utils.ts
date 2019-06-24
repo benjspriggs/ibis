@@ -96,9 +96,10 @@ function pruneChildren(answers: boolean[], body: Node) {
 export const trimLeft = (condition: RegExp, root: Node): Node => {
     const contains = nodeMatches(condition)
     const childrenContains = childrenContainsDefinitionText(condition)
+    const nodeOrChildrenContains = (n: Node) => contains(n) || childrenContains(n)
 
     if (root instanceof TextNode) {
-        return (contains(root) || childrenContains(root)) ? root : undefined;
+        return nodeOrChildrenContains(root) ? root : undefined;
     }
 
     // console.debug('root is html node')
@@ -110,7 +111,7 @@ export const trimLeft = (condition: RegExp, root: Node): Node => {
     }
 
     // prune children
-    const answers: boolean[] = body.childNodes.map(n => contains(n) || childrenContains(n))
+    const answers: boolean[] = body.childNodes.map(nodeOrChildrenContains)
 
     return pruneChildren(answers, body)
 }

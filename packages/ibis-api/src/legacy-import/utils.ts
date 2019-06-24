@@ -68,6 +68,31 @@ export function trimConsecutive(childNodes: Node[], tag: string = "BR", maxConse
     }, []);
 }
 
+/**
+ * Trims all nodes up to the first truthy value, based on {@link answers}.
+ * If {@link answers} is an empty array, or if there are no truthy values,
+ * this will return an unmodified {@link body}.
+ */
+function pruneChildren(answers: boolean[], body: Node) {
+    if (answers.length !== body.childNodes.length) {
+        throw new Error("answers did not match length of childNode array")
+    }
+
+    const indexOfFirstChildContainingPattern = answers.findIndex(v => v)
+
+    // console.debug({ first })
+
+    if (indexOfFirstChildContainingPattern === -1) {
+        return body
+    }
+
+    // add the body text
+    // console.debug("updating children and trimming empty nodes ")
+    const newChildren = body.childNodes.slice(indexOfFirstChildContainingPattern)
+    body.childNodes = newChildren
+    return trimEmptyNodes(body);
+}
+
 export const trimLeft = (condition: RegExp, root: Node): Node => {
     const contains = nodeMatches(condition)
     const childrenContains = childrenContainsDefinitionText(condition)
@@ -87,19 +112,7 @@ export const trimLeft = (condition: RegExp, root: Node): Node => {
     // prune children
     const answers: boolean[] = body.childNodes.map(n => contains(n) || childrenContains(n))
 
-    const indexOfFirstChildContainingPattern = answers.findIndex(v => v)
-
-    // console.debug({ first })
-
-    if (indexOfFirstChildContainingPattern === -1) {
-        return body
-    }
-
-    // add the body text
-    // console.debug("updating children and trimming empty nodes ")
-    const newChildren = body.childNodes.slice(indexOfFirstChildContainingPattern)
-    body.childNodes = newChildren
-    return trimEmptyNodes(body);
+    return pruneChildren(answers, body)
 }
 
 const versionPattern = /^-IBIS-(\d+)\.(\d+)\.(\d+)-$/

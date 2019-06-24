@@ -30,19 +30,12 @@ const emptyNode = (node: Node) => node.rawText.trim() === ""
 
 export function trimEmptyNodes(root: Node): Node | undefined {
     if (root.childNodes.length === 0) {
-        if (!emptyNode(root)) {
-            return root
-        } else {
-            return
-        }
+        return emptyNode(root) ? undefined : root
     }
 
-    if (root.childNodes.every(n => emptyNode(n))) {
-        root.childNodes = []
-    } else {
-        const trimmedNodes = root.childNodes.map(trimEmptyNodes)
-        root.childNodes = trimmedNodes.filter(n => typeof n !== "undefined")
-    }
+    root.childNodes = root.childNodes
+                            .map(trimEmptyNodes)
+                            .filter(n => typeof n !== "undefined")
 
     return root
 }

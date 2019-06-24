@@ -1,6 +1,6 @@
 import { default as express } from "express"
 import { Modality, getModality } from "ibis-lib";
-import { Entry, getMonographMetaContent, getMonographContent, getTreatmentContent, getTreatmentMetaContent } from "./db"
+import { Directory, Entry, getMonographMetaContent, getMonographContent, getTreatmentContent, getTreatmentMetaContent } from "./db"
 import isEmpty from "lodash/isEmpty"
 import { formatSearchDirectory, SearchDirectory } from "./search";
 
@@ -19,15 +19,17 @@ async function getModalityResponse(options: {
     }
 
     let entries;
+    const matchedModality = getModality(options.modality)
+    const predicate = (directory: Directory) => directory.modality.code === matchedModality.code
 
     switch (options.category) {
         case "treatments":
         case "diseases":
         case "therapeutics":
-            entries = await getTreatmentMetaContent()
+            entries = await getTreatmentMetaContent(predicate)
             break;
         case "monographs":
-            entries = await getMonographMetaContent()
+            entries = await getMonographMetaContent(predicate)
             break;
         default:
             throw new Error(`unknown category ${options.category}`)

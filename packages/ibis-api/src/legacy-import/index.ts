@@ -8,6 +8,7 @@ import { modalities, getModality } from "ibis-lib"
 
 import isEmpty from "lodash/isEmpty"
 import { Database, Directory, Entry, Category } from "./../db";
+import flatten = require("lodash/flatten");
 
 type LegacyCategory = "rx" | "tx"
 
@@ -21,13 +22,13 @@ function getCategoryFromLegacy(cat: LegacyCategory): Category {
     }
 }
 
-async function getDeserialized(options: { absoluteFilePath: string }) {
-    const content = readFileSync(options.absoluteFilePath, { encoding: 'utf-8' })
+async function getDeserialized(absoluteFilePath: string) {
+    const content = readFileSync(absoluteFilePath, { encoding: 'utf-8' })
 
     const parsed = parse(content.toString(), { noFix: false, lowerCaseTagName: false })
 
     if (!parsed) {
-        throw new Error(`failed to parse content for file at ${options.absoluteFilePath}`)
+        throw new Error(`failed to parse content for file at ${absoluteFilePath}`)
     }
 
     return parsed
@@ -73,8 +74,10 @@ const getListing = (absoluteFilePath: string, modality: string) => new Promise<s
 async function getAllListings(category: LegacyCategory): Promise<Entry[]> {
     const abs = config.relative.ibisRoot("system", category)
 
-    return ([] as Entry[]).concat(...await Promise.all(
-        Object.keys(modalities).map(async modality => {
+    const modalityCodes = Object.keys(modalities)
+
+    return flatten(await Promise.all(
+        modalityCodes.map(async modality => {
             console.debug("getting", abs, modality)
 
             let listing: string[];
@@ -86,15 +89,11 @@ async function getAllListings(category: LegacyCategory): Promise<Entry[]> {
                 listing = await getListing(abs, modality)
             }
 
-            const intermediate = listing.map(filename => ({ 
-                absoluteFilePath: join(abs, modality, filename),
-                filename, 
-            }))
-
-            const withParsedContent = await Promise.all(intermediate.map(async (i) => ({
-                ...i,
-                parsed: await getDeserialized(i),
-            })))
+            const withParsedContent = await Promise.all(
+                listing.map(async (filename) => ({
+                    filename, 
+                    parsed: await getDeserialized(join(abs, modality, filename)),
+                })))
 
             console.log("finished parsing content for entries in modality", category, modality)
 

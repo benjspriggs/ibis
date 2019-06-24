@@ -42,6 +42,7 @@
     "tap": true,
     "files": [
       "dist/**/*.test.js"
-    ]
+    ],
+    "timeout": "5s"
   }
 }

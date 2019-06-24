@@ -18,8 +18,14 @@ async function getModalityResponse(options: {
         throw new Error("options required for `getModalityResponse`")
     }
 
-    let entries;
     const matchedModality = getModality(options.modality)
+
+    if (!matchedModality) {
+        throw new Error(`unknown modality '${options.modality}'`)
+    }
+
+    let entries;
+
     const predicate = (directory: Directory) => directory.modality.code === matchedModality.code
 
     switch (options.category) {

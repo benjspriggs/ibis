@@ -1,10 +1,26 @@
 import "./semantic-api"
 import { CategorizedSearchResult, SearchResult } from "ibis-api"
 import { Searchable } from "fomantic-ui"
+import { SearchDirectory } from "ibis-api/dist/search";
 
 declare var $: JQueryStatic
 
 $(document).ready(() => {
+    function annotateSearchDirectory(result: SearchDirectory) {
+        return ({
+            ...result,
+            category: result.modality.data.displayName,
+            title: result.header.name
+        })
+    }
+
+    function annotateSearchResult(data: any) {
+        return ({
+            ...data,
+            results: data.results.map(annotateSearchDirectory)
+        })
+    }
+
     $("#modality-menu-toggle").click(() => {
         let menu: any = $("#modality-menu") as any;
         if (menu) {
@@ -21,16 +37,7 @@ $(document).ready(() => {
 
     ($(".ui.search") as Searchable).search({
         apiSettings: {
-            onResponse: (data: SearchResult) => {
-                return ({
-                    ...data,
-                    results: data.results.map(result => ({
-                        ...result,
-                        category: result.modality.data.displayName,
-                        title: result.header.name
-                    }))
-                })
-            }
+            onResponse: annotateSearchResult
         }
     });
 
@@ -42,14 +49,7 @@ $(document).ready(() => {
                     ...data,
                     results: Object.keys(data.results).reduce((acc: any, category) => {
                         const d = data.results[category]
-                        acc[category] = ({
-                            ...d,
-                            results: d.results.map(result => ({
-                                ...result,
-                                category: result.modality.data.displayName,
-                                title: result.header.name
-                            }))
-                        })
+                        acc[category] = annotateSearchResult(d)
                         return acc
                     }, {})
                 })

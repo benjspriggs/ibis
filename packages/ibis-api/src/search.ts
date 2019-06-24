@@ -3,7 +3,7 @@ import { getModality } from "ibis-lib"
 import { default as express, Router } from "express"
 import fuse from "fuse.js"
 
-import { getMetaContent, Directory, getDirectoryIdentifier, getContent, getCategoryFromRequestString } from "./db"
+import { getMetaContent, Directory, getDirectoryIdentifier, getCategoryFromRequestString, Category } from "./db"
 import flatten = require("lodash/flatten");
 
 const router: Router = express.Router()
@@ -24,14 +24,16 @@ const modalityPattern = /m(?:odality)?:(\w+|".*?"|".*?")/g
 
 router.get("/", async (req, res) => {
     if (!req.query.q) {
-        res.send({})
+        res.sendStatus(204)
     } else {
         const entries = await Promise.all([
             getMetaContent("monographs"),
             getMetaContent("treatments")
         ])
 
-        res.send(searchDirectory(req.query.q, flatten(entries)))
+        const results = searchDirectory(req.query.q, flatten(entries))
+
+        res.send(results)
     }
 })
 
@@ -106,7 +108,14 @@ router.get("/:sub", async (req, res) => {
         sub
     } = req.params
 
-    const category = getCategoryFromRequestString(sub)
+    let category: Category;
+
+    try {
+        category = getCategoryFromRequestString(sub)
+    } catch (e) {
+        res.sendStatus(404)
+        return
+    }
 
     const entries = await getMetaContent(category)
 

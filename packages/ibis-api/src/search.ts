@@ -3,7 +3,7 @@ import { getModality } from "ibis-lib"
 import { default as express, Router } from "express"
 import fuse from "fuse.js"
 
-import { getTreatmentMetaContent, getMonographMetaContent, Directory } from "./db"
+import { getTreatmentMetaContent, getMonographMetaContent, Directory, getDirectoryIdentifier } from "./db"
 
 const router: Router = express.Router()
 
@@ -42,7 +42,7 @@ export interface SearchDirectory extends Directory {
 export function formatSearchDirectory(directory: Directory): SearchDirectory {
     return {
         ...directory,
-        url: `/${directory.category}/${directory.modality.code}/${directory.id}`
+        url: getDirectoryIdentifier(directory)
     }
 }
 

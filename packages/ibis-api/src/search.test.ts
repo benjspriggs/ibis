@@ -1,5 +1,4 @@
-import { router as search, SearchResult, query, directoryFilter, formatSearchDirectory } from "./search"
-import { Category } from "./db"
+import { router as search, SearchResult, query, directoryFilter } from "./search"
 import { getModality } from "ibis-lib"
 
 import bodyparser from "body-parser"
@@ -14,70 +13,69 @@ const getApp = () => {
     return app
 }
 
-const getAppAndAssertResponse = (url: string, withResponse: (_: request.Response) => void) => 
+const getAppAndAssertResponse = (url: string, withResponse: (_: request.Response) => Promise<void>) =>
     request(getApp()).get(url)
         .then((r) => {
-            withResponse(r)
+            return withResponse(r)
         })
 
-test("search:app:/", (t) => 
-    getAppAndAssertResponse("/", res => {
+test("search:app:/", async (t) =>
+    await getAppAndAssertResponse("/", async res => {
+        t.is(res.status, 204)
+    })
+)
+
+test("search:app:/:query", async (t) =>
+    await getAppAndAssertResponse("/?q=string", async res => {
         t.is(res.status, 200)
         t.not(res.body, undefined)
     })
 )
 
-test("search:app:/:query", (t) =>
-    getAppAndAssertResponse("/?q=string", res => {
-        t.is(res.status, 200)
-        t.not(res.body, undefined)
-    })
-)
-
-test("search:app:/diseases", (t) => 
-    getAppAndAssertResponse("/diseases", res => {
+test("search:app:/diseases", async (t) =>
+    await getAppAndAssertResponse("/diseases", async res => {
         t.is(res.status, 200)
         t.is((res.body as SearchResult).directory, "diseases")
     })
 )
 
-test("search:app:/treatments", (t) => 
-    getAppAndAssertResponse("/treatments", res => {
+test("search:app:/treatments", async (t) =>
+    await getAppAndAssertResponse("/treatments", async res => {
         t.is(res.status, 200)
         t.is((res.body as SearchResult).directory, "treatments")
     })
 )
 
-test("search:app:/treatments:categorized", (t) => 
-    getAppAndAssertResponse("/treatments?categorize=true", res => {
+test("search:app:/treatments:categorized", async (t) =>
+    await getAppAndAssertResponse("/treatments?categorize=true", async res => {
         t.is(res.status, 200)
         t.false(Array.isArray(res.body.results))
     })
 )
 
-test("search:app:/diseases:categorized", (t) =>
-    getAppAndAssertResponse("/diseases?categorize=true", res => {
+test("search:app:/diseases:categorized", async (t) =>
+    await getAppAndAssertResponse("/diseases?categorize=true", async res => {
         t.is(res.status, 200)
         t.false(Array.isArray(res.body.results))
     })
 )
 
-test("search:app:/treatments:not categorized", (t) =>
-    getAppAndAssertResponse("/treatments?categorize=false", res => {
+test("search:app:/treatments:not categorized", async (t) =>
+    await getAppAndAssertResponse("/treatments?categorize=false", async res => {
         t.is(res.status, 200)
         t.true(Array.isArray(res.body.results))
     })
 )
 
-test("search:app:/diseases:not categorized", (t) =>
-    getAppAndAssertResponse("/diseases?categorize=false", res => {
+test("search:app:/diseases:not categorized", async (t) =>
+    getAppAndAssertResponse("/diseases?categorize=false", async res => {
         t.is(res.status, 200)
         t.true(Array.isArray(res.body.results))
     })
 )
 
-test("search:app:/foobar", (t) => 
-    getAppAndAssertResponse("/foobar", res => {
+test("search:app:/foobar", async (t) =>
+    await getAppAndAssertResponse("/foobar", async res => {
         t.is(res.status, 404)
     })
 )
@@ -161,23 +159,4 @@ test("search:directoryFilter:modality:true", (t) => {
             category: ''
         }
     }))
-})
-
-test("search:formatSearchDirectory:based off id", (t) => {
-    t.is("/treatments/acup/entryID", formatSearchDirectory({
-        id: "entryID",
-        modality: {
-            code: "acup",
-            data: {
-                "displayName": ""
-            }
-        },
-        category: "treatments",
-        header: {
-            "version": "",
-            "name": "",
-            "tag": "",
-            "category": "acup"
-        }
-    }).url)
 })

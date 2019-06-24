@@ -4,76 +4,61 @@ import { readdir, readFileSync, existsSync } from "fs";
 import { join } from "path";
 import { trimConsecutive, trimLeft, parseHeader } from "./utils"
 
-import { Header, modalities, getModality } from "ibis-lib"
+import { Header, modalities, getModality, Modality } from "ibis-lib"
 
 import isEmpty from "lodash/isEmpty"
-import { Database, Directory, Entry, Category } from "./../db";
+import { Database, Directory, Entry, Category, getDirectoryIdentifier } from "./../db";
 
-async function getFileInfo({
-    absoluteFilePath,
-    modality,
-    listing
-}: {
-    absoluteFilePath: string,
-    modality: string,
-    listing: string[]
-}): Promise<{ id: string, header: Header, content: string }[]> {
-    async function getParsedContent(filename: string) {
-        const filepather = join(absoluteFilePath, modality, filename)
+type LegacyCategory = "rx" | "tx"
 
-        const content = readFileSync(filepather, { encoding: 'utf-8' })
+function getCategoryFromLegacy(cat: LegacyCategory): Category {
+    if (cat === "tx") {
+        return "treatments"
+    } else if (cat === "rx") {
+        return "monographs"
+    } else {
+        throw new Error(`unknown legacy category '${cat}'`)
+    }
+}
 
-        const parsed = parse(content.toString(), { noFix: false, lowerCaseTagName: false })
+async function getDeserialized(options: { absoluteFilePath: string }) {
+    const content = readFileSync(options.absoluteFilePath, { encoding: 'utf-8' })
 
-        if (!parsed) {
-            throw new Error(`failed to parse content for file at ${filepather}`)
-        }
+    const parsed = parse(content.toString(), { noFix: false, lowerCaseTagName: false })
 
-        return {
-            filename,
-            filepather,
-            parsed
-        }
+    if (!parsed) {
+        throw new Error(`failed to parse content for file at ${options.absoluteFilePath}`)
     }
 
-    async function getModifiedEntryBody({ filename, parsed, filepather }: { filename: string, parsed: Node, filepather: string }) {
-        const body = parsed.childNodes.find(node => node instanceof HTMLElement) as HTMLElement
+    return parsed
+}
 
-        if (!body) {
-            throw new Error(`unable to find HTML element for file at ${filepather}: ${parsed}`)
-        }
+async function parseAndTrim(options: { parsed: Node }) {
+    const body = options.parsed.childNodes.find(node => node instanceof HTMLElement) as HTMLElement
 
-        body.childNodes = trimConsecutive(body.childNodes)
-
-        const header = parseHeader(body)
-
-        if (isEmpty(header)) {
-            console.warn("empty header for ", filepather)
-        }
-
-        let trimmed = trimLeft(/[Dd]efinition/, body) as HTMLElement
-
-        if (!trimmed || trimmed.childNodes.length === 0) {
-            console.error("failed trimming left with definition rule on", filepather)
-            process.exit(1)
-        }
-
-        return ({
-            header,
-            filename,
-            filepather,
-            trimmed
-        })
+    if (!body) {
+        throw new Error(`unable to find HTML element for content`)
     }
 
-    const modifiedBodies = await Promise.all(listing.map(getParsedContent).map(p => p.then(getModifiedEntryBody)))
+    body.childNodes = trimConsecutive(body.childNodes)
 
-    return modifiedBodies.map(({ filename, trimmed, header }) => ({
-        modality: modality,
-        id: filename.slice(),
-        header: header,
-        content: trimmed.toString() as string
-    }))
+    const header = parseHeader(body)
+
+    if (isEmpty(header)) {
+        console.warn("empty header")
+    }
+
+    let trimmed = trimLeft(/[Dd]efinition/, body) as HTMLElement
+
+    if (!trimmed || trimmed.childNodes.length === 0) {
+        console.error("failed trimming left with definition rule")
+        process.exit(1)
+    }
+
+    return ({
+        header,
+        content: trimmed.toString()
+    })
 }
 
 const getListing = (absoluteFilePath: string, modality: string) => new Promise<string[]>((resolve, reject) => {
@@ -85,7 +70,9 @@ const getListing = (absoluteFilePath: string, modality: string) => new Promise<s
     })
 })
 
-async function getAllListings(category: Category, abs: string): Promise<Entry[]> {
+async function getAllListings(category: LegacyCategory): Promise<Entry[]> {
+    const abs = config.relative.ibisRoot("system", category)
+
     return ([] as Entry[]).concat(...await Promise.all(
         Object.keys(modalities).map(async modality => {
             console.debug("getting", abs, modality)
@@ -99,10 +86,24 @@ async function getAllListings(category: Category, abs: string): Promise<Entry[]>
                 listing = await getListing(abs, modality)
             }
 
-            const fileInfos = await getFileInfo({ absoluteFilePath: abs, modality, listing })
-            console.debug("done", abs, modality)
+            const intermediate = listing.map(filename => ({ 
+                absoluteFilePath: join(abs, modality, filename),
+                filename, 
+            }))
 
-            return fileInfos.map(f => ({ ...f, modality: getModality(modality), category: category }))
+            const withParsedContent = await Promise.all(intermediate.map(async (i) => ({
+                ...i,
+                parsed: await getDeserialized(i),
+            })))
+
+            console.log("finished parsing content for entries in modality", category, modality)
+
+            return await Promise.all(withParsedContent.map((async content => ({
+                ...await parseAndTrim(content),
+                id: content.filename,
+                category: getCategoryFromLegacy(category),
+                modality: getModality(modality)
+            }))))
         })))
 }
 
@@ -119,8 +120,8 @@ export async function importEntriesFromDisk(): Promise<Database> {
         return directory;
     }
 
-    const diseases = getAllListings("treatments", config.relative.ibisRoot("system", "tx"))
-    const monographs = getAllListings("monographs", config.relative.ibisRoot("system", "rx"))
+    const diseases = getAllListings("tx")
+    const monographs = getAllListings("rx")
 
     return {
         "monographs": (await monographs).map(stripContent),

@@ -7,6 +7,19 @@ import lowdb from "lowdb"
 
 export type Category = "monographs" | "treatments"
 
+export function getCategoryFromRequestString(category: string): Category {
+    switch (category) {
+        case "treatments":
+        case "diseases":
+        case "therapeutics":
+            return "treatments";
+        case "monographs":
+            return "monographs"
+        default:
+            throw new Error(`unknown category '${category}'`)
+    }
+}
+
 export interface Directory {
     id: string,
     category: Category,
@@ -52,10 +65,10 @@ function database(): Promise<lowdb.LowdbAsync<Database>> {
     return lowdb(adapter)
 }
 
-export async function getTreatmentMetaContent(query?: (d: Directory) => boolean): Promise<Directory[]> {
+export async function getMetaContent(category: Category, query?: (d: Directory) => boolean): Promise<Directory[]> {
     const db = await database()
 
-    const treatments = db.get("treatments")
+    const treatments = db.get(category)
 
     if (!query) {
         return treatments.value();
@@ -64,39 +77,15 @@ export async function getTreatmentMetaContent(query?: (d: Directory) => boolean)
     }
 }
 
-export async function getTreatmentContent(query?: (e: Entry) => boolean): Promise<Entry[]> {
+export async function getContent(category: Category, query?: (e: Entry) => boolean): Promise<Entry[]> {
     const db = await database()
 
-    const treatments = db.get("content").get("treatments")
+    const treatments = db.get("content").get(category)
 
     if (!query) {
         return treatments.value();
     } else {
         return treatments.filter(query).value();
-    }
-}
-
-export async function getMonographMetaContent(query?: (d: Directory) => boolean): Promise<Directory[]> {
-    const db = await database()
-
-    const monographs = db.get("monographs")
-
-    if (!query) {
-        return monographs.value();
-    } else {
-        return monographs.filter(query).value();
-    }
-}
-
-export async function getMonographContent(query?: (e: Entry) => boolean): Promise<Entry[]> {
-    const db = await database()
-
-    const monographs = db.get("content").get("monographs")
-
-    if (!query) {
-        return monographs.value();
-    } else {
-        return monographs.filter(query).value();
     }
 }
 

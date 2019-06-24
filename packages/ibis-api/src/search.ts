@@ -3,7 +3,8 @@ import { getModality } from "ibis-lib"
 import { default as express, Router } from "express"
 import fuse from "fuse.js"
 
-import { getTreatmentMetaContent, getMonographMetaContent, Directory, getDirectoryIdentifier } from "./db"
+import { getMetaContent, Directory, getDirectoryIdentifier, getContent, getCategoryFromRequestString } from "./db"
+import flatten = require("lodash/flatten");
 
 const router: Router = express.Router()
 
@@ -25,10 +26,12 @@ router.get("/", async (req, res) => {
     if (!req.query.q) {
         res.send({})
     } else {
-        const t = await getMonographMetaContent()
-        const d = await getTreatmentMetaContent()
+        const entries = await Promise.all([
+            getMetaContent("monographs"),
+            getMetaContent("treatments")
+        ])
 
-        res.send(searchDirectory(req.query.q, [].concat(t, d)))
+        res.send(searchDirectory(req.query.q, flatten(entries)))
     }
 })
 
@@ -103,20 +106,9 @@ router.get("/:sub", async (req, res) => {
         sub
     } = req.params
 
-    let entries;
+    const category = getCategoryFromRequestString(sub)
 
-    switch (sub) {
-        case "diseases":
-        case "treatments":
-            entries = await getTreatmentMetaContent()
-            break;
-        case "monographs":
-            entries = await getMonographMetaContent()
-            break;
-        default:
-            res.sendStatus(404)
-            return
-    }
+    const entries = await getMetaContent(category)
 
     const {
         q,

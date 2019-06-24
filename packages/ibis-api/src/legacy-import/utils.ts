@@ -73,11 +73,7 @@ export const trimLeft = (condition: RegExp, root: Node): Node => {
     const childrenContains = childrenContainsDefinitionText(condition)
 
     if (root instanceof TextNode) {
-        if (contains(root) || childrenContains(root)) {
-            return root;
-        } else {
-            return;
-        }
+        return (contains(root) || childrenContains(root)) ? root : undefined;
     }
 
     // console.debug('root is html node')
@@ -95,15 +91,15 @@ export const trimLeft = (condition: RegExp, root: Node): Node => {
 
     // console.debug({ first })
 
-    if (indexOfFirstChildContainingPattern !== -1) {
-        // add the body text
-        // console.debug("updating children and trimming empty nodes ")
-        const newChildren = body.childNodes.slice(indexOfFirstChildContainingPattern)
-        body.childNodes = newChildren
-        return trimEmptyNodes(body);
-    } else {
-        return body;
+    if (indexOfFirstChildContainingPattern === -1) {
+        return body
     }
+
+    // add the body text
+    // console.debug("updating children and trimming empty nodes ")
+    const newChildren = body.childNodes.slice(indexOfFirstChildContainingPattern)
+    body.childNodes = newChildren
+    return trimEmptyNodes(body);
 }
 
 const versionPattern = /^-IBIS-(\d+)\.(\d+)\.(\d+)-$/

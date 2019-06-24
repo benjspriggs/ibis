@@ -84,8 +84,8 @@
     ]
   },
   "dependencies": {
-    "ibis-api": "file:packages\\ibis-api",
-    "ibis-app": "file:packages\\ibis-app",
-    "ibis-lib": "file:packages\\ibis-lib"
+    "@ibis-app/api": "file:packages/ibis-api",
+    "@ibis-app/app": "file:packages/ibis-app",
+    "@ibis-app/lib": "file:packages/ibis-lib"
   }
 }

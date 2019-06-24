@@ -16,8 +16,8 @@
   "author": "Ben Spriggs",
   "license": "ISC",
   "dependencies": {
-    "@ibis-app/api": "^0.0.3",
-    "@ibis-app/lib": "^0.0.3",
+    "@ibis-app/api": "file:../ibis-api",
+    "@ibis-app/lib": "file:../ibis-lib",
     "cors": "^2.8.5",
     "express": "^4.16.4",
     "express-hbs": "^2.1.2",

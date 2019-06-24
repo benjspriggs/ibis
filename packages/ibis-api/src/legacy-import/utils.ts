@@ -24,8 +24,8 @@ export const possibleNodes = (node: Node) => {
         .filter(nodeText => nodeText.every(text => text !== "")))
 }
 
-const nodeMatches = (condition: RegExp) => (node: Node) => condition.test(node.rawText)
-const childrenContainsDefinitionText = (condition: RegExp) => (node: Node): boolean => node.childNodes.some(nodeMatches(condition))
+const nodeMatches = (condition: RegExp, node: Node) => condition.test(node.rawText)
+const childrenContainsDefinitionText = (condition: RegExp, node: Node): boolean => node.childNodes.some(node => nodeMatches(condition, node))
 const emptyNode = (node: Node) => node.rawText.trim() === ""
 
 export function trimEmptyNodes(root: Node): Node | undefined {
@@ -94,9 +94,7 @@ function pruneChildren(answers: boolean[], body: Node) {
 }
 
 export const trimLeft = (condition: RegExp, root: Node): Node => {
-    const contains = nodeMatches(condition)
-    const childrenContains = childrenContainsDefinitionText(condition)
-    const nodeOrChildrenContains = (n: Node) => contains(n) || childrenContains(n)
+    const nodeOrChildrenContains = (n: Node) => nodeMatches(condition, n) || childrenContainsDefinitionText(condition, n)
 
     if (root instanceof TextNode) {
         return nodeOrChildrenContains(root) ? root : undefined;
@@ -105,7 +103,7 @@ export const trimLeft = (condition: RegExp, root: Node): Node => {
     // console.debug('root is html node')
     const body = root as HTMLElement;
 
-    if (body.childNodes.length === 0 && contains(body)) {
+    if (body.childNodes.length === 0) {
         // console.log("found text: ", body.text)
         return body;
     }

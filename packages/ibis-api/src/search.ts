@@ -68,29 +68,29 @@ export interface CategorizedSearchMap {
     }
 }
 
+function reduceSearchResults(acc: CategorizedSearchMap, cur: SearchDirectory): CategorizedSearchMap {
+    const name = cur.modality.data.displayName
+
+    if (name in acc) {
+        acc[name].results.push(cur)
+    } else {
+        acc[name] = {
+            name: name,
+            results: [cur]
+        }
+    }
+
+    return acc
+}
+
 function formatSearchResponse(query: string, directory: string, results: Directory[], categorize: boolean = false): SearchResult | CategorizedSearchResult {
     const formattedResults = results.map(formatSearchDirectory)
 
     if (categorize) {
-        const resultsMap = formattedResults.reduce<CategorizedSearchMap>((acc, cur) => {
-            const name = cur.modality.data.displayName
-
-            if (name in acc) {
-                acc[name].results.push(cur)
-            } else {
-                acc[name] = {
-                    name: name,
-                    results: [cur]
-                }
-            }
-
-            return acc
-        }, {})
-
         return {
             query,
             directory,
-            results: resultsMap
+            results: formattedResults.reduce<CategorizedSearchMap>(reduceSearchResults, {})
         }
     } else {
         return {

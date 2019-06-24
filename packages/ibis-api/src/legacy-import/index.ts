@@ -4,10 +4,10 @@ import { readdir, readFileSync, existsSync } from "fs";
 import { join } from "path";
 import { trimConsecutive, trimLeft, parseHeader } from "./utils"
 
-import { Header, modalities, getModality, Modality } from "ibis-lib"
+import { modalities, getModality } from "ibis-lib"
 
 import isEmpty from "lodash/isEmpty"
-import { Database, Directory, Entry, Category, getDirectoryIdentifier } from "./../db";
+import { Database, Directory, Entry, Category } from "./../db";
 
 type LegacyCategory = "rx" | "tx"
 

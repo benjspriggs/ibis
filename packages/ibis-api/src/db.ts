@@ -33,6 +33,10 @@ export interface Database {
     }
 }
 
+export function getDirectoryIdentifier(directory: { category: Category, modality: Modality, id: string }): string {
+    return `/${directory.category}/${directory.modality.code}/${directory.id}`
+}
+
 const adapter = new BetterFileAsync<Database>(join(process.cwd(), "db.json"), {
     defaultValue: {
         monographs: [],

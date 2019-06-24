@@ -5,7 +5,7 @@
   "scripts": {
     "start": "lerna run --stream start --parallel",
     "build": "lerna run --stream build",
-    "build:semantic": "lerna run --stream build:semantic --scope ibis-app",
+    "build:semantic": "lerna run --stream build:semantic",
     "build:fast": "lerna run --stream build:fast",
     "compress": "lerna run --stream compress",
     "test": "lerna run --stream test --parallel",
